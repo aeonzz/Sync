@@ -19,7 +19,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { SignInValidation } from "@/lib/validations/user";
 import { signIn } from "next-auth/react";
-import Loader from "../ui/loader";
+import Loader from "../loaders/loader";
 import { Card } from "../ui/card";
 
 const SignInForm = () => {

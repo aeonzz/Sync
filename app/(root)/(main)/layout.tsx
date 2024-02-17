@@ -4,6 +4,11 @@ import SessionProvider from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { Metadata } from "next";
 import React from "react";
+import LeftSideBar from "@/components/navigation/left-sidebar";
+import { Inter } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Sync",
@@ -17,7 +22,7 @@ export default function AppLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-background antialiased">
+      <body className={cn("bg-background", inter.className)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -26,7 +31,10 @@ export default function AppLayout({
         >
           <SessionProvider>
             <QueryClientProvder>
-              {children}
+              <main className="relative flex h-auto w-screen justify-between px-0">
+                <LeftSideBar />
+                {children}
+              </main>
               <Toaster richColors />
             </QueryClientProvder>
           </SessionProvider>
