@@ -61,7 +61,7 @@ const SignUpForm = () => {
         toast.success("Registration Successful", {
           description: data.message,
         });
-        router.push("/sign-in");
+        router.push("/login");
       } else {
         setIsLoading(false);
         toast.error("Uh oh! Something went wrong.", {

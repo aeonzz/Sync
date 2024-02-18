@@ -7,6 +7,7 @@ import React from "react";
 import LeftSideBar from "@/components/navigation/left-sidebar";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { EdgeStoreProvider } from "@/lib/edgestore";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,10 +32,12 @@ export default function AppLayout({
         >
           <SessionProvider>
             <QueryClientProvder>
-              <main className="relative flex h-auto w-screen justify-between px-0">
-                <LeftSideBar />
-                {children}
-              </main>
+              <EdgeStoreProvider>
+                <main className="relative flex h-auto w-screen justify-between px-0">
+                  <LeftSideBar />
+                  {children}
+                </main>
+              </EdgeStoreProvider>
               <Toaster richColors />
             </QueryClientProvder>
           </SessionProvider>

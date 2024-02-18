@@ -22,7 +22,7 @@ const Login = async () => {
         href="/sign-up"
         className={cn(
           buttonVariants({ variant: "link" }),
-          "absolute right-5 top-5 text-xs text-blue-500",
+          "absolute right-5 top-5 text-xs text-blue-500 z-50",
         )}
       >
         Siginup
