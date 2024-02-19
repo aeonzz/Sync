@@ -10,12 +10,11 @@ import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const variants = {
-  base: "relative rounded-md flex justify-center items-center flex-col cursor-pointer min-h-[150px] min-w-[200px] bg-card transition-colors border duration-200 ease-in-out",
+  base: "relative rounded-md flex justify-center items-center flex-col cursor-pointer min-h-[150px] min-w-[200px] bg-card transition-colors duration-200 ease-in-out",
   image:
     "border-0 p-0 w-full h-full relative shadow-md bg-slate-200 dark:bg-slate-900 rounded-md",
   active: "border-2",
-  disabled:
-    "bg-gray-200 border-gray-300 cursor-default pointer-events-none bg-opacity-30 dark:bg-gray-700",
+  disabled: "bg-background cursor-default pointer-events-none",
   accept: "border border-blue-500 bg-blue-500 bg-opacity-10",
   reject: "border border-red-700 bg-red-700 bg-opacity-10",
 };
@@ -146,11 +145,12 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div>
-        <ScrollArea className={cn(
-          value?.length !== 0 ? "h-[250px] p-3" : "h-[150px]",
-          "flex flex-col w-full bg-card rounded-md"
-        )}>
-          
+        <ScrollArea
+          className={cn(
+            value?.length !== 0 ? "h-[200px] p-3" : "h-[150px]",
+            "flex w-full flex-col rounded-md bg-card",
+          )}
+        >
           {/* Dropzone */}
           {(!value || value.length < (dropzoneOptions?.maxFiles ?? 0)) && (
             <div
@@ -181,7 +181,7 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
           {value?.map(({ file, progress }, index) => (
             <div
               key={index}
-              className={variants.image + " aspect-square h-full my-3"}
+              className={variants.image + " relative my-3 aspect-square h-full"}
             >
               <img
                 className="h-full w-full rounded-md object-cover"
@@ -195,22 +195,18 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
                 </div>
               )}
               {/* Remove Image Icon */}
-              {imageUrls[index] && !disabled && progress === "PENDING" && (
-                <div
-                  className="group absolute right-0 top-0 -translate-y-1/4 translate-x-1/4 transform"
+              {imageUrls[index] && !disabled && (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="group absolute right-0 top-0 rounded-full bg-background/50"
                   onClick={(e) => {
                     e.stopPropagation();
                     void onChange?.(value.filter((_, i) => i !== index) ?? []);
                   }}
                 >
-                  <div className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border border-solid border-gray-500 bg-white transition-all duration-300 hover:h-6 hover:w-6 dark:border-gray-400 dark:bg-black">
-                    <X
-                      className="text-gray-500 dark:text-gray-400"
-                      width={16}
-                      height={16}
-                    />
-                  </div>
-                </div>
+                  <X className="h-5 w-5 group-active:scale-95" />
+                </Button>
               )}
             </div>
           ))}

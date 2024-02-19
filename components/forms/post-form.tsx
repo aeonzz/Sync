@@ -5,7 +5,7 @@ import { PostType } from "@/types/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -26,6 +26,8 @@ import Loader from "../loaders/loader";
 import ImageUpload from "../ui/image-upload";
 import { Card } from "../ui/card";
 import { ImagePlus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { FileState } from "./multi-image";
 
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
@@ -35,9 +37,19 @@ const PostForm: React.FC<PostFormProps> = ({ onMutationSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [openImageInput, setOpenImageInput] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [fileStates, setFileStates] = useState<FileState[]>([]);
+
+  const hasPendingProgress = fileStates.some(
+    (item) => item.progress !== "COMPLETE",
+  );
 
   const handleUrlsChange = (urls: string[]) => {
     setImageUrls(urls);
+  };
+
+  const fileStatesChange = (state: FileState[]) => {
+    setFileStates(state);
   };
 
   const form = useForm<z.infer<typeof PostValidation>>({
@@ -81,9 +93,13 @@ const PostForm: React.FC<PostFormProps> = ({ onMutationSuccess }) => {
     });
   };
 
+  useEffect(() => {
+    setIsUploading(hasPendingProgress);
+  }, [fileStates, hasPendingProgress]);
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-3">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
         {/* <FormField
           control={form.control}
           name="title"
@@ -114,39 +130,55 @@ const PostForm: React.FC<PostFormProps> = ({ onMutationSuccess }) => {
               <FormControl>
                 <Textarea
                   placeholder="Write your thoughts here..."
-                  className="h-[150px] resize-none border-none border-white placeholder:font-medium"
+                  className={cn(
+                    openImageInput ? "h-[100px]" : "h-[150px]",
+                    "resize-none border-none placeholder:font-medium",
+                  )}
                   disabled={isLoading}
                   {...field}
                 />
               </FormControl>
-              <div>
-                <FormMessage />
-              </div>
+              <FormMessage />
             </FormItem>
           )}
         />
-        {openImageInput && <ImageUpload onUrlsChange={handleUrlsChange} />}
-        <div className="flex items-center justify-end">
+        <ImageUpload
+          onUrlsChange={handleUrlsChange}
+          openImageInput={openImageInput}
+          onFileStatesChange={fileStatesChange}
+          isLoading={isLoading}
+        />
+        <div className="space-y-2">
+          <div className="flex items-center justify-end">
+            <Button
+              className={cn(
+                openImageInput && "bg-green-500/15",
+                "group rounded-full transition-all hover:bg-green-500/15 active:scale-95",
+              )}
+              size="icon"
+              variant="ghost"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenImageInput((prev) => !prev);
+              }}
+            >
+              <ImagePlus
+                className={cn(
+                  openImageInput ? "text-green-500/70" : "text-slate-500",
+                  "group-hover:text-green-500/70",
+                )}
+              />
+            </Button>
+          </div>
           <Button
-            className="group rounded-full transition-all hover:bg-green-500/15 active:scale-95"
-            size="icon"
-            variant="ghost"
-            onClick={(e) => {
-              e.preventDefault();
-              setOpenImageInput((prev) => !prev);
-            }}
+            type="submit"
+            className="w-full transition-none"
+            disabled={isLoading || isUploading}
           >
-            <ImagePlus className="text-slate-500 group-hover:text-green-500/70" />
+            {isLoading && <Loader />}
+            {isLoading ? null : <p>Post</p>}
           </Button>
         </div>
-        <Button
-          type="submit"
-          className="w-full transition-none"
-          disabled={isLoading}
-        >
-          {isLoading && <Loader />}
-          {isLoading ? null : <p>Post</p>}
-        </Button>
       </form>
     </Form>
   );
