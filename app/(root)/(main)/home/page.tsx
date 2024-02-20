@@ -1,15 +1,19 @@
 import CreatePost from "@/components/ui/create-post";
 import ProfileNav from "@/components/ui/profile-nav";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 
 export default async function Home() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
   return (
     <main className="min-h-[400px] flex-1 px-5 pt-5">
       <div className="flex items-center justify-between">
         <CreatePost session={session} />
-        <ProfileNav />
+        <div className="flex items-center space-x-2">
+          <ThemeToggle />
+          <ProfileNav />
+        </div>
       </div>
     </main>
   );

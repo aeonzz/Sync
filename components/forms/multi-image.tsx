@@ -8,9 +8,10 @@ import { twMerge } from "tailwind-merge";
 import { Button } from "../ui/button";
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const variants = {
-  base: "relative rounded-md flex justify-center items-center flex-col cursor-pointer min-h-[150px] min-w-[200px] bg-card transition-colors duration-200 ease-in-out",
+  base: "relative rounded-md flex justify-center items-center flex-col cursor-pointer min-h-[150px] min-w-[200px] bg-card transition-colors duration-200 ease-in-out border",
   image:
     "border-0 p-0 w-full h-full relative shadow-md bg-slate-200 dark:bg-slate-900 rounded-md",
   active: "border-2",
@@ -183,8 +184,10 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
               key={index}
               className={variants.image + " relative my-3 aspect-square h-full"}
             >
-              <img
+              <Image
                 className="h-full w-full rounded-md object-cover"
+                height={64}
+                width={64}
                 src={imageUrls[index]}
                 alt={typeof file === "string" ? file : file.name}
               />

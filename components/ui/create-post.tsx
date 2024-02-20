@@ -3,13 +3,25 @@
 import { Card } from "./card";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "./dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "./input";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, X } from "lucide-react";
 import { Separator } from "./separator";
 import PostForm from "../forms/post-form";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
@@ -24,8 +36,11 @@ interface CreatePostProps {
 
 const CreatePost: React.FC<CreatePostProps> = ({ session }) => {
   const [open, setOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const username = session?.user.username;
   const initialLetter = username?.charAt(0).toUpperCase();
+  const [isDirty, setIsDirty] = useState<boolean>();
+  const [isImageDirty, setIsImageDirty] = useState<boolean>();
 
   return (
     <Card className="w-[450px]">
@@ -38,7 +53,47 @@ const CreatePost: React.FC<CreatePostProps> = ({ session }) => {
             />
             <PlusCircle className="h-8 w-8 transition-transform active:scale-95" />
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent
+            onInteractOutside={(e) => {
+              if (isDirty || isImageDirty) {
+                e.preventDefault();
+                setAlertOpen(true);
+              }
+            }}
+          >
+            {isDirty || isImageDirty ? (
+              <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+                <AlertDialogTrigger asChild>
+                  <div className="absolute right-4 top-4 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                    <X className="h-4 w-4" />
+                  </div>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You have unsaved changes. Are you sure you want to leave?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Continue editing</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => setOpen(false)}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Close
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : (
+              <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </DialogClose>
+            )}
             <DialogHeader>
               <DialogTitle>Create post</DialogTitle>
             </DialogHeader>
@@ -56,10 +111,14 @@ const CreatePost: React.FC<CreatePostProps> = ({ session }) => {
                   </AvatarFallback>
                 </Link>
               </Avatar>
-              <h4 className="scroll-m-20 text-sm tracking-tight">{username}</h4>
+              <h4 className="text-md scroll-m-20 font-medium leading-none tracking-tight">
+                {username}
+              </h4>
             </div>
             <PostForm
               onMutationSuccess={setOpen}
+              hasUserInput={setIsDirty}
+              hasUserImages={setIsImageDirty}
             />
           </DialogContent>
         </Dialog>

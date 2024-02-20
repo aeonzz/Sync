@@ -5,7 +5,7 @@ import { PostType } from "@/types/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
@@ -17,28 +17,40 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "../ui/button";
 import { z } from "zod";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import Loader from "../loaders/loader";
 import ImageUpload from "../ui/image-upload";
-import { Card } from "../ui/card";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, SmilePlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FileState } from "./multi-image";
+import { useEdgeStore } from "@/lib/edgestore";
+import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
+  hasUserInput: (state: boolean) => void;
+  hasUserImages: (state: boolean) => void;
 }
 
-const PostForm: React.FC<PostFormProps> = ({ onMutationSuccess }) => {
+const PostForm: React.FC<PostFormProps> = ({
+  onMutationSuccess,
+  hasUserInput,
+  hasUserImages,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [openImageInput, setOpenImageInput] = useState(false);
+  const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
+  const { edgestore } = useEdgeStore();
 
   const hasPendingProgress = fileStates.some(
     (item) => item.progress !== "COMPLETE",
@@ -59,6 +71,14 @@ const PostForm: React.FC<PostFormProps> = ({ onMutationSuccess }) => {
       content: "",
     },
   });
+
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    const currentContent = form.getValues("content");
+
+    const newContent = currentContent + emojiData.emoji;
+
+    form.setValue("content", newContent);
+  };
 
   const { mutate: createpost } = useMutation({
     mutationFn: (newPost: PostType) => {
@@ -87,6 +107,7 @@ const PostForm: React.FC<PostFormProps> = ({ onMutationSuccess }) => {
   });
 
   const onSubmit = async (data: z.infer<typeof PostValidation>) => {
+    setOpenEmojiPicker(false);
     setIsLoading(true);
     createpost({
       ...data,
@@ -96,6 +117,11 @@ const PostForm: React.FC<PostFormProps> = ({ onMutationSuccess }) => {
   useEffect(() => {
     setIsUploading(hasPendingProgress);
   }, [fileStates, hasPendingProgress]);
+
+  useEffect(() => {
+    hasUserInput(form.formState.isDirty);
+    hasUserImages(imageUrls.length !== 0);
+  }, [form.formState.isDirty, imageUrls]);
 
   return (
     <Form {...form}>
@@ -148,7 +174,7 @@ const PostForm: React.FC<PostFormProps> = ({ onMutationSuccess }) => {
           onFileStatesChange={fileStatesChange}
           isLoading={isLoading}
         />
-        <div className="space-y-2">
+        <div className="relative space-y-2">
           <div className="flex items-center justify-end">
             <Button
               className={cn(
@@ -169,11 +195,52 @@ const PostForm: React.FC<PostFormProps> = ({ onMutationSuccess }) => {
                 )}
               />
             </Button>
+            <Button
+              className={cn(
+                openEmojiPicker && "bg-yellow-500/15",
+                "group rounded-full transition-all hover:bg-yellow-500/15 active:scale-95",
+              )}
+              size="icon"
+              variant="ghost"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenEmojiPicker((prev) => !prev);
+              }}
+            >
+              <SmilePlus
+                className={cn(
+                  openEmojiPicker ? "text-yellow-500/70" : "text-slate-500",
+                  "group-hover:text-yellow-500/70",
+                )}
+              />
+            </Button>
+            <div className="absolute -right-[70%] -top-[360px]">
+              <Suspense fallback={<Loader />}>
+                <EmojiPicker
+                  open={openEmojiPicker}
+                  theme={Theme.AUTO}
+                  className="z-[100] !h-[400px] !w-full !rounded-lg !border-none !bg-card p-3 pb-6"
+                  lazyLoadEmojis={true}
+                  searchDisabled={true}
+                  onEmojiClick={handleEmojiClick}
+                  previewConfig={{
+                    showPreview: false,
+                  }}
+                />
+              </Suspense>
+            </div>
           </div>
           <Button
             type="submit"
             className="w-full transition-none"
             disabled={isLoading || isUploading}
+            onClick={async () => {
+              for (const imageUrl of imageUrls) {
+                await edgestore.publicImages.confirmUpload({
+                  url: imageUrl,
+                });
+              }
+            }}
           >
             {isLoading && <Loader />}
             {isLoading ? null : <p>Post</p>}
