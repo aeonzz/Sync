@@ -26,12 +26,12 @@ const ProfileNav = () => {
 
   if (!session) return null;
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="lg"
-          className="flex h-[52px] space-x-2 bg-card px-5"
+          className="flex h-[52px] space-x-2 bg-card px-5 shadow-sm"
         >
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" />
@@ -47,7 +47,7 @@ const ProfileNav = () => {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[252px]" align="end" forceMount>
+      <DropdownMenuContent className="w-[252px]" align="center" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">

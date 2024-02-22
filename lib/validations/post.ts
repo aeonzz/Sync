@@ -6,4 +6,5 @@ export const PostValidation = z.object({
     message: "Description must be at least 10 characters.",
   }),
   image: z.string().optional(),
+  sequenceId: z.number().optional(),
 });

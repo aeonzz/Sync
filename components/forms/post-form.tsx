@@ -17,11 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Button } from "../ui/button";
 import { z } from "zod";
 import { Textarea } from "../ui/textarea";
@@ -32,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { FileState } from "./multi-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
+import { useThemeStore } from "@/context/store";
 
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
@@ -51,6 +47,7 @@ const PostForm: React.FC<PostFormProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
   const { edgestore } = useEdgeStore();
+  const { isDark } = useThemeStore();
 
   const hasPendingProgress = fileStates.some(
     (item) => item.progress !== "COMPLETE",
@@ -218,8 +215,8 @@ const PostForm: React.FC<PostFormProps> = ({
               <Suspense fallback={<Loader />}>
                 <EmojiPicker
                   open={openEmojiPicker}
-                  theme={Theme.AUTO}
-                  className="z-[100] !h-[400px] !w-full !rounded-lg !border-none !bg-card p-3 pb-6"
+                  theme={isDark ? Theme.LIGHT : Theme.DARK}
+                  className="z-[100] !h-[400px] !w-full !rounded-lg !border-none !bg-card p-3 pb-6 shadow-md"
                   lazyLoadEmojis={true}
                   searchDisabled={true}
                   onEmojiClick={handleEmojiClick}

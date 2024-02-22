@@ -149,7 +149,7 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
         <ScrollArea
           className={cn(
             value?.length !== 0 ? "h-[200px] p-3" : "h-[150px]",
-            "flex w-full flex-col rounded-md bg-card",
+            "flex w-full flex-col rounded-md bg-card shadow-sm",
           )}
         >
           {/* Dropzone */}

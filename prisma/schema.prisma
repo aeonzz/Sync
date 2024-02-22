@@ -11,23 +11,26 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  email    String  @unique
-  username String?
-  password String
-  name     String  @unique
-  Post     Post[]
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String?
+  password  String
+  name      String   @unique
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  Post      Post[]
 }
 
 model Post {
-  postId    String   @id @default(uuid())
-  title     String?
-  content   String
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
-  Image     Image[]
+  postId     String   @id @default(uuid())
+  sequenceId Int      @default(autoincrement())
+  title      String?
+  content    String
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @updatedAt @db.Timestamp(6)
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   String
+  Image      Image[]
 }
 
 model Image {
