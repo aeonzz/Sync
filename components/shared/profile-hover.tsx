@@ -33,32 +33,23 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>
-        <Avatar
-          className={cn(
-            className,
-            "group relative h-9 w-9 border bg-stone-900 dark:border",
-          )}
-        >
-          <Link href={`/user/${userId}`} className="relative">
-            <div className="absolute z-10 h-9 w-9 bg-stone-950 opacity-0 transition group-hover:opacity-40"></div>
+        <Link href={`/user/${userId}`} className="relative">
+          <Avatar>
             <AvatarImage src={profile} className="object-cover" />
-            <AvatarFallback className="h-9 w-9 pb-1 pr-1">
-              {initialLetter}
-            </AvatarFallback>
-          </Link>
-        </Avatar>
+            <AvatarFallback>{initialLetter}</AvatarFallback>
+          </Avatar>
+        </Link>
       </HoverCardTrigger>
       <HoverCardContent
-        className="z-50 w-[250px]"
+        className="w-[250px]"
         hideWhenDetached={true}
+        sideOffset={10}
         align="start"
       >
         <div className="flex justify-between space-x-4">
           <Avatar>
-            <AvatarImage src={profile} className="object-cover" />
-            <AvatarFallback className="h-9 w-9 bg-stone-900">
-              {initialLetter}
-            </AvatarFallback>
+            <AvatarImage src={profile} />
+            <AvatarFallback>{initialLetter}</AvatarFallback>
           </Avatar>
           <div className="w-full space-y-1">
             <h4 className="text-sm font-semibold"></h4>

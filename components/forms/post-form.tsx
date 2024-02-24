@@ -28,6 +28,7 @@ import { FileState } from "./multi-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { useThemeStore } from "@/context/store";
+import { useRouter } from "next/navigation";
 
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
@@ -47,6 +48,7 @@ const PostForm: React.FC<PostFormProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
   const { edgestore } = useEdgeStore();
+  const router = useRouter();
   const { isDark } = useThemeStore();
 
   const hasPendingProgress = fileStates.some(
@@ -99,6 +101,7 @@ const PostForm: React.FC<PostFormProps> = ({
         }),
       );
       onMutationSuccess(false);
+      router.refresh();
       toast("Posted.");
     },
   });

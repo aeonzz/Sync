@@ -38,7 +38,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   useEffect(() => {
     onFileStatesChange(fileStates);
-  }, [fileStates, onFileStatesChange]);
+    onUrlsChange(urls);
+  }, [fileStates, onFileStatesChange, urls]);
 
   return (
     <div className={cn(openImageInput ? "opacity-100" : "h-0 w-0 opacity-0")}>
@@ -46,7 +47,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         disabled={isLoading}
         value={fileStates}
         dropzoneOptions={{
-          maxFiles: 6,
+          maxFiles: 20,
         }}
         onChange={(files) => {
           setFileStates(files);
@@ -73,7 +74,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                   },
                 });
                 setUrls((prevUrls) => [...prevUrls, res.url]);
-                onUrlsChange([...urls, res.url]);
               } catch (err) {
                 updateFileProgress(addedFileState.key, "ERROR");
               }

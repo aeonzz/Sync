@@ -9,7 +9,7 @@ const TopBar = async () => {
   const session = await getServerSession(authOptions);
 
   return (
-    <header className="sticky top-0 z-[100] flex w-full items-center justify-between bg-background/50 py-5 backdrop-blur-sm backdrop-filter">
+    <header className="sticky top-0 z-40 flex w-full items-center justify-between bg-background py-5">
       <CreatePost session={session} />
       <div className="flex items-center space-x-2">
         <ThemeToggle />

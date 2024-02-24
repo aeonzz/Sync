@@ -11,14 +11,19 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  username  String?
-  password  String
-  name      String   @unique
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-  Post      Post[]
+  id          String      @id @default(uuid())
+  studentId   Int         @unique
+  username    String      @unique
+  password    String
+  avatarUrl   String?
+  displayName String?
+  bio         String?     @db.Text
+  onboarded   Boolean     @default(false)
+  createdAt   DateTime    @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime    @updatedAt @db.Timestamp(6)
+  Post        Post[]
+  StudentData StudentData @relation(fields: [studentId], references: [studentId])
+  Urls        Urls[]
 }
 
 model Post {
@@ -30,7 +35,7 @@ model Post {
   updatedAt  DateTime @updatedAt @db.Timestamp(6)
   author     User     @relation(fields: [authorId], references: [id])
   authorId   String
-  Image      Image[]
+  imageUrls  Image[]
 }
 
 model Image {
@@ -38,4 +43,25 @@ model Image {
   url    String? @db.VarChar(255)
   postId String
   post   Post    @relation(fields: [postId], references: [postId])
+}
+
+model StudentData {
+  id         Int      @id @default(autoincrement())
+  studentId  Int      @unique
+  name       String   @unique
+  yearLevel  String
+  department String
+  hasAccount Boolean  @default(false)
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @updatedAt @db.Timestamp(6)
+  User       User?
+}
+
+model Urls {
+  id        Int      @id @default(autoincrement())
+  url       String
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 }

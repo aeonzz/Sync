@@ -44,6 +44,7 @@ export async function GET(req: Request) {
         author: true,
         createdAt: true,
         postId: true,
+        imageUrls: true,
         content: true,
       },
       where: {

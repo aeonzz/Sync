@@ -4,7 +4,7 @@ import SessionProvider from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { Metadata } from "next";
 import React from "react";
-import LeftSideBar from "@/components/navigation/left-sidebar";
+import { EdgeStoreProvider } from "@/lib/edgestore";
 
 export const metadata: Metadata = {
   title: "Sync",
@@ -27,7 +27,7 @@ export default function AppLayout({
         >
           <SessionProvider>
             <QueryClientProvder>
-              {children}
+              <EdgeStoreProvider>{children}</EdgeStoreProvider>
               <Toaster richColors />
             </QueryClientProvder>
           </SessionProvider>

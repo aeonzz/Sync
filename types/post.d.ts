@@ -1,9 +1,21 @@
 export type PostType = {
-  sequenceId?: number;
-  postId?: string;
   title?: string | undefined;
   content: string;
-  image?: string | undefined;
+  imageUrls?: string | undefined;
+};
+
+export type PostProps = {
+  sequenceId: number;
+  postId: string;
+  content: string;
+  createdAt: Date;
+  imageUrls: {
+    id: number
+    url: string
+    postId: number
+    userId: number
+    createdAt: Date
+  }[] | null;
   author: {
     id: string;
     email: string;

@@ -1,6 +1,5 @@
 "use client";
 
-import { PostType } from "@/types/post";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useEffect } from "react";
@@ -9,6 +8,7 @@ import PostCard from "../cards/post-card";
 import PostSkeleton from "../loaders/post-skeleton";
 import FetchDataError from "./fetch-data-error";
 import Loader from "../loaders/loader";
+import { PostProps } from "@/types/post";
 
 const Feed = () => {
   const { ref, inView } = useInView();
@@ -40,7 +40,7 @@ const Feed = () => {
         ) : null
       ) : (
         <div>
-          {group.data.map((post: PostType) => (
+          {group.data.map((post: PostProps) => (
             <PostCard key={post.postId} post={post} />
           ))}
         </div>
@@ -63,7 +63,7 @@ const Feed = () => {
         <FetchDataError />
       ) : (
         content
-      )}
+      )} 
       <div className='h-24 mt-10 flex justify-center' ref={ref}>
         {isFetchingNextPage ? <Loader /> : null}
       </div>

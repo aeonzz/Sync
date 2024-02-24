@@ -28,7 +28,7 @@ const SignInForm = () => {
   const form = useForm<z.infer<typeof SignInValidation>>({
     resolver: zodResolver(SignInValidation),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -37,7 +37,7 @@ const SignInForm = () => {
     setIsLoading(true);
 
     const signInData = await signIn("credentials", {
-      email: values.email,
+      username: values.username,
       password: values.password,
       redirect: false,
     });
@@ -48,7 +48,7 @@ const SignInForm = () => {
         description: signInData.error,
       });
     } else {
-      router.push("/home");
+      router.push("/onboarding");
       router.refresh();
     }
   };
@@ -68,13 +68,13 @@ const SignInForm = () => {
           <div className="space-y-2">
             <FormField
               control={form.control}
-              name="email"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="mail@example.com"
+                      placeholder="Enter your username"
                       {...field}
                       disabled={isLoading}
                     />
