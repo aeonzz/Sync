@@ -24,30 +24,33 @@ const ProfileNav = async () => {
         <Button
           variant="ghost"
           size="lg"
-          className="flex h-[52px] space-x-2 border bg-card px-5 shadow-sm"
+          className="flex h-[52px] w-[200px] justify-start space-x-2 border bg-card px-5 shadow-sm"
         >
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage
+              src={currentUser.avatarUrl ? currentUser.avatarUrl : undefined}
+              alt={currentUser.avatarUrl ? currentUser.avatarUrl : "No avatar"}
+            />
             <AvatarFallback>{initialLetter}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-start space-y-1">
             <p className="text-sm font-medium leading-none">
-              {currentUser?.username}
+              {currentUser.displayName}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {currentUser?.studentId}
+              {currentUser.studentId}
             </p>
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="z-50 w-[252px]" align="center" forceMount>
+      <DropdownMenuContent className="z-50 w-[200px]" align="center" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {currentUser?.username}
+              {currentUser.username}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {currentUser?.studentId}
+              {currentUser.studentId}
             </p>
           </div>
         </DropdownMenuLabel>

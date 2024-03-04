@@ -18,8 +18,13 @@ export type PostProps = {
   }[] | null;
   author: {
     id: string;
-    email: string;
+    studentId: string;
+    avatarUrl: string;
+    displayName: string;
     username: string;
     createdAt: Date;
+    StudentData: {
+      name: string;
+    }
   };
 };

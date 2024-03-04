@@ -39,13 +39,13 @@ export async function GET(req: Request) {
     const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
 
     const posts = await prisma.post.findMany({
-      select: {
-        sequenceId: true,
-        author: true,
-        createdAt: true,
-        postId: true,
+      include: {
+        author: {
+          include: {
+            StudentData: true,
+          },
+        },
         imageUrls: true,
-        content: true,
       },
       where: {
         sequenceId: cursor ? { lt: cursor } : undefined,
@@ -53,8 +53,7 @@ export async function GET(req: Request) {
       orderBy: {
         sequenceId: "desc",
       },
-      take: 5
-      ,
+      take: 5,
     });
     const lastPost = posts[posts.length - 1];
     const nextCursor = lastPost?.sequenceId || undefined;

@@ -6,10 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { getUser } from "@/lib/actions/user.actions";
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -22,7 +19,7 @@ const Onboarding = async () => {
 
   return (
     <section className="flex h-screen w-full items-center justify-center">
-      <Card className="h-auto w-[40%] p-2">
+      <Card className="h-auto w-[550px] p-2">
         <CardHeader>
           <CardTitle>Onboarding.</CardTitle>
           <CardDescription>

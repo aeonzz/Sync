@@ -27,7 +27,7 @@ export const SignInValidation = z.object({
     .min(8, "Password must have more than 8 characters"),
 });
 
-export const UpdateUserValidation = z.object({
+export const OnboardingValidation = z.object({
   displayName: z
     .string()
     .min(1, "Display name is required")
@@ -46,4 +46,27 @@ export const UpdateUserValidation = z.object({
       }),
     )
     .optional(),
+});
+
+export const OnboardingServerValidation = z.object({
+  username: z
+    .string()
+    .min(1, "Username is required")
+    .min(10, "Username should be at least 10 characters")
+    .max(20, "Username cannot exceed 20 characters"),
+  displayName: z
+    .string()
+    .min(1, "Display name is required")
+    .min(5, "Display name should be at least 5 characters")
+    .max(8, "Display name cannot exceed 8 characters"),
+  bio: z.string().max(100, {
+    message: "Bio cannot exceed 100 characters.",
+  }),
+  urls: z.array(
+    z.object({
+      value: z.string().url({ message: "Please enter a valid URL." }),
+    }),
+  ),
+  avatarUrl: z.string().url(),
+  onboarded: z.boolean(),
 });

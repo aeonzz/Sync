@@ -12,6 +12,9 @@ export async function getUser() {
       where: {
         id: session?.user.id,
       },
+      include: {
+        StudentData: true,
+      }
     });
 
     return response;

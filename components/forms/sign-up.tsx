@@ -20,7 +20,6 @@ import { User } from "@prisma/client";
 // import { UpdateUser } from '@/types/update-user';
 import { toast } from "sonner";
 import * as z from "zod";
-import { UpdateUser } from "@/types/user";
 import { useRouter } from "next/navigation";
 import {
   getStudentData,
@@ -133,106 +132,115 @@ const SignUpForm = () => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your username"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="studentId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Student ID</FormLabel>
-                <div className="flex items-center">
+    <div className="relative w-[380px] p-10">
+      <div className="mb-7">
+        <h2 className="text-center text-2xl font-semibold tracking-tight">
+          Create an account
+        </h2>
+        <p className="text-center text-sm text-muted-foreground">
+          Enter your credentials below to create your account
+        </p>
+      </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+          <div className="space-y-2">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter your student id"
-                      disabled={isLoading || isValid}
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={10}
+                      placeholder="Enter your username"
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
-                  <Button
-                    onClick={(e) => handleIdCheck(e)}
-                    disabled={isLoading || isValid}
-                    size="sm"
-                    variant="secondary"
-                    className={cn(isValid && "bg-green-500", "w-32")}
-                  >
-                    {isValid && <Check />}
-                    {isValid ? <p>Verified</p> : <p>Check ID</p>}
-                  </Button>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter your password"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Re-Enter your password</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Re-Enter your password"
-                    type="password"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <Button
-          className="mt-6 w-full"
-          type="submit"
-          disabled={isLoading || !isValid}
-        >
-          {isLoading && <Loader />}
-          {isLoading ? null : <p>Sign up</p>}
-        </Button>
-      </form>
-    </Form>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="studentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Student ID</FormLabel>
+                  <div className="flex items-center space-x-3">
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your student id"
+                        disabled={isLoading || isValid}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={10}
+                        {...field}
+                      />
+                    </FormControl>
+                    <Button
+                      onClick={(e) => handleIdCheck(e)}
+                      disabled={isLoading || isValid}
+                      variant="secondary"
+                      className={cn(isValid && "bg-green-500", "w-32")}
+                    >
+                      {isValid && <Check />}
+                      {isValid ? <p>Verified</p> : <p>Verify</p>}
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter your password"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Re-Enter your password</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Re-Enter your password"
+                      type="password"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <Button
+            className="mt-5 w-full"
+            type="submit"
+            disabled={isLoading || !isValid}
+          >
+            {isLoading && <Loader />}
+            {isLoading ? null : <p>Sign up</p>}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };
 

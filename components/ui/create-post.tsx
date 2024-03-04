@@ -26,19 +26,19 @@ import { Separator } from "./separator";
 import PostForm from "../forms/post-form";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import Link from "next/link";
-import { Session } from "next-auth";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { Session } from "next-auth";
+import { CurrentUser } from "@/types/user";
 
 interface CreatePostProps {
-  session: Session | null;
+  currentUser: CurrentUser | null;
 }
 
-const CreatePost: React.FC<CreatePostProps> = ({ session }) => {
+const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
   const [open, setOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
-  const username = session?.user.username;
-  const initialLetter = username?.charAt(0).toUpperCase();
+  const displayName = currentUser?.displayName;
+  const initialLetter = displayName?.charAt(0).toUpperCase();
   const [isDirty, setIsDirty] = useState<boolean>();
   const [isImageDirty, setIsImageDirty] = useState<boolean>();
 
@@ -79,10 +79,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ session }) => {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Continue editing</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => setOpen(false)}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
+                    <AlertDialogAction onClick={() => setOpen(false)}>
                       Close
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -103,7 +100,14 @@ const CreatePost: React.FC<CreatePostProps> = ({ session }) => {
                 <Link href="/user/profile" className="relative">
                   <div className="absolute z-10 h-9 w-9 bg-stone-950 opacity-0 transition group-hover:opacity-40"></div>
                   <AvatarImage
-                    src="https://github.com/shadcn.png"
+                    src={
+                      currentUser?.avatarUrl ? currentUser.avatarUrl : undefined
+                    }
+                    alt={
+                      currentUser?.displayName
+                        ? currentUser.displayName
+                        : "No avatar"
+                    }
                     className="object-cover"
                   />
                   <AvatarFallback className="h-9 w-9 bg-stone-900 pb-1 pr-1">
@@ -111,9 +115,14 @@ const CreatePost: React.FC<CreatePostProps> = ({ session }) => {
                   </AvatarFallback>
                 </Link>
               </Avatar>
-              <h4 className="text-md scroll-m-20 font-medium leading-none tracking-tight">
-                {username}
-              </h4>
+              <div className="space-y-1">
+                <h4 className="text-md scroll-m-20 font-medium leading-none tracking-tight">
+                  {displayName}
+                </h4>
+                <h4 className="scroll-m-20 text-xs text-muted-foreground">
+                  {currentUser?.StudentData.name}
+                </h4>
+              </div>
             </div>
             <PostForm
               onMutationSuccess={setOpen}

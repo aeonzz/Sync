@@ -21,6 +21,8 @@ import { SignInValidation } from "@/lib/validations/user";
 import { signIn } from "next-auth/react";
 import Loader from "../loaders/loader";
 import { Card } from "../ui/card";
+import Link from "next/link";
+import { Separator } from "../ui/separator";
 
 const SignInForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,13 +56,13 @@ const SignInForm = () => {
   };
 
   return (
-    <Card className="relative w-[350px] p-10">
+    <div className="relative w-[380px] p-10">
       <div className="mb-7">
-        <h2 className="text-center text-xl font-semibold tracking-tight">
+        <h2 className="text-center text-2xl font-semibold tracking-tight">
           Welcome to Sync
         </h2>
-        <p className="text-center text-xs text-muted-foreground">
-          Please login your account
+        <p className="text-center text-sm text-muted-foreground">
+          Enter your credentials below to login to your account
         </p>
       </div>
       <Form {...form}>
@@ -102,15 +104,17 @@ const SignInForm = () => {
               )}
             />
           </div>
-          <Button
-            className="mt-7 w-full"
-            size="sm"
-            type="submit"
-            disabled={isLoading}
-          >
+          <Button className="mt-5 w-full" type="submit" disabled={isLoading}>
             {isLoading && <Loader />}
-            {isLoading ? null : <p>Sign in</p>}
+            {isLoading ? null : <p>Log in</p>}
           </Button>
+          <Separator className="mb-2 mt-4" />
+          <div className="text-center text-sm text-muted-foreground">
+            Don't have an account?
+            <Link className="underline text-blue-500 ml-1" href="/register">
+              Register here
+            </Link>
+          </div>
         </form>
 
         {/* <p className='text-center text-sm text-gray-600 mt-2'>
@@ -120,7 +124,7 @@ const SignInForm = () => {
           </Link>
         </p> */}
       </Form>
-    </Card>
+    </div>
   );
 };
 

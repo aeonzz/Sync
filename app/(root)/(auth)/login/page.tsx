@@ -7,6 +7,8 @@ import Spline from "@splinetool/react-spline";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect, useRouter } from "next/navigation";
+import Image from "next/image";
+import loginImage from "@/public/static-images/prateek-katyal-xv7-GlvBLFw-unsplash.jpg";
 
 const Login = async () => {
   const session = await getServerSession(authOptions);
@@ -16,18 +18,12 @@ const Login = async () => {
   }
 
   return (
-    <section className="relative flex h-screen w-full items-center justify-center">
+    <section className="flex h-screen w-full items-center">
       {/* <Spline scene="https://prod.spline.design/T4SctGAVgvqrV65D/scene.splinecode" /> */}
-      <Link
-        href="/sign-up"
-        className={cn(
-          buttonVariants({ variant: "link" }),
-          "absolute right-5 top-5 text-xs text-blue-500 z-50",
-        )}
-      >
-        Siginup
-      </Link>
-      <div className="absolute flex h-screen w-full items-center justify-center">
+      <div className="flex-1">
+        <Image src={loginImage} alt="login image" width={600} height={600} objectFit="cover" />
+      </div>
+      <div className="flex h-screen w-full flex-1 items-center justify-center">
         <SignInForm />
       </div>
     </section>

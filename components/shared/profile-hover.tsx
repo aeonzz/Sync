@@ -7,33 +7,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Link from "next/link";
 import { BadgeCheck, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PostProps } from "@/types/post";
+import { format } from "date-fns";
 
 interface ProfileHoverProps {
-  username?: string;
-  date?: string;
-  userId?: number;
-  imageUrl?: string;
+  post: PostProps;
   className?: string;
 }
 
-const ProfileHover: React.FC<ProfileHoverProps> = ({
-  username,
-  date,
-  userId,
-  imageUrl,
-  className,
-}) => {
-  const profile = imageUrl ? imageUrl : undefined;
-
-  let initialLetter = "";
-  if (username) {
-    initialLetter = username.charAt(0).toUpperCase();
-  }
+const ProfileHover: React.FC<ProfileHoverProps> = ({ post, className }) => {
+  const profile = post.author.avatarUrl ? post.author.avatarUrl : undefined;
+  const authorCreatedAt = new Date(post.author.createdAt);
+  const date = format(authorCreatedAt, "PP");
+  const initialLetter = post.author.displayName.charAt(0).toUpperCase();
 
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>
-        <Link href={`/user/${userId}`} className="relative">
+        <Link href={`/user/${post.author.id}`} className="relative">
           <Avatar>
             <AvatarImage src={profile} className="object-cover" />
             <AvatarFallback>{initialLetter}</AvatarFallback>
@@ -48,17 +39,19 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
       >
         <div className="flex justify-between space-x-4">
           <Avatar>
-            <AvatarImage src={profile} />
+            <AvatarImage src={profile} alt={post.author.displayName} />
             <AvatarFallback>{initialLetter}</AvatarFallback>
           </Avatar>
           <div className="w-full space-y-1">
-            <h4 className="text-sm font-semibold"></h4>
             <Link
-              href={`/user/${userId}`}
-              className=" flex items-center gap-1 text-sm underline-offset-4 hover:underline"
+              href={`/user/${post.author.id}`}
+              className="flex items-center gap-1 text-sm font-semibold underline-offset-4 hover:underline"
             >
-              {username}
+              {post.author.displayName}
             </Link>
+            <h4 className="text-xs font-semibold text-muted-foreground">
+              {post.author.StudentData.name}
+            </h4>
             <div className="flex items-center pt-2">
               <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{" "}
               <span className="text-xs text-muted-foreground">

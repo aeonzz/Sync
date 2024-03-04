@@ -71,6 +71,7 @@ const PostForm: React.FC<PostFormProps> = ({
     },
   });
 
+  const watchFormContent = form.watch("content");
   const handleEmojiClick = (emojiData: EmojiClickData) => {
     const currentContent = form.getValues("content");
 
@@ -83,7 +84,7 @@ const PostForm: React.FC<PostFormProps> = ({
     mutationFn: (newPost: PostType) => {
       return axios.post("/api/post", newPost);
     },
-    onError: (error) => {
+    onError: () => {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
         description: "Could not create post, Try again later.",
@@ -157,8 +158,11 @@ const PostForm: React.FC<PostFormProps> = ({
                 <Textarea
                   placeholder="Write your thoughts here..."
                   className={cn(
-                    openImageInput ? "h-[100px]" : "h-[150px]",
-                    "resize-none border-none placeholder:font-medium",
+                    openImageInput ? "!h-[100px]" : "h-[150px]",
+                    watchFormContent.length >= 40
+                      ? "text-md h-[150px]"
+                      : "h-[80px] text-xl",
+                    "resize-none border-none bg-transparent placeholder:font-medium",
                   )}
                   disabled={isLoading}
                   {...field}
@@ -187,6 +191,7 @@ const PostForm: React.FC<PostFormProps> = ({
                 e.preventDefault();
                 setOpenImageInput((prev) => !prev);
               }}
+              disabled={isLoading}
             >
               <ImagePlus
                 className={cn(
@@ -206,6 +211,7 @@ const PostForm: React.FC<PostFormProps> = ({
                 e.preventDefault();
                 setOpenEmojiPicker((prev) => !prev);
               }}
+              disabled={isLoading}
             >
               <SmilePlus
                 className={cn(

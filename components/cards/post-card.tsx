@@ -53,7 +53,6 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   const [showFullContent, setShowFullContent] = useState(false);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const authorCreatedAt = new Date(post.author.createdAt);
   const postedAt = new Date(post.createdAt);
   const session = useSession();
 
@@ -70,15 +69,14 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       <CardHeader className="flex-row items-center justify-between">
         <div className="relative flex items-center space-x-2">
           <ProfileHover
-            username={post.author.username}
-            date={format(authorCreatedAt, "PP")}
+            post={post}
           />
           <div className="flex flex-col">
             <Link
               href="/"
               className="flex items-center gap-1 font-semibold hover:underline"
             >
-              {post.author.username}
+              {post.author.displayName}
               {/* {post.author.role === "SYSTEMADMIN" && (
                 <BadgeCheck className="h-4 w-4 text-red-500" />
               )}
@@ -99,7 +97,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
               <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-[80px]">
+          <DropdownMenuContent className="min-w-[80px] p-1.5">
             {session?.data?.user.id === post.author.id && (
               <>
                 <Dialog open={open} onOpenChange={setOpen}>
