@@ -12,10 +12,20 @@ import { Button } from "./button";
 import { LogOut, Settings, UserRound } from "lucide-react";
 import { getUser } from "@/lib/actions/user.actions";
 import Logout from "./logout";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import Link from "next/link";
+import FetchDataError from "./fetch-data-error";
 
-const ProfileNav = async () => {
-  const currentUser = await getUser();
-  const initialLetter = currentUser?.username?.charAt(0).toUpperCase();
+const UserNav = async () => {
+  const session = await getServerSession(authOptions);
+  const currentUser = await getUser(session!.user.id);
+  if (!currentUser.data || currentUser.error) {
+    return <FetchDataError />;
+  }
+
+  const initialLetter = currentUser.data.username?.charAt(0).toUpperCase();
+  const fullname = `${currentUser.data.StudentData.firstName} ${currentUser.data.StudentData.middleName.charAt(0).toUpperCase()} ${currentUser.data.StudentData.lastName}`;
 
   if (!currentUser) return null;
   return (
@@ -24,21 +34,29 @@ const ProfileNav = async () => {
         <Button
           variant="ghost"
           size="lg"
-          className="flex h-[52px] w-[200px] justify-start space-x-2 border bg-card px-5 shadow-sm"
+          className="flex h-[52px] w-[200px] justify-start space-x-2 border bg-card px-3 shadow-sm"
         >
           <Avatar>
             <AvatarImage
-              src={currentUser.avatarUrl ? currentUser.avatarUrl : undefined}
-              alt={currentUser.avatarUrl ? currentUser.avatarUrl : "No avatar"}
+              src={
+                currentUser.data.avatarUrl
+                  ? currentUser.data.avatarUrl
+                  : undefined
+              }
+              alt={
+                currentUser.data.username
+                  ? currentUser.data.username
+                  : "No avatar"
+              }
             />
             <AvatarFallback>{initialLetter}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-start space-y-1">
             <p className="text-sm font-medium leading-none">
-              {currentUser.displayName}
+              {currentUser.data.username}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {currentUser.studentId}
+              {fullname}
             </p>
           </div>
         </Button>
@@ -47,17 +65,19 @@ const ProfileNav = async () => {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {currentUser.username}
+              {currentUser.data.username}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {currentUser.studentId}
+              {currentUser.data.studentId}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <UserRound className="mr-2 h-5 w-5" />
-            Profile
+          <DropdownMenuItem asChild>
+            <Link href={`/u/${session?.user.id}`}>
+              <UserRound className="mr-2 h-5 w-5" />
+              Profile
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Settings className="mr-2 h-5 w-5" />
@@ -70,4 +90,4 @@ const ProfileNav = async () => {
   );
 };
 
-export default ProfileNav;
+export default UserNav;

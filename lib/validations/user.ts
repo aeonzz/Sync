@@ -3,11 +3,7 @@ import * as z from "zod";
 export const SignUpValidation = z
   .object({
     studentId: z.string().min(1, "Student id is required").max(30),
-    username: z
-      .string()
-      .min(1, "Username is required")
-      .min(10, "Username should be at least 10 characters")
-      .max(20, "Username cannot exceed 20 characters"),
+    email: z.string().min(1, 'Email is required').email('Invalid email'),
     password: z
       .string()
       .min(1, "Password is required")
@@ -20,7 +16,7 @@ export const SignUpValidation = z
   });
 
 export const SignInValidation = z.object({
-  username: z.string().min(1, "Username is required"),
+  email: z.string().min(1, 'Email is required').email('Invalid email'),
   password: z
     .string()
     .min(1, "Password is required")
@@ -28,7 +24,7 @@ export const SignInValidation = z.object({
 });
 
 export const OnboardingValidation = z.object({
-  displayName: z
+  username: z
     .string()
     .min(1, "Display name is required")
     .min(5, "Display name should be at least 5 characters")

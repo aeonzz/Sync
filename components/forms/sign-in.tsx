@@ -14,13 +14,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { SignInValidation } from "@/lib/validations/user";
 import { signIn } from "next-auth/react";
 import Loader from "../loaders/loader";
-import { Card } from "../ui/card";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
 
@@ -30,7 +28,7 @@ const SignInForm = () => {
   const form = useForm<z.infer<typeof SignInValidation>>({
     resolver: zodResolver(SignInValidation),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
@@ -38,20 +36,26 @@ const SignInForm = () => {
   const onSubmit = async (values: z.infer<typeof SignInValidation>) => {
     setIsLoading(true);
 
-    const signInData = await signIn("credentials", {
-      username: values.username,
-      password: values.password,
-      redirect: false,
-    });
-
-    if (signInData?.error) {
+    try {
+      const signInData = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+      if (signInData?.error) {
+        setIsLoading(false);
+        console.log(signInData.error);
+        toast.error("Uh oh! Something went wrong.", {
+          description: signInData.error,
+        });
+      } else if (signInData?.ok) {
+        router.push("/onboarding");
+      }
+    } catch (error) {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
-        description: signInData.error,
+        description: "An error occurred while making the request. Please try again later"
       });
-    } else {
-      router.push("/onboarding");
-      router.refresh();
     }
   };
 
@@ -70,13 +74,13 @@ const SignInForm = () => {
           <div className="space-y-2">
             <FormField
               control={form.control}
-              name="username"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter your username"
+                      placeholder="mail@example.com"
                       {...field}
                       disabled={isLoading}
                     />
@@ -110,8 +114,8 @@ const SignInForm = () => {
           </Button>
           <Separator className="mb-2 mt-4" />
           <div className="text-center text-sm text-muted-foreground">
-            Don't have an account?
-            <Link className="underline text-blue-500 ml-1" href="/register">
+            Don&apos;t have an account?
+            <Link className="ml-1 text-blue-500 underline" href="/register">
               Register here
             </Link>
           </div>

@@ -10,7 +10,7 @@ import { Button } from "../ui/button";
 const variants = {
   base: "relative rounded-md flex justify-center border border-stone-800 rounded-full aspect-square items-center flex-col cursor-pointer min-h-[50px] min-w-[50px] bg-card transition-colors duration-200 ease-in-out",
   image:
-    "border-0 p-0 w-full h-full relative shadow-md bg-card rounded-md",
+    "border-0 p-0 w-full h-full relative shadow-md bg-background rounded-md",
   active: "border-2",
   disabled: "bg-background cursor-default pointer-events-none",
   accept: "border border-blue-500 bg-blue-500 bg-opacity-10",
@@ -132,7 +132,7 @@ const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
           })}
         >
           {/* Main File Input */}
-          <input ref={ref} {...getInputProps()} />
+          <input ref={ref} {...getInputProps()} disabled={disabled} />
 
           {imageUrl ? (
             // Image Preview
@@ -147,7 +147,7 @@ const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
             // Upload Icon
             <div className="flex flex-col items-center justify-center text-xs text-gray-400">
               <UploadCloudIcon className="mb-2 h-7 w-7" />
-              <div className="text-gray-400">drag & drop to upload</div>
+              <p className="text-gray-400">drag & drop to upload</p>
               <div className="mt-3">
                 <Button
                   size="sm"

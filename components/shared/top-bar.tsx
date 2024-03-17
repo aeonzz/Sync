@@ -1,20 +1,26 @@
 import React from "react";
 import CreatePost from "../ui/create-post";
 import { ThemeToggle } from "../ui/theme-toggle";
-import ProfileNav from "../ui/profile-nav";
+import UserNav from "../ui/user-nav";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getUser } from "@/lib/actions/user.actions";
+import FetchDataError from "../ui/fetch-data-error";
 
 const TopBar = async () => {
-  const currentUser = await getUser();
+  const session = await getServerSession(authOptions);
+  const currentUser = await getUser(session!.user.id);
+  
+  if (!currentUser.data || currentUser.error) {
+    return <FetchDataError />;
+  }
 
   return (
     <header className="sticky top-0 z-40 flex w-full items-center justify-between bg-background py-5">
-      <CreatePost currentUser={currentUser} />
+      <CreatePost currentUser={currentUser.data} />
       <div className="flex items-center space-x-2">
         <ThemeToggle />
-        <ProfileNav />
+        <UserNav />
       </div>
     </header>
   );

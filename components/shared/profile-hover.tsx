@@ -19,12 +19,13 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({ post, className }) => {
   const profile = post.author.avatarUrl ? post.author.avatarUrl : undefined;
   const authorCreatedAt = new Date(post.author.createdAt);
   const date = format(authorCreatedAt, "PP");
-  const initialLetter = post.author.displayName.charAt(0).toUpperCase();
+  const initialLetter = post.author.username.charAt(0).toUpperCase();
 
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>
-        <Link href={`/user/${post.author.id}`} className="relative">
+        <Link href={`/user/${post.author.id}`} className="group relative">
+          <div className="absolute z-50 h-9 w-9 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
           <Avatar>
             <AvatarImage src={profile} className="object-cover" />
             <AvatarFallback>{initialLetter}</AvatarFallback>

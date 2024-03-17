@@ -17,7 +17,6 @@ import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { User } from "@prisma/client";
-// import { UpdateUser } from '@/types/update-user';
 import { toast } from "sonner";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
@@ -28,6 +27,7 @@ import {
 import Loader from "../loaders/loader";
 import { cn } from "@/lib/utils";
 import { SignUpValidation } from "@/lib/validations/user";
+import { Card, CardHeader, CardTitle } from "../ui/card";
 
 const SignUpForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -35,17 +35,26 @@ const SignUpForm = () => {
   const [idData, setIdData] = useState<{
     id: number;
     studentId: number;
-    name: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
     yearLevel: string;
     department: string;
     hasAccount: boolean;
   } | null>(null);
   const router = useRouter();
+  const fullname = idData?.firstName
+    ? idData.firstName +
+      " " +
+      idData?.middleName.charAt(0).toUpperCase() +
+      ". " +
+      idData?.lastName
+    : undefined;
 
   const form = useForm<z.infer<typeof SignUpValidation>>({
     resolver: zodResolver(SignUpValidation),
     defaultValues: {
-      username: "",
+      email: "",
       studentId: "",
       password: "",
       confirmPassword: "",
@@ -58,26 +67,30 @@ const SignUpForm = () => {
 
     if (typeof studentId === "string") {
       if (!/^\d+$/.test(studentId)) {
-        toast.error("Invalid ID", {
-          description: "Invalid characters in Student ID",
+        toast.warning("Invalid ID", {
+          description: "Invalid characters",
         });
         return;
       }
     }
     const studentIdInt: number = +studentId;
     const idData = await getStudentData(studentIdInt);
-    setIdData(idData);
 
-    if (idData === null) {
+    if (idData.error) {
+      toast.error("Uh oh! Something went wrong.", {
+        description: "An error occurred while making the request. Please try again later"
+      });
+    } else if (!idData.data) {
       toast.error("Student ID Verification Failed", {
         description:
           "Student ID not found in our systems. Please check your ID and try again.",
       });
-    } else if (idData.hasAccount) {
-      toast.error("Student ID Verification Failed", {
+    } else if (idData.data?.hasAccount) {
+      toast.warning("Student ID Verification Failed", {
         description: "This ID already has an associated account.",
       });
     } else {
+      setIdData(idData.data);
       setIsValid(true);
     }
   };
@@ -91,7 +104,7 @@ const SignUpForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: values.username,
+          email: values.email,
           studentId: values.studentId,
           password: values.password,
           confirmPassword: values.confirmPassword,
@@ -104,9 +117,6 @@ const SignUpForm = () => {
         if (idData) {
           await updateStudentData({
             id: idData?.id,
-            name: idData?.name,
-            yearLevel: idData?.yearLevel,
-            department: idData?.department,
             hasAccount: true,
           });
         }
@@ -143,24 +153,81 @@ const SignUpForm = () => {
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
-          <div className="space-y-2">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter your username"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          {isValid ? (
+            <>
+              <div className="space-y-2">
+                {fullname && (
+                  <Card className="p-4">
+                    <h4 className="scroll-m-20 text-sm font-semibold tracking-tight">
+                      Welcome,{" "}
+                      <span className="text-muted-foreground">{fullname}</span>
+                    </h4>
+                  </Card>
+                )}
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="mail@example.com"
+                          {...field}
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Enter your password"
+                          disabled={isLoading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Re-Enter your password</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Re-Enter your password"
+                          type="password"
+                          disabled={isLoading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Button
+                className="mt-5 w-full"
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading && <Loader />}
+                {isLoading ? null : <p>Sign up</p>}
+              </Button>
+            </>
+          ) : (
             <FormField
               control={form.control}
               name="studentId"
@@ -182,10 +249,10 @@ const SignUpForm = () => {
                     <Button
                       onClick={(e) => handleIdCheck(e)}
                       disabled={isLoading || isValid}
-                      variant="secondary"
-                      className={cn(isValid && "bg-green-500", "w-32")}
+                      variant="default"
+                      className="w-32"
                     >
-                      {isValid && <Check />}
+                      {isValid && <Check className="mr-1 h-5 w-5" />}
                       {isValid ? <p>Verified</p> : <p>Verify</p>}
                     </Button>
                   </div>
@@ -193,51 +260,7 @@ const SignUpForm = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Re-Enter your password</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Re-Enter your password"
-                      type="password"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <Button
-            className="mt-5 w-full"
-            type="submit"
-            disabled={isLoading || !isValid}
-          >
-            {isLoading && <Loader />}
-            {isLoading ? null : <p>Sign up</p>}
-          </Button>
+          )}
         </form>
       </Form>
     </div>

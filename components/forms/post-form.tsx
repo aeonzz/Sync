@@ -27,19 +27,21 @@ import { cn } from "@/lib/utils";
 import { FileState } from "./multi-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
-import { useThemeStore } from "@/context/store";
+import { useMutationSuccess, useThemeStore } from "@/context/store";
 import { useRouter } from "next/navigation";
 
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
   hasUserInput: (state: boolean) => void;
   hasUserImages: (state: boolean) => void;
+  onLoading: (state: boolean) => void;
 }
 
 const PostForm: React.FC<PostFormProps> = ({
   onMutationSuccess,
   hasUserInput,
   hasUserImages,
+  onLoading,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -50,6 +52,7 @@ const PostForm: React.FC<PostFormProps> = ({
   const { edgestore } = useEdgeStore();
   const router = useRouter();
   const { isDark } = useThemeStore();
+  const { setIsMutate } = useMutationSuccess();
 
   const hasPendingProgress = fileStates.some(
     (item) => item.progress !== "COMPLETE",
@@ -86,6 +89,7 @@ const PostForm: React.FC<PostFormProps> = ({
     },
     onError: () => {
       setIsLoading(false);
+      onLoading(false);
       toast.error("Uh oh! Something went wrong.", {
         description: "Could not create post, Try again later.",
       });
@@ -102,13 +106,14 @@ const PostForm: React.FC<PostFormProps> = ({
         }),
       );
       onMutationSuccess(false);
-      router.refresh();
       toast("Posted.");
+      setIsMutate(true);
     },
   });
 
   const onSubmit = async (data: z.infer<typeof PostValidation>) => {
     setOpenEmojiPicker(false);
+    onLoading(true)
     setIsLoading(true);
     createpost({
       ...data,
@@ -158,11 +163,10 @@ const PostForm: React.FC<PostFormProps> = ({
                 <Textarea
                   placeholder="Write your thoughts here..."
                   className={cn(
-                    openImageInput ? "!h-[100px]" : "h-[150px]",
-                    watchFormContent.length >= 40
+                    watchFormContent.length >= 90
                       ? "text-md h-[150px]"
                       : "h-[80px] text-xl",
-                    "resize-none border-none bg-transparent placeholder:font-medium",
+                    "h-150px resize-none border-none bg-transparent placeholder:font-medium",
                   )}
                   disabled={isLoading}
                   {...field}

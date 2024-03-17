@@ -13,10 +13,11 @@ datasource db {
 model User {
   id          String      @id @default(uuid())
   studentId   Int         @unique
-  username    String      @unique
+  email       String      @unique
+  username    String?     @unique
   password    String
   avatarUrl   String?
-  displayName String?
+  coverUrl    String?
   bio         String?     @db.Text
   onboarded   Boolean     @default(false)
   createdAt   DateTime    @default(now()) @db.Timestamp(6)
@@ -48,7 +49,9 @@ model Image {
 model StudentData {
   id         Int      @id @default(autoincrement())
   studentId  Int      @unique
-  name       String   @unique
+  firstName  String
+  middleName String
+  lastName   String
   yearLevel  String
   department String
   hasAccount Boolean  @default(false)

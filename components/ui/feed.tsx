@@ -9,9 +9,11 @@ import PostSkeleton from "../loaders/post-skeleton";
 import FetchDataError from "./fetch-data-error";
 import Loader from "../loaders/loader";
 import { PostProps } from "@/types/post";
+import { useMutationSuccess } from "@/context/store";
 
 const Feed = () => {
   const { ref, inView } = useInView();
+  const { isMutate, setIsMutate } = useMutationSuccess()
 
   const fetchPosts = async ({ pageParam = 0 }) => {
     const res = await axios.get(`/api/post?cursor=${pageParam}`);
@@ -48,8 +50,18 @@ const Feed = () => {
     </div>
   ));
 
+  const handleRefetch = () => {
+    refetch();
+    setIsMutate(false);
+  };
+  
   useEffect(() => {
-    // if the last element is in view and there is a next page, fetch the next page
+    if (isMutate) {
+      handleRefetch();
+    }
+  }, [isMutate]);
+
+  useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
     }

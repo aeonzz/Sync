@@ -8,7 +8,6 @@ import LeftSideBar from "@/components/shared/left-sidebar";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { EdgeStoreProvider } from "@/lib/edgestore";
-import TopBar from "@/components/shared/top-bar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,7 +36,6 @@ export default function AppLayout({
                 <main className="container relative flex h-auto justify-between px-0">
                   <LeftSideBar />
                   <div className="flex-1 pr-4">
-                    <TopBar />
                     {children}
                   </div>
                 </main>

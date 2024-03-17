@@ -9,11 +9,11 @@ export async function POST(
   try {
     const userId = params.userId;
     const body = await req.json();
-    const { displayName, bio, avatarUrl, onboarded } = body;
+    const { username, bio, avatarUrl, onboarded } = body;
 
     const updateData: Record<string, unknown> = {};
-    if (displayName !== undefined) {
-      updateData.displayName = displayName;
+    if (username !== undefined) {
+      updateData.displayName = username;
     }
     if (bio !== undefined) {
       updateData.bio = bio;
@@ -37,7 +37,7 @@ export async function POST(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { message: "could not update post" },
+      { message: "Could not update User" },
       { status: 500 },
     );
   }

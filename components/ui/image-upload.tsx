@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MultiImageDropzone,
   type FileState,
 } from "@/components/forms/multi-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import { cn } from "@/lib/utils";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(useGSAP);
 
 interface ImageUploadProps {
   onUrlsChange: (urls: string[]) => void;
@@ -22,6 +26,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const [fileStates, setFileStates] = useState<FileState[]>([]);
   const [urls, setUrls] = useState<string[]>([]);
   const { edgestore } = useEdgeStore();
+  const animationTimelineRef = useRef<gsap.core.Timeline>(null);
 
   function updateFileProgress(key: string, progress: FileState["progress"]) {
     setFileStates((fileStates) => {
@@ -41,8 +46,32 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     onUrlsChange(urls);
   }, [fileStates, onFileStatesChange, urls]);
 
+  useEffect(() => {
+    animationTimelineRef.current?.clear();
+  }, []);
+
+  useGSAP(() => {
+    //@ts-ignore
+    animationTimelineRef.current = gsap.timeline();
+    if (openImageInput) {
+      animationTimelineRef.current.to("#imageInputAnimation", {
+        height: 150,
+        opacity: 1,
+        duration: 0.2,
+        scaleY: 1,
+      });
+    } else {
+      animationTimelineRef.current.to("#imageInputAnimation", {
+        height: 0,
+        opacity: 0,
+        duration: 0.2,
+        scaleY: 0,
+      });
+    }
+  }, [openImageInput]);
+
   return (
-    <div className={cn(openImageInput ? "opacity-100" : "h-0 w-0 opacity-0")}>
+    <div id="imageInputAnimation" className="h-0 scale-y-0 opacity-0">
       <MultiImageDropzone
         disabled={isLoading}
         value={fileStates}

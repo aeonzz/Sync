@@ -26,7 +26,7 @@ const SignUp = async () => {
       >
         Log in
       </Link>
-      <div className="flex-1 border border-white"></div>
+      {/* <div className="flex-1 border border-white"></div> */}
       <div className="flex h-screen w-full flex-1 items-center justify-center">
         <SignUpForm />
       </div>

@@ -1,24 +1,77 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import prisma from "../db";
-import { authOptions } from "../auth";
 
-
-export async function getUser() {
-  const session = await getServerSession(authOptions);
+export async function getUser(userId: string) {
   try {
     const response = await prisma.user.findFirst({
       where: {
-        id: session?.user.id,
+        id: userId,
       },
       include: {
         StudentData: true,
-      }
+      },
     });
 
-    return response;
+    return { data: response, error: null, status: 200 };
   } catch (error: any) {
-    throw new Error(`Failed to fetch user: ${error.message}`);
+    return { data: null, error: error.message, status: 500 };
+  }
+}
+
+interface Params {
+  userId: string;
+  username?: string | undefined;
+  bio?: string | undefined;
+  avatarUrl?: string | undefined;
+  coverUrl?: string | undefined;
+  onboarded?: boolean | undefined;
+  urls?: {
+    value: string;
+  }[] | null;
+}
+
+export async function updateUser({
+  userId,
+  username,
+  bio,
+  urls,
+  avatarUrl,
+  coverUrl,
+  onboarded,
+}: Params) {
+  try {
+    const updateData: Record<string, unknown> = {};
+    if (username !== undefined) {
+      updateData.username = username;
+    }
+    if (bio !== undefined) {
+      updateData.bio = bio;
+    }
+    if (avatarUrl !== undefined) {
+      updateData.avatarUrl = avatarUrl;
+    }
+    if (coverUrl !== undefined) {
+      updateData.coverUrl = coverUrl;
+    }
+    if (onboarded !== undefined) {
+      updateData.onboarded = onboarded;
+    }
+    if (urls !== undefined && urls !== null) {
+      updateData.Urls = {
+        create: urls.map(url => ({ url: url.value })),
+      };
+    }
+
+    const response = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
+
+
+    return { data: response, error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error)
+    return { data: null, error: error.message, status: 500 };
   }
 }

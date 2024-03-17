@@ -14,7 +14,7 @@ const LandingPageNav = () => {
           <NavMenu />
         </div>
         <Link
-          href="/login"
+          href="/home"
           className={cn(buttonVariants({ size: "default" }), "text-sm")}
         >
           Open Sync

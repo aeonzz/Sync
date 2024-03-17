@@ -1,9 +1,6 @@
 "use server";
 
-import { getServerSession } from "next-auth";
 import prisma from "../db";
-import { authOptions } from "../auth";
-import { boolean } from "zod";
 
 export async function getStudentData(studentId: number) {
   try {
@@ -13,48 +10,28 @@ export async function getStudentData(studentId: number) {
       },
     });
 
-    return response;
+    return { data: response, error: null };
   } catch (error: any) {
-    throw new Error(`Failed to fetch user: ${error.message}`);
+    return { data: null, error: error.message };
   }
 }
 
 interface Params {
   id: number;
-  name: string;
-  yearLevel: string;
-  department: string;
   hasAccount: boolean;
 }
 
-export async function updateStudentData({
-  id,
-  name,
-  yearLevel,
-  department,
-  hasAccount,
-}: Params) {
+export async function updateStudentData({ id, hasAccount }: Params) {
   try {
-    const updateData: Record<string, unknown> = {};
-    if (name !== undefined) {
-      updateData.name = name;
-    }
-    if (yearLevel !== undefined) {
-      updateData.yearLevel = yearLevel;
-    }
-    if (department !== undefined) {
-      updateData.department = department;
-    }
-    if (hasAccount !== undefined) {
-      updateData.hasAccount = hasAccount;
-    }
+    const updateData = { hasAccount };
+
     const response = await prisma.studentData.update({
       where: { id: id },
       data: updateData,
     });
-    return response;
+    return { data: response, error: null, status: 200 };
   } catch (error: any) {
-    console.log(error)
-    throw new Error(`Failed to fetch user: ${error.message}`);
+    console.log(error);
+    return { data: null, error: error.message, status: 500 };
   }
 }

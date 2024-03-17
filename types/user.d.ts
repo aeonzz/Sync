@@ -8,15 +8,17 @@ export type UserType = {
 export type CurrentUser = {
   id: string;
   studentId: number;
-  username: string;
   password: string;
   avatarUrl: string | null;
-  displayName: string | null;
+  username: string | null;
   bio: string | null;
   onboarded: boolean;
   createdAt: Date;
   updatedAt: Date;
   StudentData: {
-    name: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    department: string;
   };
 };

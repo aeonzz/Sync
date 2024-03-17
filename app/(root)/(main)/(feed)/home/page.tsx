@@ -1,29 +1,24 @@
-import OnboardingForm from "@/components/forms/onboarding-form";
+import Feed from "@/components/ui/feed";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getUser } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import React from "react";
 
-const Onboarding = async () => {
+export default async function Home() {
   const session = await getServerSession(authOptions);
   const currentUser = await getUser(session!.user.id);
   if (!currentUser.data || currentUser.error) {
     return <FetchDataError />;
   }
 
-  if (currentUser.data.onboarded) {
-    redirect("/home");
+  if (currentUser.data.onboarded === false) {
+    redirect("/onboarding");
   }
 
   return (
-    <section className="flex h-screen w-full items-center justify-center">
-      <div className="h-auto w-[600px] space-y-5">
-        <OnboardingForm />
-      </div>
+    <section className="min-h-[400px]">
+      <Feed />
     </section>
   );
-};
-
-export default Onboarding;
+}

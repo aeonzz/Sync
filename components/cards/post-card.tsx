@@ -38,6 +38,8 @@ import Linkify from "linkify-react";
 import { PostProps } from "@/types/post";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import FetchDataError from "../ui/fetch-data-error";
+import { useRouter } from "next/router";
 
 interface PostCardProps {
   post: PostProps;
@@ -49,12 +51,12 @@ const options = {
 };
 
 const PostCard: React.FC<PostCardProps> = ({ post }) => {
+  const session = useSession();
   const [actionDropdown, setActionDropdown] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const postedAt = new Date(post.createdAt);
-  const session = useSession();
 
   const contentToDisplay = showFullContent
     ? post.content
@@ -76,7 +78,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
               href="/"
               className="flex items-center gap-1 font-semibold hover:underline"
             >
-              {post.author.displayName}
+              {post.author.username}
               {/* {post.author.role === "SYSTEMADMIN" && (
                 <BadgeCheck className="h-4 w-4 text-red-500" />
               )}

@@ -11,26 +11,6 @@ import bell from "@/public/icons/bell.svg";
 import bellSecondary from "@/public/icons/bell-secondary.svg";
 
 
-export const postTabsNav = [
-  {
-    href: '/',
-    title: 'home',
-    tooltip: 'home',
-    icon: home,
-  },
-  {
-    href: '/events',
-    title: 'event',
-    tooltip: 'events',
-    icon: events,
-  },
-  {
-    href: '/announcements',
-    title: 'announcements',
-    tooltip: 'announcements',
-    icon: megaphone,
-  }
-]
 
 export const sidebarNav = [
   {
@@ -44,7 +24,7 @@ export const sidebarNav = [
     title: "Event",
     icon: events,
     active: eventsSecondary,
-    link: "/events",
+    link: "/event",
     alt: 'events'
   },
   {
@@ -61,13 +41,6 @@ export const sidebarNav = [
     link: "/freedom-wall",
     alt: "freedom-wall"
   },
-  // {
-  //   title: "Notifications",
-  //   icon: bell,
-  //   active: bellSecondary,
-  //   link: "/notifications",
-  //   alt: "notifications"
-  // },
 ]
 
 export const adminNav = [
@@ -77,26 +50,26 @@ export const adminNav = [
   },
 ]
 
-export const sidebarNavItems = [
+export const profileNav = [
   {
     title: "Profile",
-    href: "/user/profile",
+    link: "/u",
   },
   {
     title: "Account",
-    href: "/user/account",
+    link: "/user/account",
   },
   {
     title: "Appearance",
-    href: "/examples/forms/appearance",
+    link: "/examples/forms/appearance",
   },
   {
     title: "Notifications",
-    href: "/examples/forms/notifications",
+    link: "/examples/forms/notifications",
   },
   {
     title: "Display",
-    href: "/examples/forms/display",
+    link: "/examples/forms/display",
   },
 ]
 

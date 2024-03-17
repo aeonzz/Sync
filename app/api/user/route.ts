@@ -6,16 +6,16 @@ import { hash } from "bcrypt";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { studentId, username, password } = SignUpValidation.parse(body);
+    const { studentId, email, password } = SignUpValidation.parse(body);
     const studentIdInt: number = +studentId;
 
-    const existingUserByUsername = await prisma.user.findUnique({
-      where: { username: username },
+    const existingUserByEmail = await prisma.user.findUnique({
+      where: { email: email }
     });
 
-    if (existingUserByUsername) {
+    if (existingUserByEmail) {
       return NextResponse.json(
-        { user: null, message: "Username already exists" },
+        { user: null, message: "Email already exists" },
         { status: 409 },
       );
     }
@@ -37,8 +37,8 @@ export async function POST(req: Request) {
 
     const newUser = await prisma.user.create({
       data: {
+        email,
         studentId: studentIdInt,
-        username,
         password: hashedPassword,
       },
     });
