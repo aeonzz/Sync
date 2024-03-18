@@ -70,31 +70,19 @@ const ImageUploadDialog: React.FC<ImageUploadDialogProps> = ({
       }
     }
 
-    const userData = {
-      userId: currentUser.id,
-      avatarUrl: res?.url,
-    }
-    // let userData;
-    // if (type === "profile") {
-    //   userData = {
-    //     userId: currentUser.id,
-    //     avatarUrl: res?.url,
-    //   };
-    // } else {
-    //   userData = {
-    //     userId: currentUser.id,
-    //     coverUrl: res?.url,
-    //   };
-    // }
+    const userData =
+      type === "avatar"
+        ? { userId: currentUser.id, avatarUrl: res?.url }
+        : { userId: currentUser.id, coverUrl: res?.url };
 
     const result = await updateUser(userData);
 
     if (result.status === 200) {
       setEditModal(false);
       router.refresh();
-      setIsLoading(false);
       isLoadingCallback(false);
       setFile(undefined);
+      toast(`Profile ${type} successfully updated`);
     } else {
       setIsLoading(false);
       isLoadingCallback(false);

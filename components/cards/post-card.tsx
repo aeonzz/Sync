@@ -40,9 +40,11 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import FetchDataError from "../ui/fetch-data-error";
 import { useRouter } from "next/router";
+import { Session } from "next-auth";
 
 interface PostCardProps {
   post: PostProps;
+  session: Session | null;
 }
 
 const options = {
@@ -50,8 +52,7 @@ const options = {
   className: "text-blue-500 hover:underline",
 };
 
-const PostCard: React.FC<PostCardProps> = ({ post }) => {
-  const session = useSession();
+const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
   const [open, setOpen] = useState(false);
@@ -70,9 +71,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     <Card className="mb-4 min-h-[200px]">
       <CardHeader className="flex-row items-center justify-between">
         <div className="relative flex items-center space-x-2">
-          <ProfileHover
-            post={post}
-          />
+          <ProfileHover post={post} />
           <div className="flex flex-col">
             <Link
               href="/"
@@ -93,14 +92,18 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             </div>
           </div>
         </div>
-        <DropdownMenu open={actionDropdown} onOpenChange={setActionDropdown} modal={false}>
+        <DropdownMenu
+          open={actionDropdown}
+          onOpenChange={setActionDropdown}
+          modal={false}
+        >
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
               <MoreHorizontal />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-[80px] p-1.5">
-            {session?.data?.user.id === post.author.id && (
+            {session?.user.id === post.author.id && (
               <>
                 <Dialog open={open} onOpenChange={setOpen}>
                   <DialogTrigger className="w-full">

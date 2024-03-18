@@ -1,5 +1,4 @@
 import prisma from "@/lib/db";
-import { OnboardingServerValidation } from "@/lib/validations/user";
 import { NextResponse } from "next/server";
 
 export async function POST(

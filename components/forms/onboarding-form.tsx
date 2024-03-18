@@ -139,6 +139,7 @@ const OnboardingForm = () => {
                 width={160}
                 height={160}
                 value={file}
+                className="aspect-square rounded-full"
                 onChange={(file) => {
                   setFile(file);
                 }}

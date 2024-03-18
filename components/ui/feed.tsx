@@ -10,10 +10,11 @@ import FetchDataError from "./fetch-data-error";
 import Loader from "../loaders/loader";
 import { PostProps } from "@/types/post";
 import { useMutationSuccess } from "@/context/store";
+import { Session } from "next-auth";
 
-const Feed = () => {
+const Feed = ({ session }: { session: Session | null}) => {
   const { ref, inView } = useInView();
-  const { isMutate, setIsMutate } = useMutationSuccess()
+  const { isMutate, setIsMutate } = useMutationSuccess();
 
   const fetchPosts = async ({ pageParam = 0 }) => {
     const res = await axios.get(`/api/post?cursor=${pageParam}`);
@@ -43,7 +44,7 @@ const Feed = () => {
       ) : (
         <div>
           {group.data.map((post: PostProps) => (
-            <PostCard key={post.postId} post={post} />
+            <PostCard key={post.postId} post={post} session={session} />
           ))}
         </div>
       )}
@@ -54,7 +55,7 @@ const Feed = () => {
     refetch();
     setIsMutate(false);
   };
-  
+
   useEffect(() => {
     if (isMutate) {
       handleRefetch();
@@ -66,17 +67,17 @@ const Feed = () => {
       fetchNextPage();
     }
   }, [hasNextPage, inView, fetchNextPage]);
-  
+
   return (
     <div className="w-[580px]">
-      {status === 'pending' ? (
+      {status === "pending" ? (
         <PostSkeleton />
       ) : status === "error" ? (
         <FetchDataError />
       ) : (
         content
-      )} 
-      <div className='h-24 mt-10 flex justify-center' ref={ref}>
+      )}
+      <div className="mt-10 flex h-24 justify-center" ref={ref}>
         {isFetchingNextPage ? <Loader /> : null}
       </div>
       {/* <div ref={ref}></div>  */}

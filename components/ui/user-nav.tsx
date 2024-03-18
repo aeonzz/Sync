@@ -32,7 +32,7 @@ const UserNav = async () => {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant="secondary"
           size="lg"
           className="flex h-[52px] w-[200px] justify-start space-x-2 border bg-card px-3 shadow-sm"
         >

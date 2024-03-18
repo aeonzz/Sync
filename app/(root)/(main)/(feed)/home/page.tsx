@@ -18,7 +18,7 @@ export default async function Home() {
 
   return (
     <section className="min-h-[400px]">
-      <Feed />
+      <Feed session={session} />
     </section>
   );
 }

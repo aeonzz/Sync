@@ -5,6 +5,7 @@ import FetchDataError from "@/components/ui/fetch-data-error";
 import { redirect } from "next/navigation";
 import ProfileAvatar from "@/components/ui/profile-avatar";
 import ProfileCover from "@/components/ui/profile-cover";
+import EditProfile from "@/components/ui/edit-profile";
 
 interface UserProfileProps {
   params: {
@@ -27,6 +28,7 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
       <Card className="relative h-[200px] border-none">
         <ProfileCover currentUser={currentUser.data} />
         <ProfileAvatar currentUser={currentUser.data} />
+        <EditProfile currentUser={currentUser.data} />
       </Card>
     </div>
   );

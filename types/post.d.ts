@@ -20,11 +20,14 @@ export type PostProps = {
     id: string;
     studentId: string;
     avatarUrl: string;
-    displayName: string;
+    coverUrl: string;
     username: string;
     createdAt: Date;
     StudentData: {
-      name: string;
+      firstName: string;
+      middleName: string;
+      lastName: string;
+      department: string;
     }
   };
 };

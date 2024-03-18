@@ -10,6 +10,7 @@ export type CurrentUser = {
   studentId: number;
   password: string;
   avatarUrl: string | null;
+  coverUrl: string | null;
   username: string | null;
   bio: string | null;
   onboarded: boolean;

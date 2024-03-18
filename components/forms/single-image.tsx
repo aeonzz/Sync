@@ -1,14 +1,15 @@
 "use client";
 
-import { UploadCloudIcon, X } from "lucide-react";
+import { ImagePlus, UploadCloudIcon, X } from "lucide-react";
 import Image from "next/image";
 import * as React from "react";
 import { useDropzone, type DropzoneOptions } from "react-dropzone";
 import { twMerge } from "tailwind-merge";
 import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 const variants = {
-  base: "relative rounded-md flex justify-center border border-stone-800 rounded-full aspect-square items-center flex-col cursor-pointer min-h-[50px] min-w-[50px] bg-card transition-colors duration-200 ease-in-out",
+  base: "relative rounded-md flex justify-center border border-stone-800 items-center flex-col cursor-pointer min-h-[50px] min-w-[50px] bg-card transition-colors duration-200 ease-in-out overflow-hidden",
   image:
     "border-0 p-0 w-full h-full relative shadow-md bg-background rounded-md",
   active: "border-2",
@@ -21,6 +22,7 @@ type InputProps = {
   width: number;
   height: number;
   className?: string;
+  removeIcon?: boolean;
   value?: File | string;
   onChange?: (file?: File) => void | Promise<void>;
   disabled?: boolean;
@@ -44,7 +46,16 @@ const ERROR_MESSAGES = {
 
 const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { dropzoneOptions, width, height, value, className, disabled, onChange },
+    {
+      dropzoneOptions,
+      width,
+      height,
+      value,
+      className,
+      disabled,
+      onChange,
+      removeIcon,
+    },
     ref,
   ) => {
     const imageUrl = React.useMemo(() => {
@@ -137,11 +148,12 @@ const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
           {imageUrl ? (
             // Image Preview
             <Image
-              className="h-full w-full rounded-full object-cover"
-              height={64}
-              width={64}
+              className={cn(className, "h-full w-full rounded-md object-cover")}
+              height={400}
+              width={400}
               src={imageUrl}
-              alt={acceptedFiles[0]?.name}
+              alt={acceptedFiles[0]?.name ? acceptedFiles[0]?.name : "Upload photo"}
+              quality={100}
             />
           ) : (
             // Upload Icon
@@ -160,20 +172,34 @@ const SingleImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
               </div>
             </div>
           )}
-
           {/* Remove Image Icon */}
           {imageUrl && !disabled && (
-            <Button
-              size="icon"
-              variant="ghost"
-              className="group absolute right-0 top-0 rounded-full bg-background/50"
-              onClick={(e) => {
-                e.stopPropagation();
-                void onChange?.(undefined);
-              }}
-            >
-              <X className="h-5 w-5 group-active:scale-95" />
-            </Button>
+            <>
+              {removeIcon ? (
+                <div className="group absolute left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center bg-background/50 transition hover:bg-background/40">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="group rounded-full bg-background/50"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <ImagePlus className="h-5 w-5 group-active:scale-95" />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="group absolute right-0 top-0 rounded-full bg-background/50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void onChange?.(undefined);
+                  }}
+                >
+                  <X className="h-5 w-5 group-active:scale-95" />
+                </Button>
+              )}
+            </>
           )}
         </div>
 
