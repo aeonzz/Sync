@@ -68,3 +68,10 @@ model Urls {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
 }
+
+model Banner {
+  id        Int      @id @default(autoincrement())
+  bannerUrl String
+  deleted   Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+}

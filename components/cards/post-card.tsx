@@ -223,7 +223,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                     quality={100}
                     // placeholder="blur"
                     // blurDataURL=""
-                    priority={true}
+                    priority
                   />
                 </div>
               ))}

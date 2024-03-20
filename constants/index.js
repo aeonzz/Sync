@@ -1,5 +1,4 @@
 import home from "@/public/icons/home.svg";
-import haha from "@/public/icons/haha.svg";
 import megaphone from "@/public/icons/megaphone.svg";
 import events from "@/public/icons/events.svg";
 import bird from "@/public/icons/bird.svg";
@@ -7,8 +6,6 @@ import homeSecondary from "@/public/icons/home-secondary.svg";
 import eventsSecondary from "@/public/icons/events-secondary.svg";
 import megaphoneSecondary from "@/public/icons/megaphone-secondary.svg";
 import birdSecondary from "@/public/icons/bird-secondary.svg";
-import bell from "@/public/icons/bell.svg";
-import bellSecondary from "@/public/icons/bell-secondary.svg";
 
 
 

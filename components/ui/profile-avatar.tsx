@@ -1,5 +1,3 @@
-"use client";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CurrentUser } from "@/types/user";
 import {
@@ -11,21 +9,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import { Button } from "./button";
-import { PenLine, X } from "lucide-react";
-import { useState } from "react";
-import ImageUploadDialog from "./image-upload-dialog";
 
 interface ProfileAvatarProps {
   currentUser: CurrentUser;
 }
 
-const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ currentUser }) => {
+const ProfileAvatar: React.FC<ProfileAvatarProps> = async ({ currentUser }) => {
   const profileImage = currentUser.avatarUrl
     ? currentUser.avatarUrl
     : undefined;
   const fullname = `${currentUser.StudentData.firstName} ${currentUser.StudentData.middleName.charAt(0).toUpperCase()} ${currentUser.StudentData.lastName}`;
-
+  
   return (
     <div className="absolute -bottom-20 left-5 flex h-32 w-auto items-end space-x-3">
       <Dialog>
@@ -45,7 +39,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ currentUser }) => {
           </DialogTrigger>
         </div>
         {profileImage && (
-          <DialogImage>
+          <DialogImage className="max-h-[80%] !w-fit">
             <Image
               className="object-cover"
               src={profileImage}
@@ -53,6 +47,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ currentUser }) => {
               width={500}
               height={500}
               quality={100}
+              priority
             />
           </DialogImage>
         )}

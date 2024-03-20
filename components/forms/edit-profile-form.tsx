@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -25,15 +24,20 @@ import { useEdgeStore } from "@/lib/edgestore";
 import { updateUser } from "@/lib/actions/user.actions";
 import { useRouter } from "next/navigation";
 import Loader from "../loaders/loader";
+import Banners from "../ui/banners";
 
 interface EditProfileFormProps {
   currentUser: CurrentUser;
   setOpen: (state: boolean) => void;
+  isLoading: boolean;
+  setIsLoading: (state: boolean) => void;
 }
 
 const EditProfileForm: React.FC<EditProfileFormProps> = ({
   currentUser,
   setOpen,
+  isLoading,
+  setIsLoading,
 }) => {
   const form = useForm<z.infer<typeof OnboardingValidation>>({
     resolver: zodResolver(OnboardingValidation),
@@ -48,7 +52,6 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
   const profileAvatar = currentUser.avatarUrl
     ? currentUser.avatarUrl
     : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/no-image.jpg";
-  const [isLoading, setIsLoading] = useState(false);
   const { edgestore } = useEdgeStore();
   const router = useRouter();
   const [coverFile, setCoverFile] = useState<File>();
@@ -96,8 +99,10 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
 
     if (result.status === 200) {
       setOpen(false);
+      setIsLoading(false);
       router.refresh();
       toast("Profile successfully updated");
+      setIsLoading(false);
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
@@ -106,7 +111,6 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
       });
     }
   }
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
@@ -115,7 +119,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
             width={464}
             height={160}
             removeIcon={true}
-            className="rounded-md"
+            className="rounded-md bg-secondary"
             disabled={isLoading}
             value={coverFile ? coverFile : profileCover}
             onChange={(coverFile) => {
@@ -127,7 +131,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
               width={160}
               height={160}
               removeIcon={true}
-              className="aspect-square rounded-full"
+              className="aspect-square rounded-full bg-secondary"
               disabled={isLoading}
               value={avatarFile ? avatarFile : profileAvatar}
               onChange={(avatarFile) => {
@@ -135,6 +139,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
               }}
             />
           </div>
+          <Banners />
         </div>
         <div className="w-full space-y-2 pt-12">
           <FormField
@@ -146,6 +151,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
                 <FormControl>
                   <Input
                     placeholder="This is your public display name."
+                    autoComplete="off"
                     disabled={isLoading}
                     {...field}
                   />
@@ -163,7 +169,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
                 <FormControl>
                   <Textarea
                     placeholder="Tell us a little bit about yourself"
-                    className="resize-none"
+                    className="resize-none focus-visible:ring-1 focus-visible:ring-offset-1"
                     disabled={isLoading}
                     {...field}
                   />

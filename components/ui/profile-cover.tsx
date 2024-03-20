@@ -1,6 +1,3 @@
-"use client";
-
-import loginImage from "@/public/static-images/prateek-katyal-xv7-GlvBLFw-unsplash.jpg";
 import {
   Dialog,
   DialogContent,
@@ -10,19 +7,23 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import { Button } from "./button";
-import { useState } from "react";
-import ImageUploadDialog from "./image-upload-dialog";
 import { CurrentUser } from "@/types/user";
+import { getPlaiceholder } from "plaiceholder";
 
 interface ProfileCoverProps {
   currentUser: CurrentUser;
 }
 
-const ProfileCover: React.FC<ProfileCoverProps> = ({ currentUser }) => {
+const ProfileCover: React.FC<ProfileCoverProps> = async ({ currentUser }) => {
   const profileCover = currentUser.coverUrl
     ? currentUser.coverUrl
     : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/nat-cXuvDkzEJdE-unsplash.jpg";
+
+  const buffer = await fetch(profileCover).then(async (res) =>
+    Buffer.from(await res.arrayBuffer()),
+  );
+
+  const { base64 } = await getPlaiceholder(buffer);
 
   return (
     <>
@@ -34,15 +35,16 @@ const ProfileCover: React.FC<ProfileCoverProps> = ({ currentUser }) => {
             src={profileCover}
             alt="cover photo"
             quality={100}
+            priority
+            blurDataURL={base64}
           />
         </DialogTrigger>
-        <DialogImage>
+        <DialogImage className="h-[75%] max-w-5xl">
           <Image
             className="object-cover"
             src={profileCover}
             alt="Cover Photo"
-            width={1000}
-            height={1000}
+            fill
             quality={100}
           />
         </DialogImage>
