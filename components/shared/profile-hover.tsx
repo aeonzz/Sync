@@ -20,7 +20,7 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({ post, className }) => {
   const profile = post.author.avatarUrl ? post.author.avatarUrl : undefined;
   const authorCreatedAt = new Date(post.author.createdAt);
   const date = format(authorCreatedAt, "PP");
-  const initialLetter = post.author.username.charAt(0).toUpperCase();
+  const initialLetter = post.author.username?.charAt(0).toUpperCase();
   const fullname = `${post.author.StudentData.firstName} ${post.author.StudentData.middleName.charAt(0).toUpperCase()} ${post.author.StudentData.lastName}`;
 
   return (
@@ -42,8 +42,8 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({ post, className }) => {
       >
         <div className="relative h-16 w-[250px]">
           <Image
-            src={post.author.coverUrl}
-            alt={post.author.coverUrl}
+            src={post.author.coverUrl ? post.author.coverUrl : "asdasd"}
+            alt={post.author.coverUrl ? post.author.coverUrl : "asdasd"}
             fill
             objectFit="cover"
             objectPosition="center"

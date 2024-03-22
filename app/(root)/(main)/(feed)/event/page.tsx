@@ -1,9 +1,31 @@
-import React from 'react'
+import PostCard from "@/components/cards/post-card";
+import LoadMore from "@/components/ui/load-more";
+import { getPosts } from "@/lib/actions/post.actions";
+import { authOptions } from "@/lib/auth";
+import { PostProps } from "@/types/post";
+import { getServerSession } from "next-auth";
+import React from "react";
 
-const page = () => {
+const Event = async () => {
+  const posts = await getPosts(1);
+  const session = await getServerSession(authOptions)
+
   return (
-    <div>page</div>
-  )
-}
+    <>
+      {posts.data?.length === 0 ? (
+        <div>
+          No post
+        </div>
+      ) : (
+        <section className="min-h-[400px] w-[580px]">
+          {posts.data?.map((post: PostProps) => (
+            <PostCard key={post.postId} post={post} session={session} />
+          ))}
+          <LoadMore session={session} />
+        </section>
+      )}
+    </>
+  );
+};
 
-export default page
+export default Event;

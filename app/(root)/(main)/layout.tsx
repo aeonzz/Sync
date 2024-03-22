@@ -22,29 +22,25 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={cn("bg-background", inter.className)}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SessionProvider>
-            <QueryClientProvder>
-              <EdgeStoreProvider>
-                <main className="container relative flex h-auto justify-between px-0">
-                  <LeftSideBar />
-                  <div className="flex-1 pr-4">
-                    {children}
-                  </div>
-                </main>
-              </EdgeStoreProvider>
-              <Toaster richColors />
-            </QueryClientProvder>
-          </SessionProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <section className={cn("bg-background", inter.className)}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <SessionProvider>
+          <QueryClientProvder>
+            <EdgeStoreProvider>
+              <main className="container relative flex h-auto justify-between px-0">
+                <LeftSideBar />
+                <div className="flex-1 pr-4">{children}</div>
+              </main>
+            </EdgeStoreProvider>
+            <Toaster richColors />
+          </QueryClientProvder>
+        </SessionProvider>
+      </ThemeProvider>
+    </section>
   );
 }

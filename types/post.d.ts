@@ -11,17 +11,17 @@ export type PostProps = {
   createdAt: Date;
   imageUrls: {
     id: number
-    url: string
-    postId: number
-    userId: number
-    createdAt: Date
+    url: string | null
+    postId: string
+    // userId: number
+    // createdAt: Date
   }[] | null;
   author: {
     id: string;
-    studentId: string;
-    avatarUrl: string;
-    coverUrl: string;
-    username: string;
+    studentId: number;
+    avatarUrl: string | null;
+    coverUrl: string | null;
+    username: string | null;
     createdAt: Date;
     StudentData: {
       firstName: string;

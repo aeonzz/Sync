@@ -214,17 +214,19 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                       ? post.imageUrls?.length >= 5 && <p>More...</p>
                       : null}
                   </div>
-                  <Image
-                    className="h-full w-full object-cover object-center"
-                    src={image.url}
-                    alt="post image"
-                    width={1000}
-                    height={1000}
-                    quality={100}
-                    // placeholder="blur"
-                    // blurDataURL=""
-                    priority
-                  />
+                  {image.url && (
+                    <Image
+                      className="h-full w-full object-cover object-center"
+                      src={image.url}
+                      alt="post image"
+                      width={1000}
+                      height={1000}
+                      quality={100}
+                      // placeholder="blur"
+                      // blurDataURL=""
+                      priority
+                    />
+                  )}
                 </div>
               ))}
             </div>

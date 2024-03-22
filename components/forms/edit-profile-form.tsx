@@ -56,6 +56,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
   const router = useRouter();
   const [coverFile, setCoverFile] = useState<File>();
   const [avatarFile, setAvatarFile] = useState<File>();
+  const [banner, setBanner] = useState<string>();
 
   async function onSubmit(data: z.infer<typeof OnboardingValidation>) {
     setIsLoading(true);
@@ -91,7 +92,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
     const userData = {
       ...data,
       userId: currentUser.id,
-      coverUrl: coverRes?.url,
+      coverUrl: banner ? banner : coverRes?.url,
       avatarUrl: avatarRes?.url,
       onboarded: true,
     };
@@ -139,7 +140,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
               }}
             />
           </div>
-          <Banners />
+          <Banners setBanner={setBanner} />
         </div>
         <div className="w-full space-y-2 pt-12">
           <FormField
