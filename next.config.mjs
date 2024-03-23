@@ -12,9 +12,8 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "supabase.com",
+        hostname: "jolfgowviyxdrvtelayh.supabase.co",
         port: "",
-        pathname: "/dashboard/project/jolfgowviyxdrvtelayh/storage/buckets",
       },
     ],
   },

@@ -18,7 +18,6 @@ const LoadMore: React.FC<LoadMoreProps> = ({ session }) => {
   const [data, setData] = useState<PostProps[]>([]);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState<boolean>();
-  console.log(hasNextPage);
 
   useEffect(() => {
     if (inView) {

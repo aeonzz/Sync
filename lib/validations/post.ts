@@ -5,6 +5,4 @@ export const PostValidation = z.object({
   content: z.string().min(10, {
     message: "Description must be at least 10 characters.",
   }),
-  imageUrls: z.string().optional(),
-  sequenceId: z.number().optional(),
 });

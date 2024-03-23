@@ -10,7 +10,7 @@ export type CurrentUser = {
   studentId: number;
   password: string;
   avatarUrl: string | null;
-  coverUrl: string | null;
+  coverUrl: string;
   username: string | null;
   bio: string | null;
   onboarded: boolean;
@@ -22,4 +22,8 @@ export type CurrentUser = {
     lastName: string;
     department: string;
   };
+  Urls: {
+    id: number
+    url: string;
+  } [] | undefined
 };

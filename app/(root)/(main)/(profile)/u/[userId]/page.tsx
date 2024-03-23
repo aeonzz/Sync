@@ -23,6 +23,7 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
     redirect("/onboarding");
   }
 
+
   return (
     <div className="h-screen w-full">
       <Card className="relative h-[200px] border-none">

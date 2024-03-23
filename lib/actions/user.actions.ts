@@ -10,6 +10,7 @@ export async function getUser(userId: string) {
       },
       include: {
         StudentData: true,
+        Urls: true,
       },
     });
 

@@ -11,6 +11,7 @@ import {
 import { Button } from "./button";
 import EditProfileForm from "../forms/edit-profile-form";
 import { CurrentUser } from "@/types/user";
+import { ScrollArea } from "./scroll-area";
 
 interface EditProfileProps {
   currentUser: CurrentUser;
@@ -33,16 +34,19 @@ const EditProfile: React.FC<EditProfileProps> = ({ currentUser }) => {
             e.preventDefault();
           }
         }}
+        className="h-[90%] !max-w-[520px]"
       >
         <DialogHeader>
           <DialogTitle>Edit profile</DialogTitle>
         </DialogHeader>
-        <EditProfileForm
-          currentUser={currentUser}
-          setOpen={setOpen}
-          setIsLoading={setIsLoading}
-          isLoading={isLoading}
-        />
+        <ScrollArea className="w-full" type="scroll">
+          <EditProfileForm
+            currentUser={currentUser}
+            setOpen={setOpen}
+            setIsLoading={setIsLoading}
+            isLoading={isLoading}
+          />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

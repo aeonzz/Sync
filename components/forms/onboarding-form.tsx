@@ -21,12 +21,10 @@ import { Plus, X } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { useState } from "react";
 import Loader from "../loaders/loader";
-import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { SingleImageDropzone } from "./single-image";
 import { useEdgeStore } from "@/lib/edgestore";
-import { UserType } from "@/types/user";
 import { useRouter } from "next/navigation";
 import { updateUser } from "@/lib/actions/user.actions";
 import {
@@ -57,24 +55,6 @@ const OnboardingForm = () => {
     name: "urls",
     control: form.control,
   });
-
-  // const { mutate: onboarding } = useMutation({
-  //   mutationFn: async (onboarding: UserType) => {
-  //     return axios.post(`/api/user/${userId}`, onboarding);
-  //   },
-  //   onError: (error) => {
-  //     console.log(error);
-  //     setIsLoading(false);
-  //     toast.error("Uh oh! Something went wrong.", {
-  //       description:
-  //         "An error occurred while making the request. Please try again later",
-  //     });
-  //   },
-  //   onSuccess: () => {
-  //     router.push("/home");
-  //     router.refresh();
-  //   },
-  // });
 
   async function onSubmit(data: z.infer<typeof OnboardingValidation>) {
     setIsLoading(true);

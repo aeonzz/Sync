@@ -31,16 +31,15 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { Separator } from "../ui/separator";
 import Loader from "../loaders/loader";
 import Linkify from "linkify-react";
 import { PostProps } from "@/types/post";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import FetchDataError from "../ui/fetch-data-error";
-import { useRouter } from "next/router";
 import { Session } from "next-auth";
+import PostForm from "../forms/post-form";
+import EditContentForm from "../forms/edit-content-form";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface PostCardProps {
   post: PostProps;
@@ -55,9 +54,14 @@ const options = {
 const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [isDirty, setIsDirty] = useState<boolean>();
+  const [isImageDirty, setIsImageDirty] = useState<boolean>();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const postedAt = new Date(post.createdAt);
+  const [isEditing, setIsEditing] = useState(false);
+  const ShortContentWithNoImage =
+    post.content.length < 40 && post.imageUrls?.length === 0;
 
   const contentToDisplay = showFullContent
     ? post.content
@@ -119,10 +123,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                     <DialogHeader>
                       <DialogTitle>Edit post</DialogTitle>
                     </DialogHeader>
-                    <Separator />
+                    <PostForm
+                      onMutationSuccess={setOpen}
+                      hasUserInput={setIsDirty}
+                      hasUserImages={setIsImageDirty}
+                      onLoading={setIsLoading}
+                    />
                   </DialogContent>
                 </Dialog>
-                {/* <DropdownMenuSeparator /> */}
                 <Dialog>
                   <DialogTrigger asChild>
                     <DropdownMenuItem
@@ -160,30 +168,51 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                 </Dialog>
               </>
             )}
+            <DropdownMenuItem
+              className="text-xs"
+              onClick={() => setIsEditing(true)}
+            >
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
       <CardContent>
         <Linkify options={options}>
-          <p
-            className={cn(
-              post.content.length < 40 &&
-                post.imageUrls?.length === 0 &&
-                "text-2xl",
-              "whitespace-pre-wrap break-words",
-            )}
-          >
-            {contentToDisplay}
-            {post.content.length > 500 && (
-              <Button
-                variant="link"
-                onClick={toggleContentVisibility}
-                className="-mt-5 ml-1 p-0 text-slate-200"
+          <AnimatePresence>
+            {isEditing ? (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 20, opacity: 0 }}
               >
-                {showFullContent ? "See Less" : "...See More"}
-              </Button>
+                <EditContentForm
+                  content={post.content}
+                  setIsEditing={setIsEditing}
+                  ShortContentWithNoImage={ShortContentWithNoImage}
+                />
+              </motion.div>
+            ) : (
+              <p
+                className={cn(
+                  ShortContentWithNoImage && "text-2xl",
+                  "whitespace-pre-wrap break-words",
+                )}
+              >
+                {contentToDisplay}
+                {post.content.length > 500 && (
+                  <Button
+                    variant="link"
+                    onClick={toggleContentVisibility}
+                    className="-mt-5 ml-1 p-0 text-slate-200"
+                  >
+                    {showFullContent ? "See Less" : "...See More"}
+                  </Button>
+                )}
+              </p>
             )}
-          </p>
+          </AnimatePresence>
         </Linkify>
         <Link href={`/post/${post.postId}`}>
           <div className="relative mt-5 flex w-full overflow-hidden rounded-md">

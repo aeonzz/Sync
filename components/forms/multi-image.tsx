@@ -56,7 +56,6 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     const [customError, setCustomError] = React.useState<string>();
-
     const imageUrls = React.useMemo(() => {
       if (value) {
         return value.map((fileState) => {
@@ -145,10 +144,10 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
     }, [fileRejections, dropzoneOptions]);
 
     return (
-      <div>
+      <div className="flex h-full items-end">
         <ScrollArea
           className={cn(
-            value?.length !== 0 ? "h-[200px] p-3" : "h-[150px]",
+            value?.length !== 0 ? "h-[225px] p-3" : "h-[150px]",
             "flex w-full flex-col rounded-md bg-card shadow-sm",
           )}
         >

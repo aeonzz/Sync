@@ -21,7 +21,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = async ({ currentUser }) => {
   const fullname = `${currentUser.StudentData.firstName} ${currentUser.StudentData.middleName.charAt(0).toUpperCase()} ${currentUser.StudentData.lastName}`;
   
   return (
-    <div className="absolute -bottom-20 left-5 flex h-32 w-auto items-end space-x-3">
+    <div className="absolute -bottom-28 left-5 flex h-32 w-auto items-end space-x-3">
       <Dialog>
         <div className="relative">
           <DialogTrigger asChild>

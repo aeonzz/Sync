@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -25,6 +25,9 @@ import { updateUser } from "@/lib/actions/user.actions";
 import { useRouter } from "next/navigation";
 import Loader from "../loaders/loader";
 import Banners from "../ui/banners";
+import { Plus, X } from "lucide-react";
+import { ScrollArea } from "../ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 interface EditProfileFormProps {
   currentUser: CurrentUser;
@@ -39,13 +42,22 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
   isLoading,
   setIsLoading,
 }) => {
+  const hasUrls = currentUser.Urls && currentUser.Urls.length > 0;
+
   const form = useForm<z.infer<typeof OnboardingValidation>>({
     resolver: zodResolver(OnboardingValidation),
     defaultValues: {
       username: currentUser.username ? currentUser.username : "",
       bio: currentUser.bio ? currentUser.bio : "",
+      urls: hasUrls ? currentUser.Urls?.map((url) => ({ value: url.url })) : [],
     },
   });
+
+  const { fields, append, remove } = useFieldArray({
+    name: "urls",
+    control: form.control,
+  });
+
   const profileCover = currentUser.coverUrl
     ? currentUser.coverUrl
     : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/nat-cXuvDkzEJdE-unsplash.jpg";
@@ -59,6 +71,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
   const [banner, setBanner] = useState<string>();
 
   async function onSubmit(data: z.infer<typeof OnboardingValidation>) {
+    console.log(data)
     setIsLoading(true);
 
     let coverRes;
@@ -114,7 +127,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6 px-1">
         <div className="relative">
           <SingleImageDropzone
             width={464}
@@ -179,6 +192,47 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
               </FormItem>
             )}
           />
+        </div>
+        <div className="space-y-2">
+          <FormLabel>URLs</FormLabel>
+          <div className="flex items-center justify-between">
+            <FormDescription>
+              Add links to your website, blog, or social media profiles.
+            </FormDescription>
+            <Button
+              type="button"
+              variant="ghost"
+              className="text-xs"
+              onClick={() => append({ value: "" })}
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              Add URL
+            </Button>
+          </div>
+          {fields.map((field, index) => (
+            <div key={field.id} className="mb-4 flex items-center space-x-2">
+              <FormField
+                control={form.control}
+                name={`urls.${index}.value`}
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input {...field} disabled={isLoading} />
+                    </FormControl>
+                    <FormMessage className="-bottom-4" />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                onClick={() => remove(index)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
         </div>
         <div className="mt-5 flex w-full space-x-3">
           <Button

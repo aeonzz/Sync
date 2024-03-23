@@ -21,14 +21,16 @@ import { Button } from "../ui/button";
 import { z } from "zod";
 import { Textarea } from "../ui/textarea";
 import Loader from "../loaders/loader";
-import ImageUpload from "../ui/image-upload";
-import { ImagePlus, SmilePlus } from "lucide-react";
+import { ImagePlus, SmilePlus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { FileState } from "./multi-image";
+import { FileState, MultiImageDropzone } from "./multi-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { useMutationSuccess, useThemeStore } from "@/context/store";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import { CreatePost } from "@/lib/actions/post.actions";
+import { AppendImage } from "@/lib/actions/image.actions";
 
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
@@ -47,24 +49,11 @@ const PostForm: React.FC<PostFormProps> = ({
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [openImageInput, setOpenImageInput] = useState(false);
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
   const { edgestore } = useEdgeStore();
   const router = useRouter();
   const { isDark } = useThemeStore();
   const { setIsMutate } = useMutationSuccess();
-
-  const hasPendingProgress = fileStates.some(
-    (item) => item.progress !== "COMPLETE",
-  );
-
-  const handleUrlsChange = (urls: string[]) => {
-    setImageUrls(urls);
-  };
-
-  const fileStatesChange = (state: FileState[]) => {
-    setFileStates(state);
-  };
 
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
@@ -83,6 +72,19 @@ const PostForm: React.FC<PostFormProps> = ({
     form.setValue("content", newContent);
   };
 
+  function updateFileProgress(key: string, progress: FileState["progress"]) {
+    setFileStates((fileStates) => {
+      const newFileStates = structuredClone(fileStates);
+      const fileState = newFileStates.find(
+        (fileState) => fileState.key === key,
+      );
+      if (fileState) {
+        fileState.progress = progress;
+      }
+      return newFileStates;
+    });
+  }
+
   const { mutate: createpost } = useMutation({
     mutationFn: (newPost: PostType) => {
       return axios.post("/api/post", newPost);
@@ -99,30 +101,55 @@ const PostForm: React.FC<PostFormProps> = ({
 
       await Promise.all(
         imageUrls.map(async (url) => {
-          await axios.post("/api/files", {
+          const data = {
             url,
             postId,
-          });
+          };
+          await AppendImage(data);
         }),
       );
       onMutationSuccess(false);
       toast("Posted.");
+      router.refresh();
       setIsMutate(true);
     },
   });
 
   const onSubmit = async (data: z.infer<typeof PostValidation>) => {
     setOpenEmojiPicker(false);
-    onLoading(true)
+    onLoading(true);
     setIsLoading(true);
+    await Promise.all(
+      fileStates.map(async (fileState) => {
+        try {
+          if (
+            fileState.progress !== "PENDING" ||
+            typeof fileState.file === "string"
+          ) {
+            return;
+          }
+          const res = await edgestore.publicImages.upload({
+            file: fileState.file,
+            onProgressChange: async (progress) => {
+              updateFileProgress(fileState.key, progress);
+              if (progress === 100) {
+                // wait 1 second to set it to complete
+                // so that the user can see the progress bar
+                // await new Promise((resolve) => setTimeout(resolve, 1000));
+                updateFileProgress(fileState.key, "COMPLETE");
+              }
+            },
+          });
+          setImageUrls((prevUrls) => [...prevUrls, res.url]);
+        } catch (err) {
+          updateFileProgress(fileState.key, "ERROR");
+        }
+      }),
+    );
     createpost({
       ...data,
     });
   };
-
-  useEffect(() => {
-    setIsUploading(hasPendingProgress);
-  }, [fileStates, hasPendingProgress]);
 
   useEffect(() => {
     hasUserInput(form.formState.isDirty);
@@ -166,7 +193,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     watchFormContent.length >= 90
                       ? "text-md h-[150px]"
                       : "h-[80px] text-xl",
-                    "h-150px resize-none border-none bg-transparent placeholder:font-medium",
+                    "h-150px resize-none border-none bg-transparent placeholder:font-medium mb-5",
                   )}
                   disabled={isLoading}
                   {...field}
@@ -176,12 +203,28 @@ const PostForm: React.FC<PostFormProps> = ({
             </FormItem>
           )}
         />
-        <ImageUpload
-          onUrlsChange={handleUrlsChange}
-          openImageInput={openImageInput}
-          onFileStatesChange={fileStatesChange}
-          isLoading={isLoading}
-        />
+        <AnimatePresence>
+          {openImageInput && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 225, opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className={cn("overflow-hidden rounded-md")}
+            >
+              <MultiImageDropzone
+                value={fileStates}
+                dropzoneOptions={{
+                  maxFiles: 20,
+                }}
+                disabled={isLoading}
+                onChange={setFileStates}
+                onFilesAdded={async (addedFiles) => {
+                  setFileStates([...fileStates, ...addedFiles]);
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
         <div className="relative space-y-2">
           <div className="flex items-center justify-end">
             <Button
@@ -225,32 +268,23 @@ const PostForm: React.FC<PostFormProps> = ({
               />
             </Button>
             <div className="absolute -right-[70%] -top-[360px]">
-              <Suspense fallback={<Loader />}>
-                <EmojiPicker
-                  open={openEmojiPicker}
-                  theme={isDark ? Theme.LIGHT : Theme.DARK}
-                  className="z-[100] !h-[400px] !w-full !rounded-lg !border-none !bg-card p-3 pb-6 shadow-md"
-                  lazyLoadEmojis={true}
-                  searchDisabled={true}
-                  onEmojiClick={handleEmojiClick}
-                  previewConfig={{
-                    showPreview: false,
-                  }}
-                />
-              </Suspense>
+              <EmojiPicker
+                open={openEmojiPicker}
+                theme={isDark ? Theme.LIGHT : Theme.DARK}
+                className="z-[100] !h-[400px] !w-full !rounded-lg !border-none !bg-card p-3 pb-6 shadow-md"
+                lazyLoadEmojis={true}
+                searchDisabled={true}
+                onEmojiClick={handleEmojiClick}
+                previewConfig={{
+                  showPreview: false,
+                }}
+              />
             </div>
           </div>
           <Button
             type="submit"
             className="w-full transition-none"
-            disabled={isLoading || isUploading}
-            onClick={async () => {
-              for (const imageUrl of imageUrls) {
-                await edgestore.publicImages.confirmUpload({
-                  url: imageUrl,
-                });
-              }
-            }}
+            disabled={isLoading}
           >
             {isLoading && <Loader />}
             {isLoading ? null : <p>Post</p>}

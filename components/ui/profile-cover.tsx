@@ -16,8 +16,6 @@ interface ProfileCoverProps {
 
 const ProfileCover: React.FC<ProfileCoverProps> = async ({ currentUser }) => {
   const profileCover = currentUser.coverUrl
-    ? currentUser.coverUrl
-    : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/nat-cXuvDkzEJdE-unsplash.jpg";
 
   const buffer = await fetch(profileCover).then(async (res) =>
     Buffer.from(await res.arrayBuffer()),

@@ -6,7 +6,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Link from "next/link";
 import { BadgeCheck, CalendarDays } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { PostProps } from "@/types/post";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -42,8 +41,8 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({ post, className }) => {
       >
         <div className="relative h-16 w-[250px]">
           <Image
-            src={post.author.coverUrl ? post.author.coverUrl : "asdasd"}
-            alt={post.author.coverUrl ? post.author.coverUrl : "asdasd"}
+            src={post.author.coverUrl}
+            alt={post.author.coverUrl}
             fill
             objectFit="cover"
             objectPosition="center"

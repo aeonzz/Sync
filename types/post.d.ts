@@ -13,14 +13,12 @@ export type PostProps = {
     id: number
     url: string | null
     postId: string
-    // userId: number
-    // createdAt: Date
   }[] | null;
   author: {
     id: string;
     studentId: number;
     avatarUrl: string | null;
-    coverUrl: string | null;
+    coverUrl: string;
     username: string | null;
     createdAt: Date;
     StudentData: {
