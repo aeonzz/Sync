@@ -1,7 +1,7 @@
 "use client";
 
 import { PostValidation } from "@/lib/validations/post";
-import { PostType } from "@/types/post";
+import { PostProps, PostType } from "@/types/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
@@ -29,14 +29,22 @@ import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { useMutationSuccess, useThemeStore } from "@/context/store";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { CreatePost } from "@/lib/actions/post.actions";
-import { AppendImage } from "@/lib/actions/image.actions";
+import { appendImage, deleteImage } from "@/lib/actions/image.actions";
+import Image from "next/image";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "../ui/accordion";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
   hasUserInput: (state: boolean) => void;
   hasUserImages: (state: boolean) => void;
   onLoading: (state: boolean) => void;
+  editData?: PostProps | null;
 }
 
 const PostForm: React.FC<PostFormProps> = ({
@@ -44,12 +52,16 @@ const PostForm: React.FC<PostFormProps> = ({
   hasUserInput,
   hasUserImages,
   onLoading,
+  editData,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [openImageInput, setOpenImageInput] = useState(false);
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
+  const [accordionValue, setAccourdionValue] = useState("item-1");
+  const [idToDelete, setIdToDelete] = useState<number[]>([]);
+  console.log(idToDelete)
   const { edgestore } = useEdgeStore();
   const router = useRouter();
   const { isDark } = useThemeStore();
@@ -58,8 +70,8 @@ const PostForm: React.FC<PostFormProps> = ({
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
-      title: "",
-      content: "",
+      title: editData?.content ? editData.content : "",
+      content: editData?.content ? editData.content : "",
     },
   });
 
@@ -105,7 +117,7 @@ const PostForm: React.FC<PostFormProps> = ({
             url,
             postId,
           };
-          await AppendImage(data);
+          await appendImage(data);
         }),
       );
       onMutationSuccess(false);
@@ -151,6 +163,19 @@ const PostForm: React.FC<PostFormProps> = ({
     });
   };
 
+  const handleDeleteImage = async (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
+    e.preventDefault();
+
+    const response = await deleteImage(id)
+
+    if (response.status === 200) {
+      toast("success")
+      router.refresh()
+    } else {
+      alert("yawa")
+    }
+  };
+
   useEffect(() => {
     hasUserInput(form.formState.isDirty);
     hasUserImages(imageUrls.length !== 0);
@@ -193,7 +218,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     watchFormContent.length >= 90
                       ? "text-md h-[150px]"
                       : "h-[80px] text-xl",
-                    "h-150px resize-none border-none bg-transparent placeholder:font-medium mb-5",
+                    "h-150px mb-5 resize-none border-none bg-transparent placeholder:font-medium",
                   )}
                   disabled={isLoading}
                   {...field}
@@ -203,7 +228,75 @@ const PostForm: React.FC<PostFormProps> = ({
             </FormItem>
           )}
         />
-        <AnimatePresence>
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full"
+          value={accordionValue}
+          onValueChange={setAccourdionValue}
+        >
+          {editData && editData.imageUrls?.length !== 0 && (
+            <AccordionItem value="item-1" className="border-none">
+              <AccordionContent>
+                <ScrollArea className="h-[250px]">
+                  <div
+                    className={cn(
+                      editData.imageUrls?.length === 1 && "grid-cols-1",
+                      editData.imageUrls?.length === 2 && "grid-cols-2",
+                      editData.imageUrls?.length === 3 && "grid-cols-2",
+                      //@ts-ignore
+                      editData.imageUrls?.length >= 4 && "grid-cols-4",
+                      "grid min-h-[200px] w-full grid-flow-row gap-2",
+                    )}
+                  >
+                    {editData.imageUrls?.map((image, index) => (
+                      <div
+                        key={index}
+                        className="relative col-span-1 aspect-square rounded-md bg-secondary"
+                      >
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="group absolute right-0 top-0 z-10 rounded-full bg-background/50"
+                          onClick={(e) => {
+                            // setIdToDelete([image.id]);
+                            handleDeleteImage(e, image.id);
+                          }}
+                        >
+                          <X className="h-5 w-5 group-active:scale-95" />
+                        </Button>
+                        <Image
+                          src={image.url as string}
+                          alt={image.url as string}
+                          fill
+                          objectFit="cover"
+                          priority
+                          className="rounded-md"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+          <AccordionItem value="item-2" className="border-none">
+            <AccordionContent className="h-[225px]">
+              <MultiImageDropzone
+                value={fileStates}
+                dropzoneOptions={{
+                  maxFiles: 20,
+                }}
+                disabled={isLoading}
+                onChange={setFileStates}
+                onFilesAdded={async (addedFiles) => {
+                  setFileStates([...fileStates, ...addedFiles]);
+                }}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        {/* <AnimatePresence>
           {openImageInput && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
@@ -224,7 +317,7 @@ const PostForm: React.FC<PostFormProps> = ({
               />
             </motion.div>
           )}
-        </AnimatePresence>
+        </AnimatePresence> */}
         <div className="relative space-y-2">
           <div className="flex items-center justify-end">
             <Button
@@ -237,6 +330,13 @@ const PostForm: React.FC<PostFormProps> = ({
               onClick={(e) => {
                 e.preventDefault();
                 setOpenImageInput((prev) => !prev);
+                setAccourdionValue((prev) =>
+                  prev === "item-1"
+                    ? "item-2"
+                    : "item-1" || prev === ""
+                      ? "item-1"
+                      : "item-2",
+                );
               }}
               disabled={isLoading}
             >
@@ -286,8 +386,11 @@ const PostForm: React.FC<PostFormProps> = ({
             className="w-full transition-none"
             disabled={isLoading}
           >
-            {isLoading && <Loader />}
-            {isLoading ? null : <p>Post</p>}
+            {isLoading ? (
+              <Loader />
+            ) : (
+              <>{editData ? <p>Conifrm</p> : <p>Post</p>}</>
+            )}
           </Button>
         </div>
       </form>

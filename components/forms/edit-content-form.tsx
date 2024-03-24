@@ -17,35 +17,54 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { PostValidation } from "@/lib/validations/post";
 import { cn } from "@/lib/utils";
+import { Check, X } from "lucide-react";
+import { useState } from "react";
+import { UpdatePost } from "@/lib/actions/post.actions";
+import { usePathname } from "next/navigation";
 
 interface EditContentFormProps {
+  postId: string;
   content: string;
   setIsEditing: (state: boolean) => void;
-  ShortContentWithNoImage: boolean;
 }
 const EditContentForm: React.FC<EditContentFormProps> = ({
+  postId,
   content,
   setIsEditing,
-  ShortContentWithNoImage,
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const pathname = usePathname();
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
       content: content,
     },
   });
+  const watchFormContent = form.watch("content");
 
-  function onSubmit(data: z.infer<typeof PostValidation>) {
-    toast(
-      <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-        <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-      </pre>,
-    );
+  async function onSubmit(data: z.infer<typeof PostValidation>) {
+    setIsLoading(true);
+
+    const updateData = {
+      ...data,
+      postId,
+      path: pathname,
+    };
+
+    const response = await UpdatePost(updateData);
+
+    if (response.status === 200) {
+      setIsLoading(false);
+      setIsEditing(false);
+    }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full relative">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="relative w-full space-y-3"
+      >
         <FormField
           control={form.control}
           name="content"
@@ -53,8 +72,13 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
             <FormItem>
               <FormControl>
                 <Textarea
+                  autoFocus
                   className={cn(
-                    ShortContentWithNoImage && "!text-2xl",
+                    watchFormContent.length >= 90 ? "!text-base" : "!text-2xl",
+                    watchFormContent.length > 100 && "!h-[80px]",
+                    watchFormContent.length > 150 && "!h-[100px]",
+                    watchFormContent.length > 200 && "!h-[120px]",
+                    watchFormContent.length > 250 && "!h-[140px]",
                     content.length > 100 && "!h-[80px]",
                     content.length > 150 && "!h-[100px]",
                     content.length > 200 && "!h-[120px]",
@@ -68,17 +92,26 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
             </FormItem>
           )}
         />
-        <div className="absolute -top-14 right-14">
+        <div className="flex justify-end">
           <Button
             variant="ghost"
+            disabled={isLoading}
+            size="icon"
             onClick={(e) => {
               e.preventDefault();
               setIsEditing(false);
             }}
           >
-            Cancel
+            <X className="text-red-500/70" />
           </Button>
-          <Button type="submit">Submit</Button>
+          <Button
+            type="submit"
+            size="icon"
+            variant="ghost"
+            disabled={isLoading}
+          >
+            <Check className="text-green-500/70" />
+          </Button>
         </div>
       </form>
     </Form>

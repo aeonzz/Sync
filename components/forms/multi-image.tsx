@@ -56,6 +56,7 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     const [customError, setCustomError] = React.useState<string>();
+    console.log(value)
     const imageUrls = React.useMemo(() => {
       if (value) {
         return value.map((fileState) => {

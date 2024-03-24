@@ -16,7 +16,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -30,7 +34,15 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { MoreHorizontal, Pencil, Trash } from "lucide-react";
+import {
+  MoreHorizontal,
+  Pencil,
+  PlusCircle,
+  Text,
+  Trash,
+  UserPlus,
+  X,
+} from "lucide-react";
 import Loader from "../loaders/loader";
 import Linkify from "linkify-react";
 import { PostProps } from "@/types/post";
@@ -40,6 +52,17 @@ import { Session } from "next-auth";
 import PostForm from "../forms/post-form";
 import EditContentForm from "../forms/edit-content-form";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
 
 interface PostCardProps {
   post: PostProps;
@@ -60,6 +83,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [isLoading, setIsLoading] = useState(false);
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
 
@@ -96,124 +120,197 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             </div>
           </div>
         </div>
-        <DropdownMenu
-          open={actionDropdown}
-          onOpenChange={setActionDropdown}
-          modal={false}
-        >
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-[80px] p-1.5">
-            {session?.user.id === post.author.id && (
-              <>
-                <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogTrigger className="w-full">
-                    <DropdownMenuItem
-                      className="text-xs"
-                      onSelect={(e) => e.preventDefault()}
-                    >
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DropdownMenu
+            open={actionDropdown}
+            onOpenChange={setActionDropdown}
+            modal={false}
+          >
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="min-w-[100px] p-1.5">
+              {session?.user.id === post.author.id && (
+                <>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="text-xs">
                       <Pencil className="mr-2 h-4 w-4" />
                       Edit
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Edit post</DialogTitle>
-                    </DialogHeader>
-                    <PostForm
-                      onMutationSuccess={setOpen}
-                      hasUserInput={setIsDirty}
-                      hasUserImages={setIsImageDirty}
-                      onLoading={setIsLoading}
-                    />
-                  </DialogContent>
-                </Dialog>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem
-                      className="text-xs text-red-600"
-                      onSelect={(e) => e.preventDefault()}
-                    >
-                      <Trash className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle className="text-xl font-semibold">
-                        Are you absolutely sure?
-                      </DialogTitle>
-                      <DialogDescription>
-                        This action cannot be undone. This will permanently
-                        delete the post from our servers.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button variant="outline">Close</Button>
-                      </DialogClose>
-                      <Button
-                        variant="destructive"
-                        onClick={() => {}}
-                        disabled={isLoading}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent className="min-w-[100px] p-1.5">
+                        <DropdownMenuItem
+                          className="text-xs"
+                          onClick={() => setIsEditing(true)}
+                        >
+                          <Text className="mr-2 h-4 w-4" />
+                          Caption
+                        </DropdownMenuItem>
+                        <DialogTrigger disabled={isEditing} asChild>
+                          <DropdownMenuItem
+                            className="text-xs"
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            More
+                          </DropdownMenuItem>
+                        </DialogTrigger>
+                        <DialogContent
+                          onInteractOutside={(e) => {
+                            if (isDirty || isImageDirty) {
+                              e.preventDefault();
+                              if (!isLoading) {
+                                setAlertOpen(true);
+                              }
+                            }
+                          }}
+                        >
+                          {isDirty || isImageDirty ? (
+                            <AlertDialog
+                              open={alertOpen}
+                              onOpenChange={setAlertOpen}
+                            >
+                              <AlertDialogTrigger asChild>
+                                <button
+                                  className="absolute right-4 top-4 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                                  disabled={isLoading}
+                                >
+                                  <X className="h-5 w-5" />
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    You have unsaved changes. Are you sure you
+                                    want to leave?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>
+                                    Continue editing
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => setOpen(false)}
+                                  >
+                                    Close
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          ) : (
+                            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                              <X className="h-5 w-5" />
+                              <span className="sr-only">Close</span>
+                            </DialogClose>
+                          )}
+                          <DialogHeader>
+                            <DialogTitle>Edit post</DialogTitle>
+                          </DialogHeader>
+                          <PostForm
+                            onMutationSuccess={setOpen}
+                            hasUserInput={setIsDirty}
+                            hasUserImages={setIsImageDirty}
+                            onLoading={setIsLoading}
+                            editData={post}
+                          />
+                        </DialogContent>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem
+                        className="text-xs text-red-600"
+                        onSelect={(e) => e.preventDefault()}
                       >
-                        {isLoading && <Loader />}
-                        Continue
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
-            <DropdownMenuItem
-              className="text-xs"
-              onClick={() => setIsEditing(true)}
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                        <Trash className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle className="text-xl font-semibold">
+                          Are you absolutely sure?
+                        </DialogTitle>
+                        <DialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete the post from our servers.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button variant="outline">Close</Button>
+                        </DialogClose>
+                        <Button
+                          variant="destructive"
+                          onClick={() => {}}
+                          disabled={isLoading}
+                        >
+                          {isLoading && <Loader />}
+                          Continue
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </Dialog>
       </CardHeader>
       <CardContent>
-        <Linkify options={options}>
+        <div className="relative">
           <AnimatePresence>
-            {isEditing ? (
+            {isEditing && (
               <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 20, opacity: 0 }}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
               >
                 <EditContentForm
+                  postId={post.postId}
                   content={post.content}
                   setIsEditing={setIsEditing}
-                  ShortContentWithNoImage={ShortContentWithNoImage}
                 />
               </motion.div>
-            ) : (
-              <p
-                className={cn(
-                  ShortContentWithNoImage && "text-2xl",
-                  "whitespace-pre-wrap break-words",
-                )}
-              >
-                {contentToDisplay}
-                {post.content.length > 500 && (
-                  <Button
-                    variant="link"
-                    onClick={toggleContentVisibility}
-                    className="-mt-5 ml-1 p-0 text-slate-200"
-                  >
-                    {showFullContent ? "See Less" : "...See More"}
-                  </Button>
-                )}
-              </p>
             )}
           </AnimatePresence>
-        </Linkify>
+          <AnimatePresence initial={false}>
+            {isEditing === false && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <Linkify options={options}>
+                  <p
+                    className={cn(
+                      ShortContentWithNoImage && "text-2xl",
+                      "whitespace-pre-wrap break-words",
+                    )}
+                  >
+                    {contentToDisplay}
+                    {post.content.length > 500 && (
+                      <Button
+                        variant="link"
+                        onClick={toggleContentVisibility}
+                        className="-mt-5 ml-1 p-0 text-slate-200"
+                      >
+                        {showFullContent ? "See Less" : "...See More"}
+                      </Button>
+                    )}
+                  </p>
+                </Linkify>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
         <Link href={`/post/${post.postId}`}>
           <div className="relative mt-5 flex w-full overflow-hidden rounded-md">
             <div

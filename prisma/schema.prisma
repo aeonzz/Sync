@@ -17,7 +17,7 @@ model User {
   username    String?     @unique
   password    String
   avatarUrl   String?
-  coverUrl    String     @default("https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/26993850_369183360223308_167538467966553831_n.png")
+  coverUrl    String      @default("https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/26993850_369183360223308_167538467966553831_n.png")
   bio         String?     @db.Text
   onboarded   Boolean     @default(false)
   createdAt   DateTime    @default(now()) @db.Timestamp(6)
@@ -40,10 +40,10 @@ model Post {
 }
 
 model Image {
-  id     Int     @id @default(autoincrement())
-  url    String? @db.VarChar(255)
-  postId String
-  post   Post    @relation(fields: [postId], references: [postId])
+  id      Int     @id @default(autoincrement())
+  url     String? @db.VarChar(255)
+  postId  String
+  post    Post    @relation(fields: [postId], references: [postId])
 }
 
 model StudentData {
