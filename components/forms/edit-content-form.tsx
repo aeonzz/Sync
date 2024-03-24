@@ -56,6 +56,12 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
     if (response.status === 200) {
       setIsLoading(false);
       setIsEditing(false);
+    } else {
+      setIsLoading(false);
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
     }
   }
 

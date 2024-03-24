@@ -63,6 +63,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { deleteImage } from "@/lib/actions/image.actions";
 
 interface PostCardProps {
   post: PostProps;
@@ -83,6 +86,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [isLoading, setIsLoading] = useState(false);
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
+  const router = useRouter()
   const [alertOpen, setAlertOpen] = useState(false);
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
@@ -94,6 +98,24 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const toggleContentVisibility = () => {
     setShowFullContent(!showFullContent);
   };
+
+  async function handleDeleteImage(
+    e: React.MouseEvent<HTMLButtonElement>,
+    id: number,
+  ) {
+    e.preventDefault();
+
+    const response = await deleteImage(id);
+
+    if (response.status === 200) {
+      router.refresh()
+    } else {
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    }
+  }
 
   return (
     <Card className="mb-4 min-h-[200px]">
@@ -328,6 +350,18 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                     "relative w-full",
                   )}
                 >
+                  {isEditing && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="group absolute right-0 top-0 z-10 rounded-full bg-background/50"
+                      onClick={(e) => {
+                        handleDeleteImage(e, image.id);
+                      }}
+                    >
+                      <X className="h-5 w-5 group-active:scale-95" />
+                    </Button>
+                  )}
                   <div
                     className={cn(
                       index === 3 && post.imageUrls

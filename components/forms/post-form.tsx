@@ -27,7 +27,7 @@ import { FileState, MultiImageDropzone } from "./multi-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { useMutationSuccess, useThemeStore } from "@/context/store";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { appendImage, deleteImage } from "@/lib/actions/image.actions";
 import Image from "next/image";
@@ -38,6 +38,7 @@ import {
   AccordionTrigger,
 } from "../ui/accordion";
 import { ScrollArea } from "../ui/scroll-area";
+import { UpdatePost } from "@/lib/actions/post.actions";
 
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
@@ -60,9 +61,9 @@ const PostForm: React.FC<PostFormProps> = ({
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
   const [accordionValue, setAccourdionValue] = useState("item-1");
-  const [idToDelete, setIdToDelete] = useState<number[]>([]);
-  console.log(idToDelete)
+  const [editImages, setEditImages] = useState(editData?.imageUrls);
   const { edgestore } = useEdgeStore();
+  const pathname = usePathname();
   const router = useRouter();
   const { isDark } = useThemeStore();
   const { setIsMutate } = useMutationSuccess();
@@ -127,11 +128,11 @@ const PostForm: React.FC<PostFormProps> = ({
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof PostValidation>) => {
+  async function onSubmit(data: z.infer<typeof PostValidation>) {
     setOpenEmojiPicker(false);
     onLoading(true);
     setIsLoading(true);
-    await Promise.all(
+    const gg = await Promise.all(
       fileStates.map(async (fileState) => {
         try {
           if (
@@ -152,29 +153,71 @@ const PostForm: React.FC<PostFormProps> = ({
               }
             },
           });
+
           setImageUrls((prevUrls) => [...prevUrls, res.url]);
+          return res.url;
         } catch (err) {
           updateFileProgress(fileState.key, "ERROR");
         }
       }),
     );
-    createpost({
-      ...data,
-    });
-  };
 
-  const handleDeleteImage = async (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
+    if (editData) {
+      const updateData = {
+        ...data,
+        postId: editData.postId,
+        path: pathname,
+      };
+      const response = await UpdatePost(updateData);
+
+      if (response?.status === 200) {
+        if (gg.length > 0 && editData) {
+          await Promise.all(
+            gg.map(async (url) => {
+              if (url) {
+                const data = {
+                  url,
+                  postId: editData.postId,
+                };
+                await appendImage(data);
+              }
+            }),
+          );
+        }
+        onMutationSuccess(false);
+        setIsLoading(false);
+        setIsMutate(true);
+        router.refresh()
+      } else {
+        toast.error("Uh oh! Something went wrong.", {
+          description:
+            "An error occurred while making the request. Please try again later",
+        });
+      }
+    } else {
+      createpost({
+        ...data,
+      });
+    }
+  }
+
+  async function handleDeleteImage(
+    e: React.MouseEvent<HTMLButtonElement>,
+    id: number,
+  ) {
     e.preventDefault();
 
-    const response = await deleteImage(id)
+    const response = await deleteImage(id);
 
     if (response.status === 200) {
-      toast("success")
-      router.refresh()
+      setEditImages(editImages?.filter((image) => image.id !== id));
     } else {
-      alert("yawa")
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
     }
-  };
+  }
 
   useEffect(() => {
     hasUserInput(form.formState.isDirty);
@@ -235,21 +278,21 @@ const PostForm: React.FC<PostFormProps> = ({
           value={accordionValue}
           onValueChange={setAccourdionValue}
         >
-          {editData && editData.imageUrls?.length !== 0 && (
+          {editImages && editImages.length !== 0 && (
             <AccordionItem value="item-1" className="border-none">
               <AccordionContent>
-                <ScrollArea className="h-[250px]">
+                <ScrollArea className="h-[125px] rounded-md">
                   <div
                     className={cn(
-                      editData.imageUrls?.length === 1 && "grid-cols-1",
-                      editData.imageUrls?.length === 2 && "grid-cols-2",
-                      editData.imageUrls?.length === 3 && "grid-cols-2",
+                      editImages.length === 1 && "grid-cols-1",
+                      editImages.length === 2 && "grid-cols-2",
+                      editImages.length === 3 && "grid-cols-2",
                       //@ts-ignore
-                      editData.imageUrls?.length >= 4 && "grid-cols-4",
+                      editImages.length >= 4 && "grid-cols-4",
                       "grid min-h-[200px] w-full grid-flow-row gap-2",
                     )}
                   >
-                    {editData.imageUrls?.map((image, index) => (
+                    {editImages.map((image, index) => (
                       <div
                         key={index}
                         className="relative col-span-1 aspect-square rounded-md bg-secondary"
@@ -259,7 +302,6 @@ const PostForm: React.FC<PostFormProps> = ({
                           variant="ghost"
                           className="group absolute right-0 top-0 z-10 rounded-full bg-background/50"
                           onClick={(e) => {
-                            // setIdToDelete([image.id]);
                             handleDeleteImage(e, image.id);
                           }}
                         >
