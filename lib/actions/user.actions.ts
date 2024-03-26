@@ -2,7 +2,7 @@
 
 import prisma from "../db";
 
-export async function getUser(userId: string) {
+export async function getUserById(userId: string) {
   try {
     const response = await prisma.user.findFirst({
       where: {

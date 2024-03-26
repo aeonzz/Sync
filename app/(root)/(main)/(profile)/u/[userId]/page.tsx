@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { getUser } from "@/lib/actions/user.actions";
+import { getUserById } from "@/lib/actions/user.actions";
 import React from "react";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { redirect } from "next/navigation";
@@ -14,7 +14,7 @@ interface UserProfileProps {
 }
 
 const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
-  const currentUser = await getUser(params.userId);
+  const currentUser = await getUserById(params.userId);
   if (!currentUser.data || currentUser.error) {
     return <FetchDataError />;
   }

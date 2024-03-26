@@ -1,5 +1,4 @@
 import PostCard from "@/components/cards/post-card";
-import LoadMore from "@/components/ui/load-more";
 import { getPosts } from "@/lib/actions/post.actions";
 import { authOptions } from "@/lib/auth";
 import { PostProps } from "@/types/post";
@@ -21,7 +20,6 @@ const Event = async () => {
           {posts.data?.map((post: PostProps) => (
             <PostCard key={post.postId} post={post} session={session} />
           ))}
-          <LoadMore session={session} />
         </section>
       )}
     </>

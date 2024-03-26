@@ -15,12 +15,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -35,6 +29,7 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import {
+  CircleUserRound,
   MoreHorizontal,
   Pencil,
   PlusCircle,
@@ -63,9 +58,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { toast } from "sonner";
+import { deletePost } from "@/lib/actions/post.actions";
 import { useRouter } from "next/navigation";
-import { deleteImage } from "@/lib/actions/image.actions";
+import { toast } from "sonner";
+import { useMutationSuccess } from "@/context/store";
+import CommentForm from "../forms/comment-form";
 
 interface PostCardProps {
   post: PostProps;
@@ -80,14 +77,11 @@ const options = {
 const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
-  const [isDirty, setIsDirty] = useState<boolean>();
-  const [isImageDirty, setIsImageDirty] = useState<boolean>();
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
-  const router = useRouter()
-  const [alertOpen, setAlertOpen] = useState(false);
+  const { setIsMutate } = useMutationSuccess();
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
 
@@ -99,16 +93,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
     setShowFullContent(!showFullContent);
   };
 
-  async function handleDeleteImage(
-    e: React.MouseEvent<HTMLButtonElement>,
-    id: number,
-  ) {
-    e.preventDefault();
-
-    const response = await deleteImage(id);
+  async function handleDelete() {
+    const response = await deletePost(post.postId);
 
     if (response.status === 200) {
-      router.refresh()
+      setIsMutate(true);
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -156,96 +145,16 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             <DropdownMenuContent className="min-w-[100px] p-1.5">
               {session?.user.id === post.author.id && (
                 <>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="text-xs">
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                      <DropdownMenuSubContent className="min-w-[100px] p-1.5">
-                        <DropdownMenuItem
-                          className="text-xs"
-                          onClick={() => setIsEditing(true)}
-                        >
-                          <Text className="mr-2 h-4 w-4" />
-                          Caption
-                        </DropdownMenuItem>
-                        <DialogTrigger disabled={isEditing} asChild>
-                          <DropdownMenuItem
-                            className="text-xs"
-                            onSelect={(e) => e.preventDefault()}
-                          >
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            More
-                          </DropdownMenuItem>
-                        </DialogTrigger>
-                        <DialogContent
-                          onInteractOutside={(e) => {
-                            if (isDirty || isImageDirty) {
-                              e.preventDefault();
-                              if (!isLoading) {
-                                setAlertOpen(true);
-                              }
-                            }
-                          }}
-                        >
-                          {isDirty || isImageDirty ? (
-                            <AlertDialog
-                              open={alertOpen}
-                              onOpenChange={setAlertOpen}
-                            >
-                              <AlertDialogTrigger asChild>
-                                <button
-                                  className="absolute right-4 top-4 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-                                  disabled={isLoading}
-                                >
-                                  <X className="h-5 w-5" />
-                                </button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>
-                                    Are you absolutely sure?
-                                  </AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    You have unsaved changes. Are you sure you
-                                    want to leave?
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>
-                                    Continue editing
-                                  </AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => setOpen(false)}
-                                  >
-                                    Close
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          ) : (
-                            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                              <X className="h-5 w-5" />
-                              <span className="sr-only">Close</span>
-                            </DialogClose>
-                          )}
-                          <DialogHeader>
-                            <DialogTitle>Edit post</DialogTitle>
-                          </DialogHeader>
-                          <PostForm
-                            onMutationSuccess={setOpen}
-                            hasUserInput={setIsDirty}
-                            hasUserImages={setIsImageDirty}
-                            onLoading={setIsLoading}
-                            editData={post}
-                          />
-                        </DialogContent>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenuSub>
-                  <Dialog>
-                    <DialogTrigger asChild>
+                  <DropdownMenuItem
+                    className="text-xs"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+
+                  <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+                    <AlertDialogTrigger asChild>
                       <DropdownMenuItem
                         className="text-xs text-red-600"
                         onSelect={(e) => e.preventDefault()}
@@ -253,32 +162,25 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                         <Trash className="mr-2 h-4 w-4" />
                         Delete
                       </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle className="text-xl font-semibold">
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
                           Are you absolutely sure?
-                        </DialogTitle>
-                        <DialogDescription>
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
                           This action cannot be undone. This will permanently
                           delete the post from our servers.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <DialogClose asChild>
-                          <Button variant="outline">Close</Button>
-                        </DialogClose>
-                        <Button
-                          variant="destructive"
-                          onClick={() => {}}
-                          disabled={isLoading}
-                        >
-                          {isLoading && <Loader />}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete()}>
                           Continue
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </>
               )}
             </DropdownMenuContent>
@@ -293,11 +195,13 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
+                className="border border-transparent"
               >
                 <EditContentForm
                   postId={post.postId}
                   content={post.content}
                   setIsEditing={setIsEditing}
+                  editData={post}
                 />
               </motion.div>
             )}
@@ -338,7 +242,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             <div
               className={cn(
                 post.imageUrls?.length === 1 ? "grid-cols-1" : "grid-cols-2",
-                "grid w-full flex-1",
+                "grid w-full flex-1 gap-[1px]",
               )}
             >
               {post.imageUrls?.slice(0, 4).map((image, index) => (
@@ -350,18 +254,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                     "relative w-full",
                   )}
                 >
-                  {isEditing && (
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="group absolute right-0 top-0 z-10 rounded-full bg-background/50"
-                      onClick={(e) => {
-                        handleDeleteImage(e, image.id);
-                      }}
-                    >
-                      <X className="h-5 w-5 group-active:scale-95" />
-                    </Button>
-                  )}
                   <div
                     className={cn(
                       index === 3 && post.imageUrls
@@ -379,11 +271,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                       className="h-full w-full object-cover object-center"
                       src={image.url}
                       alt="post image"
-                      width={1000}
-                      height={1000}
-                      quality={100}
-                      // placeholder="blur"
-                      // blurDataURL=""
+                      width={700}
+                      height={700}
+                      quality={50}
+                      placeholder="blur"
+                      blurDataURL={image.blurDataUrl}
                       priority
                     />
                   )}
@@ -393,7 +285,61 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
           </div>
         </Link>
       </CardContent>
-      <CardFooter></CardFooter>
+      <CardFooter className="flex-col space-y-5">
+        <div className="flex justify-between w-full">
+          <div className="flex -mr-5">
+            <CircleUserRound />
+            <CircleUserRound />
+            <CircleUserRound />
+            <CircleUserRound />
+          </div>
+          <div className="flex space-x-5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
+              />
+            </svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="h-6 w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
+              />
+            </svg>
+          </div>
+        </div>
+        <CommentForm post={post} />
+      </CardFooter>
     </Card>
   );
 };

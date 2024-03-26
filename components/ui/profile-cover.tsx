@@ -9,6 +9,7 @@ import {
 import Image from "next/image";
 import { CurrentUser } from "@/types/user";
 import { getPlaiceholder } from "plaiceholder";
+import getBase64 from "@/lib/base64";
 
 interface ProfileCoverProps {
   currentUser: CurrentUser;
@@ -17,12 +18,8 @@ interface ProfileCoverProps {
 const ProfileCover: React.FC<ProfileCoverProps> = async ({ currentUser }) => {
   const profileCover = currentUser.coverUrl
 
-  const buffer = await fetch(profileCover).then(async (res) =>
-    Buffer.from(await res.arrayBuffer()),
-  );
-
-  const { base64 } = await getPlaiceholder(buffer);
-
+  const base64 = await getBase64(profileCover)
+  
   return (
     <>
       <Dialog>
@@ -33,7 +30,7 @@ const ProfileCover: React.FC<ProfileCoverProps> = async ({ currentUser }) => {
             src={profileCover}
             alt="cover photo"
             quality={100}
-            priority
+            placeholder="blur"
             blurDataURL={base64}
           />
         </DialogTrigger>
@@ -44,6 +41,8 @@ const ProfileCover: React.FC<ProfileCoverProps> = async ({ currentUser }) => {
             alt="Cover Photo"
             fill
             quality={100}
+            placeholder="blur"
+            blurDataURL={base64}
           />
         </DialogImage>
       </Dialog>

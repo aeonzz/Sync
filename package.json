@@ -36,6 +36,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
+    "embla-carousel-autoplay": "^8.0.0",
+    "embla-carousel-react": "^8.0.0",
     "emoji-picker-react": "^4.7.18",
     "framer-motion": "^11.0.20",
     "linkify-react": "^4.1.3",

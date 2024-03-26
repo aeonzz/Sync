@@ -17,7 +17,7 @@ export async function createBanner(bannerUrl: string) {
   }
 }
 
-export async function getBanners() {
+export async function getBanner() {
   try {
     const response = await prisma.banner.findMany({
       orderBy: {

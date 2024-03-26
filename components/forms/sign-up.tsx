@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import {
-  getStudentData,
+  getStudentDataById,
   updateStudentData,
 } from "@/lib/actions/student.actions";
 import Loader from "../loaders/loader";
@@ -74,7 +74,7 @@ const SignUpForm = () => {
       }
     }
     const studentIdInt: number = +studentId;
-    const idData = await getStudentData(studentIdInt);
+    const idData = await getStudentDataById(studentIdInt);
 
     if (idData.error) {
       toast.error("Uh oh! Something went wrong.", {
@@ -224,7 +224,7 @@ const SignUpForm = () => {
                 disabled={isLoading}
               >
                 {isLoading && <Loader />}
-                {isLoading ? null : <p>Sign up</p>}
+                {isLoading ? null : <p>Signup</p>}
               </Button>
             </>
           ) : (

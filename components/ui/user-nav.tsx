@@ -10,7 +10,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./button";
 import { LogOut, Settings, UserRound } from "lucide-react";
-import { getUser } from "@/lib/actions/user.actions";
+import { getUserById } from "@/lib/actions/user.actions";
 import Logout from "./logout";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -19,7 +19,7 @@ import FetchDataError from "./fetch-data-error";
 
 const UserNav = async () => {
   const session = await getServerSession(authOptions);
-  const currentUser = await getUser(session!.user.id);
+  const currentUser = await getUserById(session!.user.id);
   if (!currentUser.data || currentUser.error) {
     return <FetchDataError />;
   }

@@ -28,24 +28,15 @@ import { useEdgeStore } from "@/lib/edgestore";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { useMutationSuccess, useThemeStore } from "@/context/store";
 import { usePathname, useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
 import { appendImage, deleteImage } from "@/lib/actions/image.actions";
-import Image from "next/image";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../ui/accordion";
-import { ScrollArea } from "../ui/scroll-area";
-import { UpdatePost } from "@/lib/actions/post.actions";
-
+import { Accordion, AccordionContent, AccordionItem } from "../ui/accordion";
+import { createPostt } from "@/lib/actions/post.actions";
+import { useSession } from "next-auth/react";
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
   hasUserInput: (state: boolean) => void;
   hasUserImages: (state: boolean) => void;
   onLoading: (state: boolean) => void;
-  editData?: PostProps | null;
 }
 
 const PostForm: React.FC<PostFormProps> = ({
@@ -53,17 +44,14 @@ const PostForm: React.FC<PostFormProps> = ({
   hasUserInput,
   hasUserImages,
   onLoading,
-  editData,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [openImageInput, setOpenImageInput] = useState(false);
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
-  const [accordionValue, setAccourdionValue] = useState("item-1");
-  const [editImages, setEditImages] = useState(editData?.imageUrls);
+  const [accordionValue, setAccourdionValue] = useState("");
   const { edgestore } = useEdgeStore();
-  const pathname = usePathname();
+  const session = useSession();
   const router = useRouter();
   const { isDark } = useThemeStore();
   const { setIsMutate } = useMutationSuccess();
@@ -71,8 +59,8 @@ const PostForm: React.FC<PostFormProps> = ({
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
-      title: editData?.content ? editData.content : "",
-      content: editData?.content ? editData.content : "",
+      title: "",
+      content: "",
     },
   });
 
@@ -98,41 +86,12 @@ const PostForm: React.FC<PostFormProps> = ({
     });
   }
 
-  const { mutate: createpost } = useMutation({
-    mutationFn: (newPost: PostType) => {
-      return axios.post("/api/post", newPost);
-    },
-    onError: () => {
-      setIsLoading(false);
-      onLoading(false);
-      toast.error("Uh oh! Something went wrong.", {
-        description: "Could not create post, Try again later.",
-      });
-    },
-    onSuccess: async (data) => {
-      const postId = data.data.postId;
-
-      await Promise.all(
-        imageUrls.map(async (url) => {
-          const data = {
-            url,
-            postId,
-          };
-          await appendImage(data);
-        }),
-      );
-      onMutationSuccess(false);
-      toast("Posted.");
-      router.refresh();
-      setIsMutate(true);
-    },
-  });
-
   async function onSubmit(data: z.infer<typeof PostValidation>) {
     setOpenEmojiPicker(false);
     onLoading(true);
     setIsLoading(true);
-    const gg = await Promise.all(
+
+    const uploadImage = await Promise.all(
       fileStates.map(async (fileState) => {
         try {
           if (
@@ -154,7 +113,6 @@ const PostForm: React.FC<PostFormProps> = ({
             },
           });
 
-          setImageUrls((prevUrls) => [...prevUrls, res.url]);
           return res.url;
         } catch (err) {
           updateFileProgress(fileState.key, "ERROR");
@@ -162,56 +120,21 @@ const PostForm: React.FC<PostFormProps> = ({
       }),
     );
 
-    if (editData) {
-      const updateData = {
-        ...data,
-        postId: editData.postId,
-        path: pathname,
-      };
-      const response = await UpdatePost(updateData);
+    const postData = {
+      ...data,
+      userId: session.data!.user.id,
+      images: uploadImage,
+    };
 
-      if (response?.status === 200) {
-        if (gg.length > 0 && editData) {
-          await Promise.all(
-            gg.map(async (url) => {
-              if (url) {
-                const data = {
-                  url,
-                  postId: editData.postId,
-                };
-                await appendImage(data);
-              }
-            }),
-          );
-        }
-        onMutationSuccess(false);
-        setIsLoading(false);
-        setIsMutate(true);
-        router.refresh()
-      } else {
-        toast.error("Uh oh! Something went wrong.", {
-          description:
-            "An error occurred while making the request. Please try again later",
-        });
-      }
-    } else {
-      createpost({
-        ...data,
-      });
-    }
-  }
-
-  async function handleDeleteImage(
-    e: React.MouseEvent<HTMLButtonElement>,
-    id: number,
-  ) {
-    e.preventDefault();
-
-    const response = await deleteImage(id);
+    const response = await createPostt(postData);
 
     if (response.status === 200) {
-      setEditImages(editImages?.filter((image) => image.id !== id));
+      onMutationSuccess(false);
+      toast("Posted.");
+      router.refresh();
+      setIsMutate(true);
     } else {
+      setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
         description:
           "An error occurred while making the request. Please try again later",
@@ -221,8 +144,8 @@ const PostForm: React.FC<PostFormProps> = ({
 
   useEffect(() => {
     hasUserInput(form.formState.isDirty);
-    hasUserImages(imageUrls.length !== 0);
-  }, [form.formState.isDirty, imageUrls]);
+    hasUserImages(fileStates.length > 0);
+  }, [form.formState.isDirty, fileStates]);
 
   return (
     <Form {...form}>
@@ -278,52 +201,8 @@ const PostForm: React.FC<PostFormProps> = ({
           value={accordionValue}
           onValueChange={setAccourdionValue}
         >
-          {editImages && editImages.length !== 0 && (
-            <AccordionItem value="item-1" className="border-none">
-              <AccordionContent>
-                <ScrollArea className="h-[125px] rounded-md">
-                  <div
-                    className={cn(
-                      editImages.length === 1 && "grid-cols-1",
-                      editImages.length === 2 && "grid-cols-2",
-                      editImages.length === 3 && "grid-cols-2",
-                      //@ts-ignore
-                      editImages.length >= 4 && "grid-cols-4",
-                      "grid min-h-[200px] w-full grid-flow-row gap-2",
-                    )}
-                  >
-                    {editImages.map((image, index) => (
-                      <div
-                        key={index}
-                        className="relative col-span-1 aspect-square rounded-md bg-secondary"
-                      >
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="group absolute right-0 top-0 z-10 rounded-full bg-background/50"
-                          onClick={(e) => {
-                            handleDeleteImage(e, image.id);
-                          }}
-                        >
-                          <X className="h-5 w-5 group-active:scale-95" />
-                        </Button>
-                        <Image
-                          src={image.url as string}
-                          alt={image.url as string}
-                          fill
-                          objectFit="cover"
-                          priority
-                          className="rounded-md"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          <AccordionItem value="item-2" className="border-none">
-            <AccordionContent className="h-[225px]">
+          <AccordionItem value="item-1">
+            <AccordionContent>
               <MultiImageDropzone
                 value={fileStates}
                 dropzoneOptions={{
@@ -373,11 +252,11 @@ const PostForm: React.FC<PostFormProps> = ({
                 e.preventDefault();
                 setOpenImageInput((prev) => !prev);
                 setAccourdionValue((prev) =>
-                  prev === "item-1"
-                    ? "item-2"
-                    : "item-1" || prev === ""
-                      ? "item-1"
-                      : "item-2",
+                  prev === ""
+                    ? "item-1"
+                    : "" || prev === "item-1"
+                      ? ""
+                      : "item-1",
                 );
               }}
               disabled={isLoading}
@@ -428,11 +307,7 @@ const PostForm: React.FC<PostFormProps> = ({
             className="w-full transition-none"
             disabled={isLoading}
           >
-            {isLoading ? (
-              <Loader />
-            ) : (
-              <>{editData ? <p>Conifrm</p> : <p>Post</p>}</>
-            )}
+            {isLoading ? <Loader /> : <p>Post</p>}
           </Button>
         </div>
       </form>

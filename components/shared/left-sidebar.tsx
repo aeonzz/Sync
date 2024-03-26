@@ -44,7 +44,7 @@ const LeftSideBar = () => {
                 width={28}
                 height={28}
                 alt={item.alt}
-                className="mr-4 transition-all group-hover:scale-105 group-active:scale-95"
+                className="mr-4 transition-all duration-300 group-hover:scale-105 group-active:scale-95"
               />
               {item.title}
             </Link>

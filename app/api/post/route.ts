@@ -49,6 +49,7 @@ export async function GET(req: Request) {
       },
       where: {
         sequenceId: cursor ? { lt: cursor } : undefined,
+        deleted: false,
       },
       orderBy: {
         sequenceId: "desc",
@@ -67,9 +68,9 @@ export async function GET(req: Request) {
     );
   } catch (error: any) {
     console.log(error);
-    return new Response(
-      JSON.stringify(JSON.stringify({ error: error.message })),
-      { status: 403 },
+    return NextResponse.json(
+      { message: "could not get post" },
+      { status: 500 },
     );
   }
 }

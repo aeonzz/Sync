@@ -203,6 +203,7 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
                   variant="ghost"
                   className="group absolute right-0 top-0 rounded-full bg-background/50"
                   onClick={(e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     void onChange?.(value.filter((_, i) => i !== index) ?? []);
                   }}

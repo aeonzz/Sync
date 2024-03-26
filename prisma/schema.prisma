@@ -34,16 +34,18 @@ model Post {
   content    String
   createdAt  DateTime @default(now()) @db.Timestamp(6)
   updatedAt  DateTime @updatedAt @db.Timestamp(6)
+  deleted    Boolean  @default(false)
   author     User     @relation(fields: [authorId], references: [id])
   authorId   String
   imageUrls  Image[]
 }
 
 model Image {
-  id      Int     @id @default(autoincrement())
-  url     String? @db.VarChar(255)
-  postId  String
-  post    Post    @relation(fields: [postId], references: [postId])
+  id          Int     @id @default(autoincrement())
+  url         String? @db.VarChar(255)
+  blurDataUrl String  @db.VarChar(255)
+  postId      String
+  post        Post    @relation(fields: [postId], references: [postId])
 }
 
 model StudentData {

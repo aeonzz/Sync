@@ -110,7 +110,7 @@ const SignInForm = () => {
           </div>
           <Button className="mt-5 w-full" type="submit" disabled={isLoading}>
             {isLoading && <Loader />}
-            {isLoading ? null : <p>Log in</p>}
+            {isLoading ? null : <p>Login</p>}
           </Button>
           <Separator className="mb-2 mt-4" />
           <div className="text-center text-sm text-muted-foreground">

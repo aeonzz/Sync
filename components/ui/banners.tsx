@@ -8,7 +8,7 @@ import {
 import { Button } from "./button";
 import { Image as ImageIcon } from "lucide-react";
 import BannerUploadForm from "../forms/banner-upload-form";
-import { getBanners } from "@/lib/actions/banner.actions";
+import { getBanner } from "@/lib/actions/banner.actions";
 import { Card } from "./card";
 import { useEffect, useState } from "react";
 import { BannerType } from "@/types/banner";
@@ -24,7 +24,7 @@ const Banners: React.FC<BannersProps> = ({ setBanner }) => {
 
   useEffect(() => {
     const fetchBanners = async () => {
-      const response = await getBanners();
+      const response = await getBanner();
       const bannersData = response.data;
       if (bannersData !== null) {
         setBanners(bannersData);

@@ -16,10 +16,13 @@ export default function AppLayout({
   return (
     <section>
       <TopBar />
-      <div className="flex space-x-3">
+      <div className="flex space-x-4">
         {children}
-        <div className="flex-1 border">
+        <div className="flex-1">
           <Haha />
+        </div>
+        <div className="bg-card rounded-md w-20">
+          {/* <Haha /> */}
         </div>
       </div>
     </section>

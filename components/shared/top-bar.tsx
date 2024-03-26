@@ -4,12 +4,12 @@ import { ThemeToggle } from "../ui/theme-toggle";
 import UserNav from "../ui/user-nav";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getUser } from "@/lib/actions/user.actions";
+import { getUserById } from "@/lib/actions/user.actions";
 import FetchDataError from "../ui/fetch-data-error";
 
 const TopBar = async () => {
   const session = await getServerSession(authOptions);
-  const currentUser = await getUser(session!.user.id);
+  const currentUser = await getUserById(session!.user.id);
   
   if (!currentUser.data || currentUser.error) {
     return <FetchDataError />;

@@ -2,7 +2,7 @@
 
 import prisma from "../db";
 
-export async function getStudentData(studentId: number) {
+export async function getStudentDataById(studentId: number) {
   try {
     const response = await prisma.studentData.findFirst({
       where: {
