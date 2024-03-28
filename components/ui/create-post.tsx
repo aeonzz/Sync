@@ -26,10 +26,10 @@ import PostForm from "../forms/post-form";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import Link from "next/link";
 import { useState } from "react";
-import { CurrentUser } from "@/types/user";
+import { UserProps } from "@/types/user";
 
 interface CreatePostProps {
-  currentUser: CurrentUser;
+  currentUser: UserProps;
 }
 
 const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {

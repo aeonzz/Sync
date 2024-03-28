@@ -18,7 +18,7 @@ import { Input } from "../ui/input";
 import { OnboardingValidation } from "@/lib/validations/user";
 import { Textarea } from "../ui/textarea";
 import { useEffect, useState } from "react";
-import { CurrentUser } from "@/types/user";
+import { UserProps } from "@/types/user";
 import { SingleImageDropzone } from "./single-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import { updateUser } from "@/lib/actions/user.actions";
@@ -30,26 +30,26 @@ import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 interface EditProfileFormProps {
-  currentUser: CurrentUser;
+  userData: UserProps;
   setOpen: (state: boolean) => void;
   isLoading: boolean;
   setIsLoading: (state: boolean) => void;
 }
 
 const EditProfileForm: React.FC<EditProfileFormProps> = ({
-  currentUser,
+  userData,
   setOpen,
   isLoading,
   setIsLoading,
 }) => {
-  const hasUrls = currentUser.Urls && currentUser.Urls.length > 0;
+  const hasUrls = userData.Urls && userData.Urls.length > 0;
 
   const form = useForm<z.infer<typeof OnboardingValidation>>({
     resolver: zodResolver(OnboardingValidation),
     defaultValues: {
-      username: currentUser.username ? currentUser.username : "",
-      bio: currentUser.bio ? currentUser.bio : "",
-      urls: hasUrls ? currentUser.Urls?.map((url) => ({ value: url.url })) : [],
+      username: userData.username ? userData.username : "",
+      bio: userData.bio ? userData.bio : "",
+      urls: hasUrls ? userData.Urls?.map((url) => ({ value: url.url })) : [],
     },
   });
 
@@ -58,11 +58,11 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
     control: form.control,
   });
 
-  const profileCover = currentUser.coverUrl
-    ? currentUser.coverUrl
+  const profileCover = userData.coverUrl
+    ? userData.coverUrl
     : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/nat-cXuvDkzEJdE-unsplash.jpg";
-  const profileAvatar = currentUser.avatarUrl
-    ? currentUser.avatarUrl
+  const profileAvatar = userData.avatarUrl
+    ? userData.avatarUrl
     : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/no-image.jpg";
   const { edgestore } = useEdgeStore();
   const router = useRouter();
@@ -102,14 +102,14 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
       }
     }
 
-    const userData = {
+    const userEditData = {
       ...data,
-      userId: currentUser.id,
+      userId: userData.id,
       coverUrl: banner ? banner : coverRes?.url,
       avatarUrl: avatarRes?.url,
       onboarded: true,
     };
-    const result = await updateUser(userData);
+    const result = await updateUser(userEditData);
 
     if (result.status === 200) {
       setOpen(false);

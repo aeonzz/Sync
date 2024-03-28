@@ -59,7 +59,6 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { deletePost } from "@/lib/actions/post.actions";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useMutationSuccess } from "@/context/store";
 import CommentForm from "../forms/comment-form";
@@ -87,7 +86,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
 
   const contentToDisplay = showFullContent
     ? post.content
-    : post.content.slice(0, 500);
+    : post.content.slice(0, 100);
 
   const toggleContentVisibility = () => {
     setShowFullContent(!showFullContent);
@@ -206,39 +205,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
               </motion.div>
             )}
           </AnimatePresence>
-          <AnimatePresence initial={false}>
-            {isEditing === false && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
-              >
-                <Linkify options={options}>
-                  <p
-                    className={cn(
-                      ShortContentWithNoImage && "text-2xl",
-                      "whitespace-pre-wrap break-words",
-                    )}
-                  >
-                    {contentToDisplay}
-                    {post.content.length > 500 && (
-                      <Button
-                        variant="link"
-                        onClick={toggleContentVisibility}
-                        className="-mt-5 ml-1 p-0 text-slate-200"
-                      >
-                        {showFullContent ? "See Less" : "...See More"}
-                      </Button>
-                    )}
-                  </p>
-                </Linkify>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
         <Link href={`/post/${post.postId}`}>
-          <div className="relative mt-5 flex w-full overflow-hidden rounded-md">
+          <div className="relative mb-3 flex w-full overflow-hidden rounded-md">
             <div
               className={cn(
                 post.imageUrls?.length === 1 ? "grid-cols-1" : "grid-cols-2",
@@ -284,10 +253,40 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             </div>
           </div>
         </Link>
+        <AnimatePresence initial={false}>
+          {isEditing === false && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <Linkify options={options}>
+                <p
+                  className={cn(
+                    ShortContentWithNoImage ? "text-2xl" : "text-sm",
+                    "whitespace-pre-wrap break-words",
+                  )}
+                >
+                  {contentToDisplay}
+                  {post.content.length > 100 && (
+                    <Button
+                      variant="link"
+                      onClick={toggleContentVisibility}
+                      className="-mt-5 ml-1 p-0 text-xs text-slate-200"
+                    >
+                      {showFullContent ? "See Less" : "...See More"}
+                    </Button>
+                  )}
+                </p>
+              </Linkify>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </CardContent>
       <CardFooter className="flex-col space-y-5">
-        <div className="flex justify-between w-full">
-          <div className="flex -mr-5">
+        <div className="flex w-full justify-between">
+          <div className="-mr-5 flex">
             <CircleUserRound />
             <CircleUserRound />
             <CircleUserRound />
@@ -338,7 +337,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             </svg>
           </div>
         </div>
-        <CommentForm post={post} />
+        <CommentForm post={post} session={session} />
+
       </CardFooter>
     </Card>
   );

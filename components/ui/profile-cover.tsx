@@ -7,16 +7,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import { CurrentUser } from "@/types/user";
+import { UserProps } from "@/types/user";
 import { getPlaiceholder } from "plaiceholder";
 import getBase64 from "@/lib/base64";
 
 interface ProfileCoverProps {
-  currentUser: CurrentUser;
+  userData: UserProps;
 }
 
-const ProfileCover: React.FC<ProfileCoverProps> = async ({ currentUser }) => {
-  const profileCover = currentUser.coverUrl
+const ProfileCover: React.FC<ProfileCoverProps> = async ({ userData }) => {
+  const profileCover = userData.coverUrl
 
   const base64 = await getBase64(profileCover)
   

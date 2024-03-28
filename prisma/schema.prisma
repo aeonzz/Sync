@@ -25,19 +25,34 @@ model User {
   Post        Post[]
   StudentData StudentData @relation(fields: [studentId], references: [studentId])
   Urls        Urls[]
+  Comment     Comment[]
 }
 
 model Post {
-  postId     String   @id @default(uuid())
-  sequenceId Int      @default(autoincrement())
+  postId     String    @id @default(uuid())
+  sequenceId Int       @default(autoincrement())
   title      String?
   content    String
-  createdAt  DateTime @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime @updatedAt @db.Timestamp(6)
-  deleted    Boolean  @default(false)
-  author     User     @relation(fields: [authorId], references: [id])
+  createdAt  DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt @db.Timestamp(6)
+  deleted    Boolean   @default(false)
+  author     User      @relation(fields: [authorId], references: [id])
   authorId   String
   imageUrls  Image[]
+  Comment    Comment[]
+}
+
+model Comment {
+  commendId Int       @id @default(autoincrement())
+  text      String
+  postId    String
+  post      Post      @relation(fields: [postId], references: [postId])
+  parentId  Int?
+  replies   Comment[] @relation("CommentReplies")
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [commendId])
+  User      User      @relation(fields: [userId], references: [id])
+  userId    String
+  commentId Int?
 }
 
 model Image {

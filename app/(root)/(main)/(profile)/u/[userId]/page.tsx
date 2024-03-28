@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 import ProfileAvatar from "@/components/ui/profile-avatar";
 import ProfileCover from "@/components/ui/profile-cover";
 import EditProfile from "@/components/ui/edit-profile";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 interface UserProfileProps {
   params: {
@@ -14,22 +16,24 @@ interface UserProfileProps {
 }
 
 const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
-  const currentUser = await getUserById(params.userId);
-  if (!currentUser.data || currentUser.error) {
+  const session = await getServerSession(authOptions);
+  const userData = await getUserById(params.userId);
+  if (!userData.data || userData.error) {
     return <FetchDataError />;
   }
 
-  if (currentUser.data.onboarded === false) {
+  if (userData.data.onboarded === false) {
     redirect("/onboarding");
   }
-
 
   return (
     <div className="h-screen w-full">
       <Card className="relative h-[200px] border-none">
-        <ProfileCover currentUser={currentUser.data} />
-        <ProfileAvatar currentUser={currentUser.data} />
-        <EditProfile currentUser={currentUser.data} />
+        <ProfileCover userData={userData.data} />
+        <ProfileAvatar userData={userData.data} />
+        {session?.user.id === params.userId && (
+          <EditProfile userData={userData.data} />
+        )}
       </Card>
     </div>
   );

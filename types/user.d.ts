@@ -1,11 +1,11 @@
-export type UserType = {
-  username?: string | undefined;
-  password?: string | undefined;
-  avatarUrl?: string | undefined;
-  onboarded?: boolean | undefined;
-};
+// export type UserType = {
+//   username?: string | undefined;
+//   password?: string | undefined;
+//   avatarUrl?: string | undefined;
+//   onboarded?: boolean | undefined;
+// };
 
-export type CurrentUser = {
+export type UserProps = {
   id: string;
   studentId: number;
   password: string;

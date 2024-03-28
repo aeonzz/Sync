@@ -20,7 +20,7 @@ export async function getUserById(userId: string) {
   }
 }
 
-interface Params {
+interface UpdateUserParams {
   userId: string;
   username?: string | undefined;
   bio?: string | undefined;
@@ -40,7 +40,7 @@ export async function updateUser({
   avatarUrl,
   coverUrl,
   onboarded,
-}: Params) {
+}: UpdateUserParams) {
   try {
     const updateData: Record<string, unknown> = {};
     if (username !== undefined) {

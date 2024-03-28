@@ -3,12 +3,13 @@
 import getBase64 from "../base64";
 import prisma from "../db";
 
-interface Params {
+// ? these functions are not currently in use
+interface AppendImageParams {
   url: string;
   postId: string;
 }
 
-export async function appendImage({ url, postId }: Params) {
+export async function appendImage({ url, postId }: AppendImageParams) {
   try {
 
     const blurDataUrl = await getBase64(url)

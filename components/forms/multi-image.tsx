@@ -187,6 +187,7 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
                 className="h-full w-full rounded-md object-cover"
                 height={64}
                 width={64}
+                quality={50}
                 src={imageUrls[index]}
                 alt={typeof file === "string" ? file : file.name}
               />

@@ -1,7 +1,6 @@
 "use client";
 
 import { PostValidation } from "@/lib/validations/post";
-import { PostProps, PostType } from "@/types/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
@@ -27,10 +26,9 @@ import { FileState, MultiImageDropzone } from "./multi-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { useMutationSuccess, useThemeStore } from "@/context/store";
-import { usePathname, useRouter } from "next/navigation";
-import { appendImage, deleteImage } from "@/lib/actions/image.actions";
+import { useRouter } from "next/navigation";
 import { Accordion, AccordionContent, AccordionItem } from "../ui/accordion";
-import { createPostt } from "@/lib/actions/post.actions";
+import { createPost } from "@/lib/actions/post.actions";
 import { useSession } from "next-auth/react";
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
@@ -126,7 +124,7 @@ const PostForm: React.FC<PostFormProps> = ({
       images: uploadImage,
     };
 
-    const response = await createPostt(postData);
+    const response = await createPost(postData);
 
     if (response.status === 200) {
       onMutationSuccess(false);

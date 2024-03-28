@@ -16,12 +16,15 @@ export async function getStudentDataById(studentId: number) {
   }
 }
 
-interface Params {
+interface updateStudentDataParams {
   id: number;
   hasAccount: boolean;
 }
 
-export async function updateStudentData({ id, hasAccount }: Params) {
+export async function updateStudentData({
+  id,
+  hasAccount,
+}: updateStudentDataParams) {
   try {
     const updateData = { hasAccount };
 

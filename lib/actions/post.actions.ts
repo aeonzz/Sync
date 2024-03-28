@@ -33,14 +33,14 @@ export async function getPosts(page: number) {
   }
 }
 
-interface Params {
+interface CreatePostParams {
   userId: string;
   title?: string | undefined;
   content: string;
   images: (string | undefined)[];
 }
 
-export async function createPostt({ userId, title, content, images }: Params) {
+export async function createPost({ userId, title, content, images }: CreatePostParams) {
   try {
     const imageObjects = await Promise.all(
       images.map(async (image) => {
@@ -74,11 +74,12 @@ export async function createPostt({ userId, title, content, images }: Params) {
   }
 }
 
-interface UpdateParams {
+interface UpdatePostParams {
   postId: string;
   content: string;
   title?: string | undefined;
-  images: (string | undefined)[];
+  images: (string | undefined)[] | undefined;
+  deleteId: number[] | undefined;
 }
 
 export async function UpdatePost({
@@ -86,16 +87,20 @@ export async function UpdatePost({
   title,
   postId,
   images,
-}: UpdateParams) {
+  deleteId,
+}: UpdatePostParams) {
   try {
-    const imageObjects = await Promise.all(
-      images.map(async (image) => {
-        if (image) {
-          const blurDataUrl = await getBase64(image);
-          return { url: image, blurDataUrl };
-        }
-      }),
-    );
+    let imageObjects;
+    if (images) {
+      imageObjects = await Promise.all(
+        images.map(async (image) => {
+          if (image) {
+            const blurDataUrl = await getBase64(image);
+            return { url: image, blurDataUrl };
+          }
+        }),
+      );
+    }
 
     await prisma.post.update({
       where: { postId: postId },
@@ -109,9 +114,17 @@ export async function UpdatePost({
       },
     });
 
+    await prisma.image.deleteMany({
+      where: {
+        id: {
+          in: deleteId,
+        },
+      },
+    });
+
     return { error: null, status: 200 };
   } catch (error: any) {
-    console.log(error)
+    console.log(error);
     return { error: error.message, status: 500 };
   }
 }
@@ -126,7 +139,7 @@ export async function deletePost(postId: string) {
     });
     return { error: null, status: 200 };
   } catch (error: any) {
-    console.log(error)
+    console.log(error);
     return { error: error.message, status: 500 };
   }
 }

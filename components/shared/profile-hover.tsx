@@ -13,6 +13,11 @@ import Image from "next/image";
 interface ProfileHoverProps {
   post: PostProps;
   className?: string;
+  avatarUrl: string;
+  coverUrl: string;
+  userJoined: Date;
+  username: string;
+  
 }
 
 const ProfileHover: React.FC<ProfileHoverProps> = ({ post, className }) => {

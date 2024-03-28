@@ -14,47 +14,79 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import ProfileHover from "../shared/profile-hover";
 import { PostProps } from "@/types/post";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useState } from "react";
+import { createComment } from "@/lib/actions/comment.actions";
+import { Session } from "next-auth";
+import { toast } from "sonner";
 
 interface CommentFormProps {
   post: PostProps;
+  session: Session | null;
 }
 
-const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
-
-const CommentForm: React.FC<CommentFormProps> = ({ post }) => {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+const CommentForm: React.FC<CommentFormProps> = ({ post, session }) => {
+  const avatarUrl = post.author.avatarUrl ? post.author.avatarUrl : undefined;
+  const initialLetter = post.author.username?.charAt(0).toUpperCase();
+  const [isLoading, setIsLoading] = useState(false);
+  const form = useForm({
     defaultValues: {
-      username: "",
+      comment: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {}
+  async function onSubmit(data: { comment: string }) {
+    setIsLoading(true);
+
+    const createData = {
+      text: data.comment,
+      postId: post.postId,
+      userId: session!.user.id,
+    };
+
+    const response = await createComment(createData);
+
+    if (response.status === 200) {
+      form.reset();
+    } else {
+      setIsLoading(false);
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    }
+  }
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex w-full space-x-1 items-center"
+        className="flex w-full items-center space-x-1 border border-white"
       >
-        <ProfileHover post={post} />
+        <Link href={`/u/${post.author.id}`} className="group relative">
+          <div className="absolute z-50 h-7 w-7 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
+          <Avatar className="h-7 w-7">
+            <AvatarImage
+              src={avatarUrl}
+              className="object-cover"
+              alt={avatarUrl}
+            />
+            <AvatarFallback>{initialLetter}</AvatarFallback>
+          </Avatar>
+        </Link>
         <div className="w-full">
           <FormField
             control={form.control}
-            name="username"
+            name="comment"
             render={({ field }) => (
               <FormItem>
                 <FormControl>
                   <Input
                     placeholder="Add a comment..."
                     autoComplete="off"
-                    className="bg-transparent pt-1"
+                    className="h-8 rounded-sm bg-transparent pt-1 text-sm"
                     {...field}
                   />
                 </FormControl>
@@ -63,7 +95,12 @@ const CommentForm: React.FC<CommentFormProps> = ({ post }) => {
             )}
           />
         </div>
-        <Button type="submit" variant="ghost" size="sm">
+        <Button
+          type="submit"
+          disabled={!form.formState.isDirty || isLoading}
+          variant="ghost"
+          size="sm"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

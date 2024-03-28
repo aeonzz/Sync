@@ -36,7 +36,6 @@ import { UpdatePost } from "@/lib/actions/post.actions";
 import { usePathname, useRouter } from "next/navigation";
 import { PostProps } from "@/types/post";
 import Image from "next/image";
-import { appendImage, deleteImage } from "@/lib/actions/image.actions";
 import { Card, CardContent } from "../ui/card";
 import Autoplay from "embla-carousel-autoplay";
 import { useMutationSuccess } from "@/context/store";
@@ -62,8 +61,9 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
   const [openImageInput, setOpenImageInput] = useState(false);
   const [accordionValue, setAccourdionValue] = useState("item-1");
   const [isImageLoaded, setIsLoadedImage] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<number[]>([]);
+  const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
   const { edgestore } = useEdgeStore();
-
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
@@ -88,38 +88,42 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
   async function onSubmit(data: z.infer<typeof PostValidation>) {
     setIsLoading(true);
 
-    const uploadNewImage = await Promise.all(
-      fileStates.map(async (fileState) => {
-        try {
-          if (
-            fileState.progress !== "PENDING" ||
-            typeof fileState.file === "string"
-          ) {
-            return;
+    let uploadNewImage;
+    if (fileStates.length !== 0) {
+      uploadNewImage = await Promise.all(
+        fileStates.map(async (fileState) => {
+          try {
+            if (
+              fileState.progress !== "PENDING" ||
+              typeof fileState.file === "string"
+            ) {
+              return;
+            }
+            const res = await edgestore.publicImages.upload({
+              file: fileState.file,
+              onProgressChange: async (progress) => {
+                updateFileProgress(fileState.key, progress);
+                if (progress === 100) {
+                  // wait 1 second to set it to complete
+                  // so that the user can see the progress bar
+                  // await new Promise((resolve) => setTimeout(resolve, 1000));
+                  updateFileProgress(fileState.key, "COMPLETE");
+                }
+              },
+            });
+            return res.url;
+          } catch (err) {
+            updateFileProgress(fileState.key, "ERROR");
           }
-          const res = await edgestore.publicImages.upload({
-            file: fileState.file,
-            onProgressChange: async (progress) => {
-              updateFileProgress(fileState.key, progress);
-              if (progress === 100) {
-                // wait 1 second to set it to complete
-                // so that the user can see the progress bar
-                // await new Promise((resolve) => setTimeout(resolve, 1000));
-                updateFileProgress(fileState.key, "COMPLETE");
-              }
-            },
-          });
-          return res.url;
-        } catch (err) {
-          updateFileProgress(fileState.key, "ERROR");
-        }
-      }),
-    );
+        }),
+      );
+    }
 
     const updateData = {
       ...data,
       postId,
       images: uploadNewImage,
+      deleteId: imageToDelete,
     };
 
     const response = await UpdatePost(updateData);
@@ -141,18 +145,18 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
     id: number,
   ) {
     e.preventDefault();
+    setSelectedImageId(id);
+    setImageToDelete([...imageToDelete, id]);
 
-    const response = await deleteImage(id);
-
-    if (response.status === 200) {
-      setEditImages(editImages?.filter((image) => image.id !== id));
-      setIsMutate(true);
-    } else {
-      toast.error("Uh oh! Something went wrong.", {
-        description:
-          "An error occurred while making the request. Please try again later",
-      });
-    }
+    // if (response.status === 200) {
+    //   setEditImages(editImages?.filter((image) => image.id !== id));
+    //   setIsMutate(true);
+    // } else {
+    //   toast.error("Uh oh! Something went wrong.", {
+    //     description:
+    //       "An error occurred while making the request. Please try again later",
+    //   });
+    // }
   }
 
   const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: false }));
@@ -172,7 +176,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
                 <Textarea
                   autoFocus
                   className={cn(
-                    watchFormContent.length >= 90 ? "!text-base" : "!text-2xl",
+                    watchFormContent.length >= 90 ? "!text-sm" : "!text-2xl",
                     watchFormContent.length > 100 && "!h-[80px]",
                     watchFormContent.length > 150 && "!h-[100px]",
                     watchFormContent.length > 200 && "!h-[120px]",
@@ -181,7 +185,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
                     content.length > 150 && "!h-[100px]",
                     content.length > 200 && "!h-[120px]",
                     content.length > 250 && "!h-[140px]",
-                    "!min-h-[20px] resize-none bg-transparent p-0 text-base",
+                    "!min-h-[20px] resize-none bg-transparent p-0",
                   )}
                   {...field}
                 />
@@ -217,20 +221,27 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
                           className="pl-[0.1px] md:basis-1/3 lg:basis-1/5"
                         >
                           <div className="p-1">
-                            <Card className="bg-background">
+                            <Card className="relative bg-background">
+                              {imageToDelete.some(
+                                (item) => item === image.id,
+                              ) && (
+                                <div className="absolute z-20 aspect-square w-full rounded-md bg-background/50" />
+                              )}
                               <CardContent className="relative flex aspect-square">
-                                {isImageLoaded && (
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="group absolute -right-2 -top-2 z-10 h-7 w-7 rounded-full bg-destructive/50"
-                                    onClick={(e) => {
-                                      handleDeleteImage(e, image.id);
-                                    }}
-                                  >
-                                    <X className="h-3 w-3 group-active:scale-95" />
-                                  </Button>
-                                )}
+                                {imageToDelete.some((item) => item === image.id)
+                                  ? null
+                                  : isImageLoaded && (
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="group absolute -right-2 -top-2 z-10 h-7 w-7 rounded-full bg-destructive/50"
+                                        onClick={(e) => {
+                                          handleDeleteImage(e, image.id);
+                                        }}
+                                      >
+                                        <X className="h-3 w-3 group-active:scale-95" />
+                                      </Button>
+                                    )}
                                 <Image
                                   src={image.url as string}
                                   alt={image.url as string}

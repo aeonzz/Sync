@@ -26,11 +26,11 @@ import { useState } from "react";
 import { useEdgeStore } from "@/lib/edgestore";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { CurrentUser } from "@/types/user";
+import { UserProps } from "@/types/user";
 import { updateUser } from "@/lib/actions/user.actions";
 
 interface ImageUploadDialogProps {
-  currentUser: CurrentUser;
+  currentUser: UserProps;
   setEditModal: (state: boolean) => void;
   isLoadingCallback: (state: boolean) => void;
   alertOpen: boolean;
