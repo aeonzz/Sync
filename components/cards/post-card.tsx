@@ -109,7 +109,17 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
     <Card className="mb-4 min-h-[200px]">
       <CardHeader className="flex-row items-center justify-between">
         <div className="relative flex items-center space-x-2">
-          <ProfileHover post={post} />
+          <ProfileHover
+            authorId={post.author.id}
+            avatarUrl={post.author.avatarUrl}
+            coverUrl={post.author.coverUrl}
+            userJoined={post.author.createdAt}
+            username={post.author.username}
+            firstName={post.author.StudentData.firstName}
+            middleName={post.author.StudentData.middleName}
+            lastName={post.author.StudentData.lastName}
+            department={post.author.StudentData.department}
+          />
           <div className="flex flex-col">
             <Link
               href="/"
@@ -338,7 +348,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
           </div>
         </div>
         <CommentForm post={post} session={session} />
-
       </CardFooter>
     </Card>
   );

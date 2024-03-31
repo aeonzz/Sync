@@ -1,21 +1,30 @@
+"use client"
+
 import { getBanner } from "@/lib/actions/banner.actions";
 import { Card } from "../ui/card";
 import { Textarea } from "../ui/textarea";
 import Image from "next/image";
 import { getPlaiceholder } from "plaiceholder";
+import { Button } from "../ui/button";
+import { sendEmail } from "@/lib/actions/email.actions";
+import { toast } from "sonner";
+import axios from "axios";
 
-const Haha = async () => {
-  const banners = await getBanner();
+const Haha = () => {
   
+  async function handleSendEmail() {
+    const response = await axios.post("/api/send");
+
+    if (response.status === 200) {
+      toast("hahahaha")
+    }
+  }
 
   return (
     <Card className="flex h-1/2 items-center justify-center">
-      {/* {banners.data?.map((image) => (
-        <Image src={image} alt="asd" width={100} height={100} blurDataURL={image} />
-      ))} */}
-      {/* {base64Images.map((image) => (
-        <Image src={image} alt="asd" width={100} height={100} blurDataURL={image} />
-      ))} */}
+      <Button onClick={() => handleSendEmail()}>
+        Send
+      </Button>
     </Card>
   );
 };

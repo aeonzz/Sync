@@ -54,7 +54,8 @@ const SignInForm = () => {
     } catch (error) {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
-        description: "An error occurred while making the request. Please try again later"
+        description:
+          "An error occurred while making the request. Please try again later",
       });
     }
   };
@@ -94,6 +95,12 @@ const SignInForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
+                  <Link
+                    className="absolute right-0 top-2 text-xs text-blue-500 hover:underline"
+                    href="/forgot-password"
+                  >
+                    Forgot password?
+                  </Link>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
@@ -115,7 +122,7 @@ const SignInForm = () => {
           <Separator className="mb-2 mt-4" />
           <div className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?
-            <Link className="ml-1 text-blue-500 underline" href="/register">
+            <Link className="ml-1 text-blue-500 hover:underline" href="/sign-up">
               Register here
             </Link>
           </div>

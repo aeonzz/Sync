@@ -11,26 +11,40 @@ import { format } from "date-fns";
 import Image from "next/image";
 
 interface ProfileHoverProps {
-  post: PostProps;
-  className?: string;
-  avatarUrl: string;
+  className?: string | undefined;
+  authorId: string;
+  avatarUrl: string | null;
   coverUrl: string;
   userJoined: Date;
-  username: string;
-  
+  username: string | null;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  department: string;
 }
 
-const ProfileHover: React.FC<ProfileHoverProps> = ({ post, className }) => {
-  const profile = post.author.avatarUrl ? post.author.avatarUrl : undefined;
-  const authorCreatedAt = new Date(post.author.createdAt);
+const ProfileHover: React.FC<ProfileHoverProps> = ({
+  authorId,
+  avatarUrl,
+  className,
+  coverUrl,
+  userJoined,
+  username,
+  firstName,
+  middleName,
+  lastName,
+  department,
+}) => {
+  const profile = avatarUrl ? avatarUrl : undefined;
+  const authorCreatedAt = new Date(userJoined);
   const date = format(authorCreatedAt, "PP");
-  const initialLetter = post.author.username?.charAt(0).toUpperCase();
-  const fullname = `${post.author.StudentData.firstName} ${post.author.StudentData.middleName.charAt(0).toUpperCase()} ${post.author.StudentData.lastName}`;
+  const initialLetter = username?.charAt(0).toUpperCase();
+  const fullname = `${firstName} ${middleName.charAt(0).toUpperCase()} ${lastName}`;
 
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>
-        <Link href={`/u/${post.author.id}`} className="group relative">
+        <Link href={`/u/${authorId}`} className="group relative">
           <div className="absolute z-50 h-9 w-9 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
           <Avatar>
             <AvatarImage src={profile} className="object-cover" alt={profile} />
@@ -46,13 +60,13 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({ post, className }) => {
       >
         <div className="relative h-16 w-[250px]">
           <Image
-            src={post.author.coverUrl}
-            alt={post.author.coverUrl}
+            src={coverUrl}
+            alt={coverUrl}
             fill
             objectFit="cover"
             objectPosition="center"
           />
-          <Avatar className="absolute -bottom-8 left-3 w-16 h-16 border-2 border-popover">
+          <Avatar className="absolute -bottom-8 left-3 h-16 w-16 border-2 border-popover">
             <AvatarImage src={profile} alt={profile} />
             <AvatarFallback>{initialLetter}</AvatarFallback>
           </Avatar>
@@ -60,16 +74,14 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({ post, className }) => {
         <div className="flex justify-between space-x-4 p-4">
           <div className="w-full space-y-1">
             <Link
-              href={`/u/${post.author.id}`}
+              href={`/u/${authorId}`}
               className="flex items-center text-xl font-semibold underline-offset-4 hover:underline"
             >
-              {post.author.username}
+              {username}
             </Link>
+            <h4 className="text-xs text-muted-foreground">{fullname}</h4>
             <h4 className="text-xs text-muted-foreground">
-              {fullname}
-            </h4>
-            <h4 className="text-xs text-muted-foreground">
-              {post.author.StudentData.department}
+              {department}
             </h4>
             <div className="flex items-center pt-2">
               <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{" "}

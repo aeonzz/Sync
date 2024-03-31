@@ -28,6 +28,7 @@ import Loader from "../loaders/loader";
 import { cn } from "@/lib/utils";
 import { SignUpValidation } from "@/lib/validations/user";
 import { Card, CardHeader, CardTitle } from "../ui/card";
+import { Separator } from "../ui/separator";
 
 const SignUpForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -78,7 +79,8 @@ const SignUpForm = () => {
 
     if (idData.error) {
       toast.error("Uh oh! Something went wrong.", {
-        description: "An error occurred while making the request. Please try again later"
+        description:
+          "An error occurred while making the request. Please try again later",
       });
     } else if (!idData.data) {
       toast.error("Student ID Verification Failed", {
@@ -142,7 +144,32 @@ const SignUpForm = () => {
   };
 
   return (
-    <div className="relative w-[380px] p-10">
+    <div className="relative w-[380px] px-10 py-16">
+      <div className="absolute left-[31%] top-0 flex items-center">
+        <div className="relative text-center text-xs">
+          <p className="absolute -left-1 -top-7">Verify</p>
+          <div
+            className={cn(
+              isValid ? "bg-input" : "bg-primary",
+              "inline-flex h-6 w-6 items-center justify-center rounded-full border",
+            )}
+          >
+            1
+          </div>
+        </div>
+        <Separator className="w-24" />
+        <div className="relative text-xs">
+          <p className="absolute -left-2 -top-7 w-40">Sign up</p>
+          <div
+            className={cn(
+              isValid ? "bg-primary" : "bg-input",
+              "borde inline-flex h-6 w-6 items-center justify-center rounded-full text-xs",
+            )}
+          >
+            2
+          </div>
+        </div>
+      </div>
       <div className="mb-7">
         <h2 className="text-center text-2xl font-semibold tracking-tight">
           Create an account

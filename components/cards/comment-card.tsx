@@ -5,7 +5,7 @@ import ProfileHover from '../shared/profile-hover'
 const CommentCard = () => {
   return (
     <Card>
-      <ProfileHover />
+      
     </Card>
   )
 }
