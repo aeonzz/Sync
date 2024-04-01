@@ -15,8 +15,6 @@ import { Button } from "../ui/button";
 import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { User } from "@prisma/client";
 import { toast } from "sonner";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
@@ -260,7 +258,6 @@ const SignUpForm = () => {
               name="studentId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Student ID</FormLabel>
                   <div className="flex items-center space-x-3">
                     <FormControl>
                       <Input
@@ -276,7 +273,7 @@ const SignUpForm = () => {
                     <Button
                       onClick={(e) => handleIdCheck(e)}
                       disabled={isLoading || isValid}
-                      variant="default"
+                      variant="secondary"
                       className="w-32"
                     >
                       {isValid && <Check className="mr-1 h-5 w-5" />}

@@ -1,5 +1,6 @@
 "use server";
 
+import { hash } from "bcrypt";
 import prisma from "../db";
 
 export async function getUserById(userId: string) {
@@ -27,9 +28,11 @@ interface UpdateUserParams {
   avatarUrl?: string | undefined;
   coverUrl?: string | undefined;
   onboarded?: boolean | undefined;
-  urls?: {
-    value: string;
-  }[] | null;
+  urls?:
+    | {
+        value: string;
+      }[]
+    | null;
 }
 
 export async function updateUser({
@@ -60,7 +63,7 @@ export async function updateUser({
     }
     if (urls !== undefined && urls !== null) {
       updateData.Urls = {
-        create: urls.map(url => ({ url: url.value })),
+        create: urls.map((url) => ({ url: url.value })),
       };
     }
 
@@ -69,10 +72,29 @@ export async function updateUser({
       data: updateData,
     });
 
+    return { data: response, error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { data: null, error: error.message, status: 500 };
+  }
+}
+
+export async function resetPassword(userId: string, password: string) {
+  const hashedPassword = await hash(password, 10);
+  try {
+    const response = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: hashedPassword,
+        resetPasswordToken: null,
+        resetPasswordTokenExpiry: null,
+      },
+    });
 
     return { data: response, error: null, status: 200 };
   } catch (error: any) {
-    console.log(error)
     return { data: null, error: error.message, status: 500 };
   }
 }

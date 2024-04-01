@@ -11,21 +11,23 @@ datasource db {
 }
 
 model User {
-  id          String      @id @default(uuid())
-  studentId   Int         @unique
-  email       String      @unique
-  username    String?     @unique
-  password    String
-  avatarUrl   String?
-  coverUrl    String      @default("https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/26993850_369183360223308_167538467966553831_n.png")
-  bio         String?     @db.Text
-  onboarded   Boolean     @default(false)
-  createdAt   DateTime    @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime    @updatedAt @db.Timestamp(6)
-  Post        Post[]
-  StudentData StudentData @relation(fields: [studentId], references: [studentId])
-  Urls        Urls[]
-  Comment     Comment[]
+  id                       String      @id @default(uuid())
+  studentId                Int         @unique
+  email                    String      @unique
+  username                 String?     @unique
+  password                 String
+  avatarUrl                String?
+  coverUrl                 String      @default("https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/26993850_369183360223308_167538467966553831_n.png")
+  bio                      String?     @db.Text
+  onboarded                Boolean     @default(false)
+  createdAt                DateTime    @default(now()) @db.Timestamp(6)
+  updatedAt                DateTime    @updatedAt @db.Timestamp(6)
+  resetPasswordToken       String?     @unique
+  resetPasswordTokenExpiry DateTime?
+  Post                     Post[]
+  StudentData              StudentData @relation(fields: [studentId], references: [studentId])
+  Urls                     Urls[]
+  Comment                  Comment[]
 }
 
 model Post {

@@ -4,6 +4,10 @@ import SessionProvider from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
 import React from "react";
 import { EdgeStoreProvider } from "@/lib/edgestore";
+import { Inter } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export default function AppLayout({
   children,
@@ -11,7 +15,7 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <section>
+    <section className={cn(inter.className)}>
       <ThemeProvider
         attribute="class"
         defaultTheme="system"

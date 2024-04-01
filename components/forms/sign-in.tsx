@@ -97,7 +97,7 @@ const SignInForm = () => {
                 <FormItem>
                   <Link
                     className="absolute right-0 top-2 text-xs text-blue-500 hover:underline"
-                    href="/forgot-password"
+                    href="/auth/reset-password"
                   >
                     Forgot password?
                   </Link>
@@ -122,7 +122,7 @@ const SignInForm = () => {
           <Separator className="mb-2 mt-4" />
           <div className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?
-            <Link className="ml-1 text-blue-500 hover:underline" href="/sign-up">
+            <Link className="ml-1 text-blue-500 hover:underline" href="/auth/sign-up">
               Register here
             </Link>
           </div>
