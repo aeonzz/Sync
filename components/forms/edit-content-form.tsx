@@ -41,6 +41,7 @@ import Autoplay from "embla-carousel-autoplay";
 import { useMutationSuccess } from "@/context/store";
 import { FileState, MultiImageDropzone } from "./multi-image";
 import { useEdgeStore } from "@/lib/edgestore";
+import { Separator } from "../ui/separator";
 
 interface EditContentFormProps {
   postId: string;
@@ -283,7 +284,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-        <div className="absolute -top-[73px] right-9 flex justify-end">
+        <div className="absolute -top-[68px] right-8 flex justify-end">
           <Button
             className={cn(
               openImageInput && "bg-green-500/15",
@@ -311,9 +312,11 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
               )}
             />
           </Button>
+          <Separator orientation="vertical" className="h-auto mx-3" />
           <Button
             variant="ghost"
             disabled={isLoading}
+            className="rounded-full"
             size="icon"
             onClick={(e) => {
               e.preventDefault();
@@ -325,6 +328,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
           <Button
             type="submit"
             size="icon"
+            className="rounded-full"
             variant="ghost"
             disabled={isLoading}
           >

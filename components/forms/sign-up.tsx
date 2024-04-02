@@ -123,7 +123,7 @@ const SignUpForm = () => {
         toast.success("Registration Successful", {
           description: data.message,
         });
-        router.push("/login");
+        router.push("/auth");
       } else {
         setIsLoading(false);
         toast.error("Uh oh! Something went wrong.", {
@@ -182,10 +182,13 @@ const SignUpForm = () => {
             <>
               <div className="space-y-2">
                 {fullname && (
-                  <Card className="p-4">
-                    <h4 className="scroll-m-20 text-sm font-semibold tracking-tight">
-                      Welcome,{" "}
+                  <Card className="px-9 py-2">
+                    <h4 className="scroll-m-20 text-sm font-semibold tracking-tight inline-flex items-center gap-1">
+                      Hello,
                       <span className="text-muted-foreground">{fullname}</span>
+                      <span className="text-2xl mb-1">
+                        🎉
+                      </span>
                     </h4>
                   </Card>
                 )}

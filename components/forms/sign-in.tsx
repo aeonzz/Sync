@@ -50,6 +50,7 @@ const SignInForm = () => {
         });
       } else if (signInData?.ok) {
         router.push("/onboarding");
+        router.refresh()
       }
     } catch (error) {
       setIsLoading(false);

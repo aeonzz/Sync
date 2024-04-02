@@ -22,7 +22,7 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
     return <FetchDataError />;
   }
 
-  if (userData.data.onboarded === false) {
+  if (!userData.data.onboarded) {
     redirect("/onboarding");
   }
 

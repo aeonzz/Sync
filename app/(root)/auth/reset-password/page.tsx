@@ -58,7 +58,7 @@ const ResetPasswordPage: React.FC<ResetPasswordPageProps> = async ({
           Please enter your new password and confirm it to complete the reset
           process.
         </p>
-        <ChangePasswordForm userId={user.id} />
+        <ChangePasswordForm resetPasswordToken={searchParams.token as string} />
       </>
     );
   } else {

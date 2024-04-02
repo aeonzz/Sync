@@ -3,30 +3,69 @@
 import getBase64 from "../base64";
 import prisma from "../db";
 
-export async function getPosts(page: number) {
-  const take = 7;
-  const skip = (page - 1) * take;
+// export async function getPosts(page: number) {
+//   const take = 7;
+//   const skip = (page - 1) * take;
 
+//   try {
+//     const response = await prisma.post.findMany({
+//       include: {
+//         author: {
+//           include: {
+//             StudentData: true,
+//           },
+//         },
+//         imageUrls: true,
+//       },
+//       take,
+//       skip,
+//       orderBy: {
+//         sequenceId: "desc",
+//       },
+//     });
+
+//     const hasMore = response.length === take;
+
+//     return { data: response, hasMore, error: null, status: 200 };
+//   } catch (error: any) {
+//     console.log(error);
+//     return { data: null, error: error.message, status: 500 };
+//   }
+// }
+
+export async function getPostById(postId: string) {
   try {
-    const response = await prisma.post.findMany({
+    const response = await prisma.post.findFirst({
+      where: {
+        postId: postId,
+        deleted: false,
+      },
       include: {
+        _count: {
+          select: {
+            comment: true,
+            imageUrls: true,
+          },
+        },
         author: {
           include: {
             StudentData: true,
           },
         },
         imageUrls: true,
-      },
-      take,
-      skip,
-      orderBy: {
-        sequenceId: "desc",
+        comment: {
+          include: {
+            user: {
+              include: {
+                StudentData: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    const hasMore = response.length === take;
-
-    return { data: response, hasMore, error: null, status: 200 };
+    return { data: response, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
     return { data: null, error: error.message, status: 500 };
@@ -40,7 +79,12 @@ interface CreatePostParams {
   images: (string | undefined)[];
 }
 
-export async function createPost({ userId, title, content, images }: CreatePostParams) {
+export async function createPost({
+  userId,
+  title,
+  content,
+  images,
+}: CreatePostParams) {
   try {
     const imageObjects = await Promise.all(
       images.map(async (image) => {

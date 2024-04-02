@@ -41,7 +41,7 @@ model Post {
   author     User      @relation(fields: [authorId], references: [id])
   authorId   String
   imageUrls  Image[]
-  Comment    Comment[]
+  comment    Comment[]
 }
 
 model Comment {
@@ -50,9 +50,11 @@ model Comment {
   postId    String
   post      Post      @relation(fields: [postId], references: [postId])
   parentId  Int?
+  createdAt  DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt @db.Timestamp(6)
   replies   Comment[] @relation("CommentReplies")
   parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [commendId])
-  User      User      @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
   userId    String
   commentId Int?
 }

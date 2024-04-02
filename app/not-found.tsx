@@ -19,7 +19,7 @@ export default function NotFound({ className }: { className?: string }) {
           <p className="mb-4 text-2xl font-bold tracking-tight text-white">
             Something&apos;s missing.
           </p>
-          <p className="text-md mb-4 font-light text-gray-500 dark:text-gray-400">
+          <p className="text-md mb-4 font-light text-muted-foreground">
             Sorry, we can&apos;t find that page. You&apos;ll find lots to
             explore on the home page.{" "}
           </p>

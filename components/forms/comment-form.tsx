@@ -21,15 +21,28 @@ import { useState } from "react";
 import { createComment } from "@/lib/actions/comment.actions";
 import { Session } from "next-auth";
 import { toast } from "sonner";
+import { UserProps } from "@/types/user";
+import { Textarea } from "../ui/textarea";
+import { useRouter } from "next/navigation";
 
 interface CommentFormProps {
-  post: PostProps;
+  avatarUrl: string | null;
+  username: string | null;
+  userId: string;
   session: Session | null;
+  postId: string;
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({ post, session }) => {
-  const avatarUrl = post.author.avatarUrl ? post.author.avatarUrl : undefined;
-  const initialLetter = post.author.username?.charAt(0).toUpperCase();
+const CommentForm: React.FC<CommentFormProps> = ({
+  avatarUrl,
+  username,
+  userId,
+  session,
+  postId,
+}) => {
+  const avatar = avatarUrl ? avatarUrl : undefined;
+  const initialLetter = username?.charAt(0).toUpperCase();
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm({
     defaultValues: {
@@ -37,19 +50,23 @@ const CommentForm: React.FC<CommentFormProps> = ({ post, session }) => {
     },
   });
 
+  const isDirty = form.formState.isDirty
+
   async function onSubmit(data: { comment: string }) {
     setIsLoading(true);
 
     const createData = {
       text: data.comment,
-      postId: post.postId,
+      postId: postId,
       userId: session!.user.id,
     };
 
     const response = await createComment(createData);
 
     if (response.status === 200) {
+      setIsLoading(false);
       form.reset();
+      router.refresh()
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
@@ -61,61 +78,53 @@ const CommentForm: React.FC<CommentFormProps> = ({ post, session }) => {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex w-full items-center space-x-1 border border-white"
-      >
-        <Link href={`/u/${post.author.id}`} className="group relative">
-          <div className="absolute z-50 h-7 w-7 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
-          <Avatar className="h-7 w-7">
-            <AvatarImage
-              src={avatarUrl}
-              className="object-cover"
-              alt={avatarUrl}
-            />
-            <AvatarFallback>{initialLetter}</AvatarFallback>
-          </Avatar>
-        </Link>
-        <div className="w-full">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full">
+        <div className="flex w-full space-x-2">
+          <Link href={`/u/${userId}`} className="group relative mt-1">
+            <div className="absolute z-50 h-7 w-7 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
+            <Avatar className="h-7 w-7">
+              <AvatarImage src={avatar} className="object-cover" alt={avatar} />
+              <AvatarFallback>{initialLetter}</AvatarFallback>
+            </Avatar>
+          </Link>
           <FormField
             control={form.control}
             name="comment"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="relative w-full rounded-md bg-secondary">
                 <FormControl>
-                  <Input
+                  <Textarea
                     placeholder="Add a comment..."
-                    autoComplete="off"
-                    className="h-8 rounded-sm bg-transparent pt-1 text-sm"
+                    className="resize-none"
                     {...field}
                   />
                 </FormControl>
+                <Button
+                  type="submit"
+                  disabled={!isDirty || isLoading}
+                  variant="ghost"
+                  className="absolute bottom-0 right-0 aspect-square w-fit rounded-full p-1"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                    />
+                  </svg>
+                </Button>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <Button
-          type="submit"
-          disabled={!form.formState.isDirty || isLoading}
-          variant="ghost"
-          size="sm"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            className="h-6 w-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-            />
-          </svg>
-        </Button>
       </form>
     </Form>
   );

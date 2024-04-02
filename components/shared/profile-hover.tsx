@@ -9,6 +9,7 @@ import { BadgeCheck, CalendarDays } from "lucide-react";
 import { PostProps } from "@/types/post";
 import { format } from "date-fns";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface ProfileHoverProps {
   className?: string | undefined;
@@ -45,8 +46,13 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>
         <Link href={`/u/${authorId}`} className="group relative">
-          <div className="absolute z-50 h-9 w-9 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
-          <Avatar>
+          <div
+            className={cn(
+              className,
+              "absolute z-50 h-9 w-9 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100",
+            )}
+          />
+          <Avatar className={cn(className)}>
             <AvatarImage src={profile} className="object-cover" alt={profile} />
             <AvatarFallback>{initialLetter}</AvatarFallback>
           </Avatar>
@@ -80,9 +86,7 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
               {username}
             </Link>
             <h4 className="text-xs text-muted-foreground">{fullname}</h4>
-            <h4 className="text-xs text-muted-foreground">
-              {department}
-            </h4>
+            <h4 className="text-xs text-muted-foreground">{department}</h4>
             <div className="flex items-center pt-2">
               <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{" "}
               <span className="text-xs text-muted-foreground">

@@ -51,7 +51,7 @@ const Feed = ({ session }: { session: Session | null }) => {
       )}
     </div>
   ));
-
+  
   const handleRefetch = () => {
     refetch();
     setIsMutate(false);
@@ -70,7 +70,7 @@ const Feed = ({ session }: { session: Session | null }) => {
   }, [hasNextPage, inView, fetchNextPage]);
 
   return (
-    <div className="w-[550px]">
+    <div>
       {status === "pending" ? (
         <PostSkeleton />
       ) : status === "error" ? (

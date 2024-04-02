@@ -40,12 +40,23 @@ export async function GET(req: Request) {
 
     const posts = await prisma.post.findMany({
       include: {
+        _count: {
+          select: {
+            comment: true,
+            imageUrls: true,
+          },
+        },
         author: {
           include: {
             StudentData: true,
           },
         },
         imageUrls: true,
+        comment: {
+          include: {
+            user: true,
+          },
+        },
       },
       where: {
         sequenceId: cursor ? { lt: cursor } : undefined,

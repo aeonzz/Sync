@@ -79,12 +79,30 @@ export async function updateUser({
   }
 }
 
-export async function resetPassword(userId: string, password: string) {
-  const hashedPassword = await hash(password, 10);
+export async function resetPassword(resetPasswordToken: string, password: string) {
   try {
+    
+    const user = await prisma.user.findUnique({
+      where: {
+        resetPasswordToken,
+      },
+    })
+
+    if (!user) return { data: null, error: "User not found", status: 500 };
+  
+    const resetPasswordTokenExpiry = user.resetPasswordTokenExpiry
+
+    if (!resetPasswordTokenExpiry) return { data: null, error: "Token expired", status: 500 };
+ 
+    const today = new Date();
+    const isTokenExpired = today > resetPasswordTokenExpiry;
+
+    if (isTokenExpired) return { data: null, error: "Token expired", status: 500 };
+
+    const hashedPassword = await hash(password, 10);
     const response = await prisma.user.update({
       where: {
-        id: userId,
+        id: user.id,
       },
       data: {
         password: hashedPassword,
