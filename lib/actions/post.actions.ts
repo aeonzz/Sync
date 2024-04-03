@@ -49,15 +49,28 @@ export async function getPostById(postId: string) {
         },
         author: {
           include: {
-            StudentData: true,
+            studentData: true,
           },
         },
         imageUrls: true,
         comment: {
+          orderBy: {
+            id: "asc",
+          },
           include: {
+            _count: {
+              select: {
+                commentLike: true,
+              },
+            },
+            commentLike: {
+              select: {
+                id: true,
+              },
+            },
             user: {
               include: {
-                StudentData: true,
+                studentData: true,
               },
             },
           },

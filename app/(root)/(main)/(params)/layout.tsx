@@ -1,3 +1,4 @@
+import RightSideBar from "@/components/shared/right-sidebar";
 
 export default function ProfileLayout({
   children,
@@ -5,8 +6,9 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <section className="flex space-x-3 pt-5">
+    <section className="flex space-x-4 pt-4">
       {children}
+      <div className="w-16 rounded-md bg-card"></div>
     </section>
   );
 }

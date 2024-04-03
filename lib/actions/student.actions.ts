@@ -10,9 +10,9 @@ export async function getStudentDataById(studentId: number) {
       },
     });
 
-    return { data: response, error: null };
+    return { data: response, error: null, status: 200 };
   } catch (error: any) {
-    return { data: null, error: error.message };
+    return { data: null, error: error.message, status: 500 };
   }
 }
 
@@ -26,15 +26,15 @@ export async function updateStudentData({
   hasAccount,
 }: updateStudentDataParams) {
   try {
-    const updateData = { hasAccount };
-
-    const response = await prisma.studentData.update({
+    await prisma.studentData.update({
       where: { id: id },
-      data: updateData,
+      data: {
+        hasAccount,
+      },
     });
-    return { data: response, error: null, status: 200 };
+    return { error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { data: null, error: error.message, status: 500 };
+    return { error: error.message, status: 500 };
   }
 }

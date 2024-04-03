@@ -16,7 +16,7 @@ export async function createComment({
   parentId,
 }: CreateCommentParams) {
   try {
-    const response = await prisma.comment.create({
+    await prisma.comment.create({
       data: {
         postId,
         userId,
@@ -25,9 +25,47 @@ export async function createComment({
       },
     });
 
-    return { data: response, error: null, status: 200 };
+    return { error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { data: null, error: error.message, status: 500 };
+    return { error: error.message, status: 500 };
+  }
+}
+
+interface likeCommentProps {
+  userId: string;
+  commentId: number;
+}
+
+export async function likeComment({ userId, commentId }: likeCommentProps) {
+  try {
+    const existingLike = await prisma.commentLike.findUnique({
+      where: {
+        userId_commentId: {
+          userId,
+          commentId,
+        },
+      },
+    });
+
+    if (existingLike) {
+      await prisma.commentLike.delete({
+        where: {
+          id: existingLike.id,
+        },
+      });
+    } else {
+      await prisma.commentLike.create({
+        data: {
+          userId,
+          commentId,
+        },
+      });
+    }
+
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, status: 500 };
   }
 }

@@ -11,51 +11,55 @@ datasource db {
 }
 
 model User {
-  id                       String      @id @default(uuid())
-  studentId                Int         @unique
-  email                    String      @unique
-  username                 String?     @unique
+  id                       String        @id @default(uuid())
+  studentId                Int           @unique
+  email                    String        @unique
+  username                 String?       @unique
   password                 String
   avatarUrl                String?
-  coverUrl                 String      @default("https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/26993850_369183360223308_167538467966553831_n.png")
-  bio                      String?     @db.Text
-  onboarded                Boolean     @default(false)
-  createdAt                DateTime    @default(now()) @db.Timestamp(6)
-  updatedAt                DateTime    @updatedAt @db.Timestamp(6)
-  resetPasswordToken       String?     @unique
+  coverUrl                 String        @default("https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/26993850_369183360223308_167538467966553831_n.png")
+  bio                      String?       @db.Text
+  onboarded                Boolean       @default(false)
+  createdAt                DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt                DateTime      @updatedAt @db.Timestamp(6)
+  resetPasswordToken       String?       @unique
   resetPasswordTokenExpiry DateTime?
-  Post                     Post[]
-  StudentData              StudentData @relation(fields: [studentId], references: [studentId])
-  Comment                  Comment[]
+  post                     Post[]
+  studentData              StudentData   @relation(fields: [studentId], references: [studentId])
+  comment                  Comment[]
+  postLike                 PostLike[]
+  commentLike              CommentLike[]
 }
 
 model Post {
-  postId     String    @id @default(uuid())
-  sequenceId Int       @default(autoincrement())
+  postId     String     @id @default(uuid())
+  sequenceId Int        @default(autoincrement())
   title      String?
   content    String
-  createdAt  DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime  @updatedAt @db.Timestamp(6)
-  deleted    Boolean   @default(false)
-  author     User      @relation(fields: [authorId], references: [id])
+  createdAt  DateTime   @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime   @updatedAt @db.Timestamp(6)
+  deleted    Boolean    @default(false)
+  author     User       @relation(fields: [authorId], references: [id])
   authorId   String
   imageUrls  Image[]
   comment    Comment[]
+  postLike   PostLike[]
 }
 
 model Comment {
-  commendId Int       @id @default(autoincrement())
-  text      String
-  postId    String
-  post      Post      @relation(fields: [postId], references: [postId])
-  parentId  Int?
-  createdAt  DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime  @updatedAt @db.Timestamp(6)
-  replies   Comment[] @relation("CommentReplies")
-  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [commendId])
-  user      User      @relation(fields: [userId], references: [id])
-  userId    String
-  commentId Int?
+  id          Int           @id @default(autoincrement())
+  text        String
+  postId      String
+  post        Post          @relation(fields: [postId], references: [postId])
+  parentId    Int?
+  createdAt   DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime      @updatedAt @db.Timestamp(6)
+  replies     Comment[]     @relation("CommentReplies")
+  parent      Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  userId      String
+  commentId   Int?
+  commentLike CommentLike[]
 }
 
 model Image {
@@ -77,7 +81,7 @@ model StudentData {
   hasAccount Boolean  @default(false)
   createdAt  DateTime @default(now()) @db.Timestamp(6)
   updatedAt  DateTime @updatedAt @db.Timestamp(6)
-  User       User?
+  user       User?
 }
 
 model Banner {
@@ -85,4 +89,22 @@ model Banner {
   bannerUrl String
   deleted   Boolean  @default(false)
   createdAt DateTime @default(now()) @db.Timestamp(6)
+}
+
+model PostLike {
+  id     Int    @id @default(autoincrement())
+  userId String
+  post   Post   @relation(fields: [postId], references: [postId])
+  postId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model CommentLike {
+  id        Int     @id @default(autoincrement())
+  userId    String
+  comment   Comment @relation(fields: [commentId], references: [id])
+  commentId Int
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@unique([userId, commentId])
 }

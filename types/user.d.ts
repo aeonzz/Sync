@@ -16,14 +16,10 @@ export type UserProps = {
   onboarded: boolean;
   createdAt: Date;
   updatedAt: Date;
-  StudentData: {
+  studentData: {
     firstName: string;
     middleName: string;
     lastName: string;
     department: string;
-  };
-  Urls: {
-    id: number
-    url: string;
-  } [] | undefined
+  }
 };

@@ -48,7 +48,7 @@ export async function GET(req: Request) {
         },
         author: {
           include: {
-            StudentData: true,
+            studentData: true,
           },
         },
         imageUrls: true,

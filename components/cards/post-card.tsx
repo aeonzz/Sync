@@ -115,10 +115,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             coverUrl={post.author.coverUrl}
             userJoined={post.author.createdAt}
             username={post.author.username}
-            firstName={post.author.StudentData.firstName}
-            middleName={post.author.StudentData.middleName}
-            lastName={post.author.StudentData.lastName}
-            department={post.author.StudentData.department}
+            firstName={post.author.studentData.firstName}
+            middleName={post.author.studentData.middleName}
+            lastName={post.author.studentData.lastName}
+            department={post.author.studentData.department}
           />
           <div className="flex flex-col">
             <Link
@@ -215,7 +215,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             </motion.div>
           )}
         </AnimatePresence>
-        <Link href={`/p/${post.postId}`}>
+        <Link href={`/f/${post.postId}`}>
           <div className="relative flex w-full overflow-hidden rounded-md">
             <div
               className={cn(

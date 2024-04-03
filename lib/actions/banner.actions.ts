@@ -4,16 +4,16 @@ import prisma from "../db";
 
 export async function createBanner(bannerUrl: string) {
   try {
-    const response = await prisma.banner.create({
+    await prisma.banner.create({
       data: {
         bannerUrl,
       },
     });
 
-    return { data: response, error: null, status: 200 };
+    return { error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { data: null, error: error.message, status: 500 };
+    return { error: error.message, status: 500 };
   }
 }
 

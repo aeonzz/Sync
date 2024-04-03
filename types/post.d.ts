@@ -23,7 +23,7 @@ export type PostProps = {
     coverUrl: string;
     username: string | null;
     createdAt: Date;
-    StudentData: {
+    studentData: {
       firstName: string;
       middleName: string;
       lastName: string;
@@ -35,9 +35,15 @@ export type PostProps = {
     imageUrls: number;
   };
   comment: {
-    commentId: number | null;
+    id: number;
     text: string;
     createdAt: Date;
+    _count: {
+      commentLike: number;
+    };
+    commentLike: {
+      id: number;
+    }[];
     user: {
       id: string;
       studentId: number;
@@ -45,7 +51,7 @@ export type PostProps = {
       avatarUrl: string | null;
       coverUrl: string;
       createdAt: Date;
-      StudentData: {
+      studentData: {
         firstName: string;
         middleName: string;
         lastName: string;
@@ -56,9 +62,15 @@ export type PostProps = {
 };
 
 export type CommentProps = {
-  commentId: number | null;
+  id: number;
   text: string;
   createdAt: Date;
+  _count: {
+    commentLike: number;
+  };
+  commentLike: {
+    id: number;
+  }[];
   user: {
     id: string;
     studentId: number;
@@ -66,7 +78,7 @@ export type CommentProps = {
     avatarUrl: string | null;
     coverUrl: string;
     createdAt: Date;
-    StudentData: {
+    studentData: {
       firstName: string;
       middleName: string;
       lastName: string;

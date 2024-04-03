@@ -40,7 +40,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
   const initialLetter = username?.charAt(0).toUpperCase();
   const [isDirty, setIsDirty] = useState<boolean>();
   const [isImageDirty, setIsImageDirty] = useState<boolean>();
-  const fullname = `${currentUser.StudentData.firstName} ${currentUser.StudentData.middleName.charAt(0).toUpperCase()} ${currentUser.StudentData.lastName}`;
+  const fullname = `${currentUser.studentData.firstName} ${currentUser.studentData.middleName.charAt(0).toUpperCase()} ${currentUser.studentData.lastName}`;
 
   return (
     <Card className="w-[450px] mb-4">
