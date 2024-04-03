@@ -143,7 +143,7 @@ const PostForm: React.FC<PostFormProps> = ({
   useEffect(() => {
     hasUserInput(form.formState.isDirty);
     hasUserImages(fileStates.length > 0);
-  }, [form.formState.isDirty, fileStates]);
+  }, [form.formState.isDirty, fileStates, hasUserImages, hasUserInput]);
 
   return (
     <Form {...form}>

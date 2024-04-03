@@ -18,7 +18,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = async ({ userData }) => {
   const profileImage = userData.avatarUrl
     ? userData.avatarUrl
     : undefined;
-  const fullname = `${userData.StudentData.firstName} ${userData.StudentData.middleName.charAt(0).toUpperCase()} ${userData.StudentData.lastName}`;
+  const fullname = `${userData.studentData.firstName} ${userData.studentData.middleName.charAt(0).toUpperCase()} ${userData.studentData.lastName}`;
   
   return (
     <div className="absolute -bottom-28 left-5 flex h-32 w-auto items-end space-x-3">
@@ -58,7 +58,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = async ({ userData }) => {
         </h2>
         <h4 className="text-muted-foreground">{fullname}</h4>
         <h4 className="text-muted-foreground">
-          {userData.StudentData.department}
+          {userData.studentData.department}
         </h4>
       </div>
     </div>

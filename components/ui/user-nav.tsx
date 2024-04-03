@@ -25,7 +25,7 @@ const UserNav = async () => {
   }
 
   const initialLetter = currentUser.data.username?.charAt(0).toUpperCase();
-  const fullname = `${currentUser.data.StudentData.firstName} ${currentUser.data.StudentData.middleName.charAt(0).toUpperCase()} ${currentUser.data.StudentData.lastName}`;
+  const fullname = `${currentUser.data.studentData.firstName} ${currentUser.data.studentData.middleName.charAt(0).toUpperCase()} ${currentUser.data.studentData.lastName}`;
 
   if (!currentUser) return null;
   return (

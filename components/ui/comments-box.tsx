@@ -3,6 +3,7 @@ import CommentForm from "../forms/comment-form";
 import { Session } from "next-auth";
 import CommentCard from "../cards/comment-card";
 import { ScrollArea } from "./scroll-area";
+import { checkIfUserLikedComment } from "@/lib/actions/comment.actions";
 
 interface CommentBoxProps {
   avatarUrl: string | null;
@@ -21,6 +22,7 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
   postId,
   comments,
 }) => {
+
   return (
     <div className="relative mt-4 flex flex-col space-y-4">
       <h2 className="scroll-m-20 text-lg font-semibold tracking-tight first:mt-0">

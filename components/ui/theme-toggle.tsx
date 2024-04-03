@@ -25,7 +25,7 @@ export function ThemeToggle() {
     } else {
       lightTheme();
     }
-  }, [theme]);
+  }, [theme, darkTheme, lightTheme]);
 
   return (
     <Button variant="ghost" size="icon" onClick={() => modeHandler()}>

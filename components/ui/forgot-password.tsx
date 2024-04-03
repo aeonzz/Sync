@@ -24,8 +24,8 @@ const ForgotPassword = () => {
           </h1>
           <p className="text-center text-sm text-muted-foreground">
             No worries, we can help! Enter the email address associated with
-            your account and click the "Reset Password" button below.
-            <br /> We'll send you a link to reset your password.
+            your account and click the &quot;Reset Password&quot; button below.
+            <br /> We&apos;ll send you a link to reset your password.
           </p>
           <ForgotPasswordForm setIsEmailSent={setIsEmailSent} />
         </>
