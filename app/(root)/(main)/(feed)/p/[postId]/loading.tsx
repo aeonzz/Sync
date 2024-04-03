@@ -3,7 +3,7 @@ import React from "react";
 
 const loading = () => {
   return (
-    <div className="min-h-[400px] w-[550px]">
+    <div className="min-h-[400px] w-[550px] mt-16">
       <PostSkeleton />
     </div>
   );

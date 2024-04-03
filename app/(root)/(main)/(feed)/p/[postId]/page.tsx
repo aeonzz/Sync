@@ -1,10 +1,10 @@
 import PostCard from "@/components/cards/post-card";
+import BackButton from "@/components/ui/back-button";
 import CommentBox from "@/components/ui/comments-box";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getPostById } from "@/lib/actions/post.actions";
 import { getUserById } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";
-import { PostProps } from "@/types/post";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -34,21 +34,21 @@ const PostDetail: React.FC<PostDetailsProps> = async ({ params }) => {
 
   return (
     <>
-      <div className="min-h-[400px] w-[550px]">
-        <PostCard post={post.data} session={session} />
+      <div className="flex h-[54px] items-center space-x-2">
+        <BackButton />
+        <h2 className="scroll-m-20 text-lg font-semibold tracking-tight first:mt-0">
+          Post
+        </h2>
       </div>
-      <div className="relative flex-1">
-        <div className="sticky top-[94px] h-[calc(100vh-82px)] w-full overflow-hidden rounded-md pl-2">
-          <CommentBox
-            avatarUrl={currentUser.data.avatarUrl}
-            username={currentUser.data.username}
-            userId={currentUser.data.id}
-            session={session}
-            comments={post.data.comment}
-            postId={params.postId}
-          />
-        </div>
-      </div>
+      <PostCard post={post.data} session={session} />
+      <CommentBox
+        avatarUrl={currentUser.data.avatarUrl}
+        username={currentUser.data.username}
+        userId={currentUser.data.id}
+        session={session}
+        comments={post.data.comment}
+        postId={params.postId}
+      />
     </>
   );
 };

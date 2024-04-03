@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { useTheme } from "next-themes";
 
 interface ThemeStore {
   isDark: boolean;
@@ -17,13 +16,12 @@ export const useThemeStore = create<ThemeStore>((set) => ({
   },
 }));
 
-
 interface MutateState {
-  isMutate: boolean
-  setIsMutate: (isMutate: boolean) => void
+  isMutate: boolean;
+  setIsMutate: (isMutate: boolean) => void;
 }
 
 export const useMutationSuccess = create<MutateState>((set) => ({
   isMutate: false,
-  setIsMutate: (isMutate: boolean) => set(() => ({ isMutate }))
-}))
+  setIsMutate: (isMutate: boolean) => set(() => ({ isMutate })),
+}));

@@ -1,14 +1,14 @@
-import React from 'react'
-import CommentBox from '../ui/comments-box'
 
-const RightSideBar = async () => {
 
-  
+const RightSideBar = () => {
+
   return (
-    <div className='bg-card w-full h-32'>
-      
-    </div>
-  )
-}
+    <div className="h-32 w-full bg-card">
+      <div>
 
-export default RightSideBar
+      </div>
+    </div>
+  );
+};
+
+export default RightSideBar;

@@ -8,10 +8,14 @@ export default function FeedLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <section>
-      <TopBar />
+    <section className="pt-5">
       <div className="flex space-x-4">
-        {children}
+        <div className="min-h-[400px] w-[550px]">{children}</div>
+        <div className="relative flex-1">
+          <div className="sticky top-5 h-[calc(100vh-110px)] w-full overflow-hidden rounded-md">
+            <RightSideBar />
+          </div>
+        </div>
         <div className="w-16 rounded-md bg-card"></div>
       </div>
     </section>

@@ -1,3 +1,5 @@
+
+
 import { CommentProps } from "@/types/post";
 import CommentForm from "../forms/comment-form";
 import { Session } from "next-auth";
@@ -22,7 +24,7 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
   comments,
 }) => {
   return (
-    <div className="flex flex-col space-y-3 relative">
+    <div className="flex flex-col space-y-3 relative mt-4">
       <h3 className="font-semibold text-lg">Comments</h3>
       <ScrollArea className="h-[calc(100vh-230px)] max-h-[508px]">
         {comments?.length !== 0 &&

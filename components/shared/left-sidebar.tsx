@@ -25,7 +25,7 @@ const LeftSideBar = () => {
       <div className="flex h-auto w-full flex-col items-start space-y-3">
         <Link
           href="/home"
-          className="mb-2 w-full scroll-m-20 border-b border-stone-800 pb-4 pl-4 text-3xl font-semibold tracking-tight first:mt-0"
+          className="mb-2 w-full scroll-m-20 pl-5 text-3xl font-semibold tracking-tight first:mt-0"
         >
           Sync
         </Link>

@@ -43,10 +43,10 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
   const fullname = `${currentUser.StudentData.firstName} ${currentUser.StudentData.middleName.charAt(0).toUpperCase()} ${currentUser.StudentData.lastName}`;
 
   return (
-    <Card className="w-[450px]">
+    <Card className="w-[450px] mb-4">
       <div className="flex items-center px-5 pb-2 pt-1">
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger className="group flex w-full items-center space-x-3 ">
+          <DialogTrigger className="group flex w-full items-center space-x-3">
             <Input
               placeholder="Write your thoughts here..."
               className="rounded-none border-none bg-transparent pl-0 transition focus-visible:ring-0 focus-visible:ring-black"

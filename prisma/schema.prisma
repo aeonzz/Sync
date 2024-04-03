@@ -26,7 +26,6 @@ model User {
   resetPasswordTokenExpiry DateTime?
   Post                     Post[]
   StudentData              StudentData @relation(fields: [studentId], references: [studentId])
-  Urls                     Urls[]
   Comment                  Comment[]
 }
 
@@ -79,15 +78,6 @@ model StudentData {
   createdAt  DateTime @default(now()) @db.Timestamp(6)
   updatedAt  DateTime @updatedAt @db.Timestamp(6)
   User       User?
-}
-
-model Urls {
-  id        Int      @id @default(autoincrement())
-  url       String
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  updatedAt DateTime @updatedAt @db.Timestamp(6)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Banner {

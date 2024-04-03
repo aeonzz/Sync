@@ -20,7 +20,7 @@ const BackButton = ({ className }: { className?: string | undefined }) => {
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            size="sm"
+            size="iconRound"
             onClick={() => {
               pathname.startsWith("/auth/reset-password")
                 ? router.push("/auth")
