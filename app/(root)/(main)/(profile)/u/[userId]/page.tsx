@@ -8,6 +8,7 @@ import ProfileCover from "@/components/ui/profile-cover";
 import EditProfile from "@/components/ui/edit-profile";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import NotFound from "@/app/not-found";
 
 interface UserProfileProps {
   params: {
@@ -18,7 +19,12 @@ interface UserProfileProps {
 const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
   const session = await getServerSession(authOptions);
   const userData = await getUserById(params.userId);
-  if (!userData.data || userData.error) {
+
+  if (!userData.data) {
+    return <NotFound className="w-full" />;
+  }
+
+  if (userData.error) {
     return <FetchDataError />;
   }
 

@@ -14,11 +14,6 @@ interface ResetPasswordPageProps {
 const ResetPasswordPage: React.FC<ResetPasswordPageProps> = async ({
   searchParams,
 }) => {
-  const session = await getServerSession(authOptions);
-
-  if (session) {
-    redirect("/home");
-  }
 
   if (searchParams.token) {
     const user = await prisma.user.findUnique({

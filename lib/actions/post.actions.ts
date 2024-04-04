@@ -55,7 +55,7 @@ export async function getPostById(postId: string) {
         imageUrls: true,
         comment: {
           orderBy: {
-            id: "asc",
+            id: "desc",
           },
           include: {
             _count: {
@@ -66,6 +66,11 @@ export async function getPostById(postId: string) {
             commentLike: {
               select: {
                 id: true,
+                user: {
+                  include: {
+                    studentData: true,
+                  },
+                },
               },
             },
             user: {

@@ -8,7 +8,12 @@ import { useRouter } from "next/navigation";
 export default function NotFound({ className }: { className?: string }) {
   const router = useRouter();
   return (
-    <section className="flex h-screen items-center justify-center bg-[#0C0C0C]">
+    <section
+      className={cn(
+        className,
+        "flex h-screen items-center justify-center bg-[#0C0C0C]",
+      )}
+    >
       <div
         className={cn(className, "max-w-screen-xl px-4 py-8 lg:px-6 lg:py-16")}
       >

@@ -1,8 +1,6 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,15 +11,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { PostProps } from "@/types/post";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useState } from "react";
 import { createComment } from "@/lib/actions/comment.actions";
 import { Session } from "next-auth";
 import { toast } from "sonner";
-import { UserProps } from "@/types/user";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
 
@@ -80,7 +75,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full">
         <div className="flex w-full space-x-2">
-          <Link href={`/u/${userId}`} className="group relative mt-1">
+          <Link href={`/u/${userId}`} className="group relative h-fit">
             <div className="absolute z-50 h-7 w-7 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
             <Avatar className="h-7 w-7">
               <AvatarImage src={avatar} className="object-cover" alt={avatar} />

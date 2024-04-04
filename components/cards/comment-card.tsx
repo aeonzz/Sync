@@ -7,13 +7,19 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { checkIfUserLikedComment } from "@/lib/actions/comment.actions";
 import LikeButton from "../ui/like-button";
+import { cn } from "@/lib/utils";
 
 interface CommentCardProps {
   comment: CommentProps;
   userId: string;
+  className: string;
 }
 
-const CommentCard: React.FC<CommentCardProps> = async ({ comment, userId }) => {
+const CommentCard: React.FC<CommentCardProps> = async ({
+  comment,
+  userId,
+  className,
+}) => {
   const commentCreatedAt = new Date(comment.createdAt);
   const commentCreated = formatDistanceToNowStrict(commentCreatedAt);
   const checkIfUserLiked = await checkIfUserLikedComment(userId, comment.id);
@@ -26,8 +32,9 @@ const CommentCard: React.FC<CommentCardProps> = async ({ comment, userId }) => {
   //   checkUserLike();
   // }, [userId, comment.id]);
 
+
   return (
-    <div className="mb-5 w-full">
+    <div className={cn(className, "mb-5 w-full")}>
       <div className="flex items-center justify-between gap-10">
         <div className="relative flex">
           <div className="h-full w-9">
@@ -50,7 +57,7 @@ const CommentCard: React.FC<CommentCardProps> = async ({ comment, userId }) => {
             <div className="flex items-center">
               <Link
                 href={`/u/${comment.user.id}`}
-                className="text-sm font-semibold"
+                className="text-sm font-semibold hover:underline"
               >
                 {comment.user.username}
               </Link>
@@ -59,7 +66,7 @@ const CommentCard: React.FC<CommentCardProps> = async ({ comment, userId }) => {
                 {commentCreated}
               </p>
             </div>
-            <p className="whitespace-pre-wrap break-words text-sm font-light">
+            <p className="whitespace-pre-wrap break-words break-all text-sm font-light">
               {comment.text}
             </p>
           </Card>
@@ -69,6 +76,7 @@ const CommentCard: React.FC<CommentCardProps> = async ({ comment, userId }) => {
           commentId={comment.id}
           likeCount={comment._count.commentLike}
           liked={checkIfUserLiked}
+          likedBy={comment.commentLike}
         />
       </div>
     </div>

@@ -22,6 +22,9 @@ interface ProfileHoverProps {
   middleName: string;
   lastName: string;
   department: string;
+  side?: "top" | "right" | "bottom" | "left" | undefined;
+  align?: "center" | "start" | "end" | undefined;
+  sideOffset?: number | undefined;
 }
 
 const ProfileHover: React.FC<ProfileHoverProps> = ({
@@ -35,6 +38,9 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
   middleName,
   lastName,
   department,
+  side,
+  align,
+  sideOffset,
 }) => {
   const profile = avatarUrl ? avatarUrl : undefined;
   const authorCreatedAt = new Date(userJoined);
@@ -61,8 +67,9 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
       <HoverCardContent
         className="w-[250px] space-y-4"
         hideWhenDetached={true}
-        sideOffset={10}
-        align="start"
+        sideOffset={sideOffset ? sideOffset : 10}
+        side={side}
+        align={align}
       >
         <div className="relative h-16 w-[250px]">
           <Image

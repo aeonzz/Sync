@@ -43,6 +43,20 @@ export type PostProps = {
     };
     commentLike: {
       id: number;
+      user: {
+        id: string;
+        studentId: number;
+        username: string | null;
+        avatarUrl: string | null;
+        coverUrl: string;
+        createdAt: Date;
+        studentData: {
+          firstName: string;
+          middleName: string;
+          lastName: string;
+          department: string;
+        };
+      };
     }[];
     user: {
       id: string;
@@ -70,6 +84,20 @@ export type CommentProps = {
   };
   commentLike: {
     id: number;
+    user: {
+      id: string;
+      studentId: number;
+      username: string | null;
+      avatarUrl: string | null;
+      coverUrl: string;
+      createdAt: Date;
+      studentData: {
+        firstName: string;
+        middleName: string;
+        lastName: string;
+        department: string;
+      };
+    };
   }[];
   user: {
     id: string;

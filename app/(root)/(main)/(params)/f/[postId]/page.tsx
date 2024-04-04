@@ -1,3 +1,4 @@
+import NotFound from "@/app/not-found";
 import PostCard from "@/components/cards/post-card";
 import BackButton from "@/components/ui/back-button";
 import CommentBox from "@/components/ui/comments-box";
@@ -20,11 +21,11 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
   const currentUser = await getUserById(session!.user.id);
   const post = await getPostById(params.postId);
 
-  if (!post.data || post.error || !params.postId) {
-    return <FetchDataError />;
+  if (!post.data) {
+    return <NotFound className="w-full" />;
   }
 
-  if (!currentUser.data || currentUser.error) {
+  if (!currentUser.data || currentUser.error || post.error || !params.postId) {
     return <FetchDataError />;
   }
 
@@ -43,7 +44,7 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
         <PostCard post={post.data} session={session} />
       </div>
       <div className="relative flex-1">
-        <div className="sticky top-0 h-[calc(100vh-50px)]] w-full overflow-hidden rounded-md">
+        <div className="sticky top-0 h-auto w-full overflow-hidden rounded-md">
           <CommentBox
             avatarUrl={currentUser.data.avatarUrl}
             username={currentUser.data.username}

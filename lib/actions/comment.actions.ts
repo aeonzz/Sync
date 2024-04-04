@@ -70,7 +70,10 @@ export async function likeComment({ userId, commentId }: likeCommentProps) {
   }
 }
 
-export async function checkIfUserLikedComment(userId: string, commentId: number) {
+export async function checkIfUserLikedComment(
+  userId: string,
+  commentId: number,
+) {
   const likeRecord = await prisma.commentLike.findUnique({
     where: {
       userId_commentId: {
