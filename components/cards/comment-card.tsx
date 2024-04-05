@@ -4,11 +4,9 @@ import ProfileHover from "../shared/profile-hover";
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
 import { checkIfUserLikedComment } from "@/lib/actions/comment.actions";
 import LikeButton from "../ui/like-button";
 import { cn } from "@/lib/utils";
-import ReplyBox from "../ui/reply-box";
 import { Badge } from "../ui/badge";
 import ReplyCard from "./reply-card";
 import {
@@ -17,6 +15,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import CommentForm from "../forms/comment-form";
+import { Button } from "../ui/button";
+import { MoreHorizontal, Pencil, Trash } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface CommentCardProps {
   comment: CommentProps;
@@ -41,97 +50,116 @@ const CommentCard: React.FC<CommentCardProps> = async ({
   const commentCreated = formatDistanceToNowStrict(commentCreatedAt);
   const checkIfUserLiked = await checkIfUserLikedComment(userId, comment.id);
 
-  // useEffect(() => {
-  //   const checkUserLike = async () => {
-  //     const liked = await checkIfUserLikedComment(userId, comment.id);
-  //     setUserHasLiked(liked)
-  //   };
-  //   checkUserLike();
-  // }, [userId, comment.id]);
-
   return (
-    <div className="mb-3">
-      <div className={cn(className, "w-full space-y-1")}>
-        <div className="flex items-center justify-between gap-10">
-          <div className="relative flex">
-            <div className="h-full w-9">
-              <div className="absolute left-0">
-                <ProfileHover
-                  authorId={comment.user.id}
-                  avatarUrl={comment.user.avatarUrl}
-                  coverUrl={comment.user.coverUrl}
-                  userJoined={comment.user.createdAt}
-                  username={comment.user.username}
-                  firstName={comment.user.studentData.firstName}
-                  middleName={comment.user.studentData.middleName}
-                  lastName={comment.user.studentData.lastName}
-                  department={comment.user.studentData.department}
-                  className="h-7 w-7"
-                />
-              </div>
-            </div>
-            <Card className="flex w-fit flex-col space-y-1 p-2">
-              <div className="flex items-center gap-2">
-                <Link
-                  href={`/u/${comment.user.id}`}
-                  className="text-sm font-semibold hover:underline"
-                >
-                  {comment.user.username}
-                </Link>
-                {postAuthor === comment.user.id && (
-                  <Badge
-                    variant="secondary"
-                    className=" text-[10px] font-normal"
-                  >
-                    Author
-                  </Badge>
-                )}
-                <Separator orientation="vertical" />
-                <p className="text-[10px] text-muted-foreground">
-                  {commentCreated}
-                </p>
-              </div>
-              <p className="whitespace-pre-wrap break-words break-all text-sm font-light">
-                {comment.text}
-              </p>
-            </Card>
-          </div>
-          <LikeButton
-            userId={userId}
-            commentId={comment.id}
-            likeCount={comment._count.commentLike}
-            liked={checkIfUserLiked}
-            likedBy={comment.commentLike}
+    <div className={cn(className, "mb-3")}>
+      <div className="flex space-x-2">
+        <div className="flex flex-col items-center justify-start gap-1">
+          <ProfileHover
+            authorId={comment.user.id}
+            avatarUrl={comment.user.avatarUrl}
+            coverUrl={comment.user.coverUrl}
+            userJoined={comment.user.createdAt}
+            username={comment.user.username}
+            firstName={comment.user.studentData.firstName}
+            middleName={comment.user.studentData.middleName}
+            lastName={comment.user.studentData.lastName}
+            department={comment.user.studentData.department}
+            className="h-7 w-7"
           />
+          <div className="h-[calc(100%-45px)] w-px bg-stone-800" />
         </div>
-        <ReplyBox
-          avatarUrl={avatarUrl}
-          username={username}
-          userId={userId}
-          postId={postId}
-          parentId={comment.id}
-        />
-      </div>
-      {comment.replies.length !== 0 && (
-        <Accordion type="single" collapsible>
-          <AccordionItem value="item-1" className="border-transparent">
-            <AccordionTrigger className="ml-10 mt-1 !flex-none justify-start gap-1 py-0 text-xs text-muted-foreground">
-              View {comment._count.replies} replies
-            </AccordionTrigger>
-            <AccordionContent className="pb-0">
-              {comment.replies.map((reply, index) => (
-                <ReplyCard
-                  key={index}
-                  reply={reply}
+        <div className="w-full">
+          <div className="group flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Card className="flex w-fit flex-col space-y-1 p-2">
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/u/${comment.user.id}`}
+                    className="text-sm font-semibold hover:underline"
+                  >
+                    {comment.user.username}
+                  </Link>
+                  {postAuthor === comment.user.id && (
+                    <Badge
+                      variant="secondary"
+                      className=" text-[10px] font-normal"
+                    >
+                      Author
+                    </Badge>
+                  )}
+                  <p className="text-[10px] text-muted-foreground">
+                    {commentCreated}
+                  </p>
+                </div>
+                <p className="whitespace-pre-wrap break-words break-all text-sm font-light">
+                  {comment.text}
+                </p>
+              </Card>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button
+                    variant="ghost"
+                    size="iconRound"
+                    className="hidden group-hover:flex"
+                  >
+                    <MoreHorizontal className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="min-w-[100px] p-1.5"
+                >
+                  <DropdownMenuItem className="text-xs">
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-xs text-red-600">
+                    <Trash className="mr-2 h-4 w-4" />
+                    Remove
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <LikeButton
+              userId={userId}
+              commentId={comment.id}
+              likeCount={comment._count.commentLike}
+              liked={checkIfUserLiked}
+              likedBy={comment.commentLike}
+            />
+          </div>
+          <Accordion type="single" collapsible>
+            <AccordionItem value="item-1" className="border-transparent">
+              <AccordionTrigger className="mt-1 !flex-none justify-start gap-1 py-0 pl-3 text-xs text-muted-foreground">
+                {comment.replies.length > 0 ? (
+                  <p>View {comment._count.replies} replies</p>
+                ) : (
+                  "Reply"
+                )}
+              </AccordionTrigger>
+              <AccordionContent className="pb-0">
+                {comment.replies.map((reply, index) => (
+                  <ReplyCard
+                    key={index}
+                    reply={reply}
+                    userId={userId}
+                    postAuthor={postAuthor}
+                    className={cn(index === 0 && "mt-3")}
+                  />
+                ))}
+                <CommentForm
+                  avatarUrl={avatarUrl}
+                  username={username}
                   userId={userId}
-                  postAuthor={postAuthor}
-                  className={cn(index === 0 && "mt-3")}
+                  postId={postId}
+                  parentId={comment.id}
+                  className="mt-2 pr-4"
                 />
-              ))}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      )}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </div>
     </div>
   );
 };

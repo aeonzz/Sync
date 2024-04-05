@@ -19,6 +19,7 @@ import { Session } from "next-auth";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface CommentFormProps {
   avatarUrl: string | null;
@@ -27,6 +28,7 @@ interface CommentFormProps {
   postId: string;
   parentId?: number | undefined;
   setAccourdionValue?: (state: string) => void;
+  className?: string | undefined;
 }
 
 const CommentForm: React.FC<CommentFormProps> = ({
@@ -36,6 +38,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
   postId,
   parentId,
   setAccourdionValue,
+  className,
 }) => {
   const avatar = avatarUrl ? avatarUrl : undefined;
   const initialLetter = username?.charAt(0).toUpperCase();
@@ -46,7 +49,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
       comment: "",
     },
   });
-  
+
   const isDirty = form.formState.isDirty;
 
   async function onSubmit(data: { comment: string }) {
@@ -77,7 +80,10 @@ const CommentForm: React.FC<CommentFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex w-full">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn(className, "flex w-full")}
+      >
         <div className="flex w-full space-x-2">
           <Link href={`/u/${userId}`} className="group relative h-fit">
             <div className="absolute z-50 h-7 w-7 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />

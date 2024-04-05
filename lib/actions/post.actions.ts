@@ -56,6 +56,7 @@ export async function getPostById(postId: string) {
         comment: {
           where: {
             parentId: null,
+            deleted: false,
           },
           orderBy: {
             id: "desc",
