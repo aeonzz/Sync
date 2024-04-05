@@ -58,7 +58,6 @@ model Comment {
   parent      Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
   user        User          @relation(fields: [userId], references: [id])
   userId      String
-  commentId   Int?
   commentLike CommentLike[]
 }
 

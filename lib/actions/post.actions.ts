@@ -54,6 +54,9 @@ export async function getPostById(postId: string) {
         },
         imageUrls: true,
         comment: {
+          where: {
+            parentId: null,
+          },
           orderBy: {
             id: "desc",
           },
@@ -61,6 +64,7 @@ export async function getPostById(postId: string) {
             _count: {
               select: {
                 commentLike: true,
+                replies: true,
               },
             },
             commentLike: {
@@ -76,6 +80,33 @@ export async function getPostById(postId: string) {
             user: {
               include: {
                 studentData: true,
+              },
+            },
+            replies: {
+              orderBy: {
+                id: "desc",
+              },
+              include: {
+                _count: {
+                  select: {
+                    commentLike: true,
+                  },
+                },
+                commentLike: {
+                  select: {
+                    id: true,
+                    user: {
+                      include: {
+                        studentData: true,
+                      },
+                    },
+                  },
+                },
+                user: {
+                  include: {
+                    studentData: true,
+                  },
+                },
               },
             },
           },

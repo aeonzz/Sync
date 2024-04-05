@@ -11,8 +11,8 @@ interface CommentBoxProps {
   avatarUrl: string | null;
   username: string | null;
   userId: string;
-  session: Session | null;
   postId: string;
+  postAuthor: string;
   comments: CommentProps[] | null;
 }
 
@@ -20,9 +20,9 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
   avatarUrl,
   username,
   userId,
-  session,
   postId,
   comments,
+  postAuthor,
 }) => {
   return (
     <div className="relative mt-4 flex flex-col space-y-2 ">
@@ -33,7 +33,6 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
         avatarUrl={avatarUrl}
         username={username}
         userId={userId}
-        session={session}
         postId={postId}
       />
       <ScrollArea className="relative h-[calc(100vh-180px)]">
@@ -44,7 +43,11 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
             <CommentCard
               key={index}
               comment={comment}
-              userId={session!.user.id}
+              userId={userId}
+              postId={postId}
+              avatarUrl={avatarUrl}
+              username={username}
+              postAuthor={postAuthor}
               className={cn(index === 0 && "mt-3")}
             />
           ))

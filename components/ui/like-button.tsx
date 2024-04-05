@@ -58,11 +58,11 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   likedBy,
 }) => {
   const router = useRouter();
-  const [optimisticLike, setOptimisticLike] = useState(liked);
+  // const [optimisticLike, setOptimisticLike] = useState(liked);
   const [open, setOpen] = useState(false);
 
   async function handleLike() {
-    setOptimisticLike(!optimisticLike);
+    // setOptimisticLike(!optimisticLike);
     const data = {
       userId,
       commentId,
@@ -97,7 +97,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
                 strokeWidth="1.5"
                 stroke="currentColor"
                 className={cn(
-                  optimisticLike && "fill-red-500 stroke-red-500",
+                  liked && "fill-red-500 stroke-red-500",
                   "h-6 w-6",
                 )}
               >
@@ -164,7 +164,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
                     sideOffset={20}
                   />
                   <Link
-                    href={`/p/${user.id}`}
+                    href={`/p/${user.user.id}`}
                     className="flex items-center gap-1 text-sm hover:underline"
                   >
                     {user.user.username}

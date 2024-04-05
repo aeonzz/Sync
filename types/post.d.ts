@@ -40,7 +40,47 @@ export type PostProps = {
     createdAt: Date;
     _count: {
       commentLike: number;
+      replies: number;
     };
+    replies: {
+      id: number;
+      text: string;
+      createdAt: Date;
+      _count: {
+        commentLike: number;
+      };
+      commentLike: {
+        id: number;
+        user: {
+          id: string;
+          studentId: number;
+          username: string | null;
+          avatarUrl: string | null;
+          coverUrl: string;
+          createdAt: Date;
+          studentData: {
+            firstName: string;
+            middleName: string;
+            lastName: string;
+            department: string;
+          };
+        };
+      }[];
+      user: {
+        id: string;
+        studentId: number;
+        username: string | null;
+        avatarUrl: string | null;
+        coverUrl: string;
+        createdAt: Date;
+        studentData: {
+          firstName: string;
+          middleName: string;
+          lastName: string;
+          department: string;
+        };
+      };
+    }[];
     commentLike: {
       id: number;
       user: {
@@ -76,6 +116,86 @@ export type PostProps = {
 };
 
 export type CommentProps = {
+  id: number;
+  text: string;
+  createdAt: Date;
+  _count: {
+    commentLike: number;
+    replies: number;
+  };
+  replies: {
+    id: number;
+    text: string;
+    createdAt: Date;
+    _count: {
+      commentLike: number;
+    };
+    commentLike: {
+      id: number;
+      user: {
+        id: string;
+        studentId: number;
+        username: string | null;
+        avatarUrl: string | null;
+        coverUrl: string;
+        createdAt: Date;
+        studentData: {
+          firstName: string;
+          middleName: string;
+          lastName: string;
+          department: string;
+        };
+      };
+    }[];
+    user: {
+      id: string;
+      studentId: number;
+      username: string | null;
+      avatarUrl: string | null;
+      coverUrl: string;
+      createdAt: Date;
+      studentData: {
+        firstName: string;
+        middleName: string;
+        lastName: string;
+        department: string;
+      };
+    };
+  }[];
+  commentLike: {
+    id: number;
+    user: {
+      id: string;
+      studentId: number;
+      username: string | null;
+      avatarUrl: string | null;
+      coverUrl: string;
+      createdAt: Date;
+      studentData: {
+        firstName: string;
+        middleName: string;
+        lastName: string;
+        department: string;
+      };
+    };
+  }[];
+  user: {
+    id: string;
+    studentId: number;
+    username: string | null;
+    avatarUrl: string | null;
+    coverUrl: string;
+    createdAt: Date;
+    studentData: {
+      firstName: string;
+      middleName: string;
+      lastName: string;
+      department: string;
+    };
+  };
+};
+
+export type ReplyProps = {
   id: number;
   text: string;
   createdAt: Date;

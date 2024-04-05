@@ -32,6 +32,7 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
   if (!post.data.author.onboarded) {
     redirect("/onboarding");
   }
+  
   return (
     <div className="flex flex-1 space-x-4">
       <div className="min-h-[400px] w-[550px]">
@@ -49,9 +50,9 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
             avatarUrl={currentUser.data.avatarUrl}
             username={currentUser.data.username}
             userId={currentUser.data.id}
-            session={session}
             comments={post.data.comment}
             postId={params.postId}
+            postAuthor={post.data.author.id}
           />
         </div>
       </div>

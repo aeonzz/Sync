@@ -24,28 +24,30 @@ interface CommentFormProps {
   avatarUrl: string | null;
   username: string | null;
   userId: string;
-  session: Session | null;
   postId: string;
+  parentId?: number | undefined;
+  setAccourdionValue?: (state: string) => void;
 }
 
 const CommentForm: React.FC<CommentFormProps> = ({
   avatarUrl,
   username,
   userId,
-  session,
   postId,
+  parentId,
+  setAccourdionValue,
 }) => {
   const avatar = avatarUrl ? avatarUrl : undefined;
   const initialLetter = username?.charAt(0).toUpperCase();
-  const router = useRouter()
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm({
     defaultValues: {
       comment: "",
     },
   });
-
-  const isDirty = form.formState.isDirty
+  
+  const isDirty = form.formState.isDirty;
 
   async function onSubmit(data: { comment: string }) {
     setIsLoading(true);
@@ -53,7 +55,8 @@ const CommentForm: React.FC<CommentFormProps> = ({
     const createData = {
       text: data.comment,
       postId: postId,
-      userId: session!.user.id,
+      userId: userId,
+      parentId: parentId,
     };
 
     const response = await createComment(createData);
@@ -61,7 +64,8 @@ const CommentForm: React.FC<CommentFormProps> = ({
     if (response.status === 200) {
       setIsLoading(false);
       form.reset();
-      router.refresh()
+      setAccourdionValue && setAccourdionValue("");
+      router.refresh();
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
