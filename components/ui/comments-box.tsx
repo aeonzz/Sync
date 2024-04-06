@@ -25,7 +25,7 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
   postAuthor,
 }) => {
   return (
-    <div className="relative mt-4 flex flex-col space-y-2 ">
+    <div className="relative mt-4 flex flex-col space-y-2 bg-background">
       <h2 className="scroll-m-20 text-lg font-semibold tracking-tight first:mt-0">
         Comments
       </h2>

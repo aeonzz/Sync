@@ -85,3 +85,20 @@ export async function checkIfUserLikedComment(
 
   return likeRecord !== null;
 }
+
+export async function deleteComment(commentId: number) {
+  try {
+    await prisma.comment.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        deleted: true,
+      },
+    });
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, status: 500 };
+  }
+}

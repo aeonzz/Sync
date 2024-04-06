@@ -4,7 +4,7 @@ import ProfileHover from "../shared/profile-hover";
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Separator } from "../ui/separator";
-import { checkIfUserLikedComment } from "@/lib/actions/comment.actions";
+import { checkIfUserLikedComment, deleteComment } from "@/lib/actions/comment.actions";
 import LikeButton from "../ui/like-button";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
@@ -16,16 +16,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import CommentForm from "../forms/comment-form";
-import { Button } from "../ui/button";
-import { MoreHorizontal, Pencil, Trash } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import CommentMenu from "../ui/comment-menu";
 
 interface CommentCardProps {
   comment: CommentProps;
@@ -69,7 +60,7 @@ const CommentCard: React.FC<CommentCardProps> = async ({
           <div className="h-[calc(100%-45px)] w-px bg-stone-800" />
         </div>
         <div className="w-full">
-          <div className="group flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Card className="flex w-fit flex-col space-y-1 p-2">
                 <div className="flex items-center gap-2">
@@ -95,30 +86,7 @@ const CommentCard: React.FC<CommentCardProps> = async ({
                   {comment.text}
                 </p>
               </Card>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button
-                    variant="ghost"
-                    size="iconRound"
-                    className="hidden group-hover:flex"
-                  >
-                    <MoreHorizontal className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  className="min-w-[100px] p-1.5"
-                >
-                  <DropdownMenuItem className="text-xs">
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-xs text-red-600">
-                    <Trash className="mr-2 h-4 w-4" />
-                    Remove
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <CommentMenu commentId={comment.id} />
             </div>
             <LikeButton
               userId={userId}

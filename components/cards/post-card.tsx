@@ -6,7 +6,6 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "../ui/card";
 import ProfileHover from "../shared/profile-hover";
 import { format, formatDistanceToNow } from "date-fns";
@@ -17,34 +16,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
 import { Button, buttonVariants } from "../ui/button";
 import {
   CircleUserRound,
   MoreHorizontal,
   Pencil,
-  PlusCircle,
-  Text,
   Trash,
-  UserPlus,
-  X,
 } from "lucide-react";
-import Loader from "../loaders/loader";
 import Linkify from "linkify-react";
-import { CommentProps, PostProps } from "@/types/post";
+import { PostProps } from "@/types/post";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Session } from "next-auth";
-import PostForm from "../forms/post-form";
 import EditContentForm from "../forms/edit-content-form";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -76,7 +59,6 @@ const options = {
 const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
-  const [open, setOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
@@ -140,61 +122,59 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             </div>
           </div>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DropdownMenu
-            open={actionDropdown}
-            onOpenChange={setActionDropdown}
-            modal={false}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="min-w-[100px] p-1.5">
-              {session?.user.id === post.author.id && (
-                <>
-                  <DropdownMenuItem
-                    className="text-xs"
-                    disabled={isEditing}
-                    onClick={() => setIsEditing(true)}
-                  >
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-                    <AlertDialogTrigger asChild>
-                      <DropdownMenuItem
-                        className="text-xs text-red-600"
-                        onSelect={(e) => e.preventDefault()}
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Are you absolutely sure?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          delete the post from our servers.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete()}>
-                          Continue
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </Dialog>
+        <DropdownMenu
+          open={actionDropdown}
+          onOpenChange={setActionDropdown}
+          modal={false}
+        >
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreHorizontal />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="min-w-[100px] p-1.5">
+            {session?.user.id === post.author.id && (
+              <>
+                <DropdownMenuItem
+                  className="text-xs"
+                  disabled={isEditing}
+                  onClick={() => setIsEditing(true)}
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
+                <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem
+                      className="text-xs text-red-600"
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <Trash className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently
+                        delete the post from our servers.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDelete()}>
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardHeader>
       <CardContent className="pb-0">
         <AnimatePresence>
@@ -321,8 +301,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                   className="h-6 w-6"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
                   />
                 </svg>

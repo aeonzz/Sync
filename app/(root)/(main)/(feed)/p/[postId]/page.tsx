@@ -41,14 +41,6 @@ const PostDetail: React.FC<PostDetailsProps> = async ({ params }) => {
         </h2>
       </div>
       <PostCard post={post.data} session={session} />
-      <CommentBox
-        avatarUrl={currentUser.data.avatarUrl}
-        username={currentUser.data.username}
-        userId={currentUser.data.id}
-        session={session}
-        comments={post.data.comment}
-        postId={params.postId}
-      />
     </>
   );
 };
