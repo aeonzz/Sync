@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import getBase64 from "../base64";
 import prisma from "../db";
 
@@ -44,6 +45,7 @@ export async function getPostById(postId: string) {
         _count: {
           select: {
             comment: true,
+            postLike: true,
             imageUrls: true,
           },
         },
@@ -53,6 +55,18 @@ export async function getPostById(postId: string) {
           },
         },
         imageUrls: true,
+        postLike: {
+          orderBy: {
+            id: "desc",
+          },
+          include: {
+            user: {
+              include: {
+                studentData: true,
+              },
+            },
+          },
+        },
         comment: {
           where: {
             parentId: null,
@@ -85,7 +99,7 @@ export async function getPostById(postId: string) {
             },
             replies: {
               orderBy: {
-                id: "desc",
+                id: "asc",
               },
               include: {
                 _count: {
@@ -236,4 +250,55 @@ export async function deletePost(postId: string) {
     console.log(error);
     return { error: error.message, status: 500 };
   }
+}
+
+interface likePostProps {
+  userId: string;
+  postId: string;
+}
+
+export async function likePost({ userId, postId }: likePostProps) {
+  try {
+    const existingLike = await prisma.postLike.findUnique({
+      where: {
+        userId_postId: {
+          userId,
+          postId,
+        },
+      },
+    });
+
+    if (existingLike) {
+      await prisma.postLike.delete({
+        where: {
+          id: existingLike.id,
+        },
+      });
+    } else {
+      await prisma.postLike.create({
+        data: {
+          userId,
+          postId,
+        },
+      });
+    }
+
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, status: 500 };
+  }
+}
+
+export async function checkIfUserLikedPost(userId: string, postId: string) {
+  const likeRecord = await prisma.postLike.findUnique({
+    where: {
+      userId_postId: {
+        userId: userId,
+        postId: postId,
+      },
+    },
+  });
+
+  return likeRecord !== null;
 }

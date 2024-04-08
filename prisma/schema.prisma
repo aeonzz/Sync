@@ -97,6 +97,8 @@ model PostLike {
   post   Post   @relation(fields: [postId], references: [postId])
   postId String
   user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, postId])
 }
 
 model CommentLike {

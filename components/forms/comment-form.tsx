@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useState } from "react";
-import { createComment } from "@/lib/actions/comment.actions";
+import { createComment, updateComment } from "@/lib/actions/comment.actions";
 import { Session } from "next-auth";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
@@ -29,6 +29,11 @@ interface CommentFormProps {
   parentId?: number | undefined;
   setAccourdionValue?: (state: string) => void;
   className?: string | undefined;
+  editData?: {
+    text: string;
+    commentId: number;
+  };
+  setDialogOpen?: (state: boolean) => void;
 }
 
 const CommentForm: React.FC<CommentFormProps> = ({
@@ -39,6 +44,8 @@ const CommentForm: React.FC<CommentFormProps> = ({
   parentId,
   setAccourdionValue,
   className,
+  editData,
+  setDialogOpen,
 }) => {
   const avatar = avatarUrl ? avatarUrl : undefined;
   const initialLetter = username?.charAt(0).toUpperCase();
@@ -46,7 +53,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm({
     defaultValues: {
-      comment: "",
+      comment: editData ? editData.text : "",
     },
   });
 
@@ -55,16 +62,25 @@ const CommentForm: React.FC<CommentFormProps> = ({
   async function onSubmit(data: { comment: string }) {
     setIsLoading(true);
 
-    const createData = {
-      text: data.comment,
-      postId: postId,
-      userId: userId,
-      parentId: parentId,
-    };
-
-    const response = await createComment(createData);
+    let response;
+    if (editData) {
+      const createData = {
+        text: data.comment,
+        commentId: editData.commentId
+      };
+      response = await updateComment(createData);
+    } else {
+      const createData = {
+        text: data.comment,
+        postId: postId,
+        userId: userId,
+        parentId: parentId,
+      };
+      response = await createComment(createData);
+    }
 
     if (response.status === 200) {
+      setDialogOpen && setDialogOpen(false)
       setIsLoading(false);
       form.reset();
       setAccourdionValue && setAccourdionValue("");
@@ -101,6 +117,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                   <Textarea
                     placeholder="Add a comment..."
                     className="resize-none"
+                    disabled={isLoading}
                     {...field}
                   />
                 </FormControl>

@@ -102,3 +102,26 @@ export async function deleteComment(commentId: number) {
     return { error: error.message, status: 500 };
   }
 }
+
+interface UpdateCommentParams {
+  text: string;
+  commentId: number
+}
+
+
+export async function updateComment({text, commentId} : UpdateCommentParams) {
+  try {
+    await prisma.comment.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        text: text,
+      },
+    });
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, status: 500 };
+  }
+}

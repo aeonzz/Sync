@@ -3,8 +3,10 @@ import { CommentProps, PostProps } from "@/types/post";
 import ProfileHover from "../shared/profile-hover";
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
-import { Separator } from "../ui/separator";
-import { checkIfUserLikedComment, deleteComment } from "@/lib/actions/comment.actions";
+import {
+  checkIfUserLikedComment,
+  deleteComment,
+} from "@/lib/actions/comment.actions";
 import LikeButton from "../ui/like-button";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
@@ -86,7 +88,16 @@ const CommentCard: React.FC<CommentCardProps> = async ({
                   {comment.text}
                 </p>
               </Card>
-              <CommentMenu commentId={comment.id} />
+              {userId === comment.user.id && (
+                <CommentMenu
+                  commentId={comment.id}
+                  avatarUrl={avatarUrl}
+                  username={username}
+                  userId={userId}
+                  postId={postId}
+                  text={comment.text}
+                />
+              )}
             </div>
             <LikeButton
               userId={userId}

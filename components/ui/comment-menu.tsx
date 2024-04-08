@@ -23,20 +23,41 @@ import {
 import { deleteComment } from "@/lib/actions/comment.actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./dialog";
+import CommentForm from "../forms/comment-form";
 
 interface CommentMenuProps {
   commentId: number;
+  avatarUrl: string | null;
+  username: string | null;
+  userId: string;
+  postId: string;
+  text: string;
 }
 
-const CommentMenu: React.FC<CommentMenuProps> = ({ commentId }) => {
+const CommentMenu: React.FC<CommentMenuProps> = ({
+  commentId,
+  avatarUrl,
+  username,
+  userId,
+  postId,
+  text,
+}) => {
   const [open, setOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const router = useRouter();
 
   async function handleDelete() {
     const response = await deleteComment(commentId);
 
     if (response.status === 200) {
-      setOpen(false)
+      setOpen(false);
       router.refresh();
     } else {
       toast.error("Uh oh! Something went wrong.", {
@@ -47,48 +68,65 @@ const CommentMenu: React.FC<CommentMenuProps> = ({ commentId }) => {
   }
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="iconRound"
-        >
-          <MoreHorizontal className="h-5 w-5" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="min-w-[100px] p-1.5">
-        <DropdownMenuItem className="text-xs">
-          <Pencil className="mr-2 h-4 w-4" />
-          Edit
-        </DropdownMenuItem>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <DropdownMenuItem
-              className="text-xs text-red-600"
-              onSelect={(e) => e.preventDefault()}
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              Remove
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="iconRound">
+            <MoreHorizontal className="h-5 w-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="min-w-[100px] p-1.5">
+          <DialogTrigger asChild>
+            <DropdownMenuItem className="text-xs">
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit
             </DropdownMenuItem>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                comment from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => handleDelete()}>
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </DialogTrigger>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem
+                className="text-xs text-red-600"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Remove
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  comment from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleDelete()}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit comment</DialogTitle>
+        </DialogHeader>
+        <CommentForm
+          avatarUrl={avatarUrl}
+          username={username}
+          userId={userId}
+          postId={postId}
+          editData={{
+            text: text,
+            commentId: commentId,
+          }}
+          setDialogOpen={setDialogOpen}
+        />
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -16,7 +16,7 @@ import NoPostMessage from "./no-post-message";
 const Feed = ({ session }: { session: Session | null }) => {
   const { ref, inView } = useInView();
   const { isMutate, setIsMutate } = useMutationSuccess();
-
+  
   const fetchPosts = async ({ pageParam = 0 }) => {
     const res = await axios.get(`/api/post?cursor=${pageParam}`);
     return res.data;

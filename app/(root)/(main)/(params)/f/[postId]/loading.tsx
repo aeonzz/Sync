@@ -1,4 +1,5 @@
 import PostSkeleton from "@/components/loaders/post-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import React from "react";
 
 const loading = () => {

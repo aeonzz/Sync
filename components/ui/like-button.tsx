@@ -58,11 +58,9 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   likedBy,
 }) => {
   const router = useRouter();
-  // const [optimisticLike, setOptimisticLike] = useState(liked);
   const [open, setOpen] = useState(false);
 
   async function handleLike() {
-    // setOptimisticLike(!optimisticLike);
     const data = {
       userId,
       commentId,

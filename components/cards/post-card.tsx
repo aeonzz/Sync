@@ -1,12 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "../ui/card";
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
 import ProfileHover from "../shared/profile-hover";
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -17,12 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button, buttonVariants } from "../ui/button";
-import {
-  CircleUserRound,
-  MoreHorizontal,
-  Pencil,
-  Trash,
-} from "lucide-react";
+import { CircleUserRound, MoreHorizontal, Pencil, Trash } from "lucide-react";
 import Linkify from "linkify-react";
 import { PostProps } from "@/types/post";
 import { cn } from "@/lib/utils";
@@ -41,10 +31,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { deletePost } from "@/lib/actions/post.actions";
+import {
+  checkIfUserLikedPost,
+  deletePost,
+  likePost,
+} from "@/lib/actions/post.actions";
 import { toast } from "sonner";
 import { useMutationSuccess } from "@/context/store";
 import { Separator } from "../ui/separator";
+import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PostCardProps {
   post: PostProps;
@@ -62,7 +63,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [alertOpen, setAlertOpen] = useState(false);
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
-  const { setIsMutate } = useMutationSuccess();
+  const [liked, setLiked] = useState(false);
+  const { isMutate, setIsMutate } = useMutationSuccess();
+  const router = useRouter();
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
 
@@ -87,6 +90,36 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
     }
   }
 
+  async function handleLike() {
+    const data = {
+      userId: session!.user.id,
+      postId: post.postId,
+    };
+
+    const response = await likePost(data);
+
+    if (response.status === 200) {
+      setIsMutate(true);
+      router.refresh();
+    } else {
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    }
+  }
+
+  useEffect(() => {
+    const checkIfUserLiked = async () => {
+      const response = await checkIfUserLikedPost(
+        session!.user.id,
+        post.postId,
+      );
+      setLiked(response);
+    };
+    checkIfUserLiked();
+  }, [post, isMutate]);
+
   return (
     <Card className="mb-4 min-h-[200px]">
       <CardHeader className="flex-row items-center justify-between">
@@ -101,6 +134,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             middleName={post.author.studentData.middleName}
             lastName={post.author.studentData.lastName}
             department={post.author.studentData.department}
+            className="h-9 w-9"
           />
           <div className="flex flex-col">
             <Link
@@ -280,79 +314,120 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
       <CardFooter>
         <div className="flex w-full items-center justify-between">
           <div className="-mr-5 flex">
-            <CircleUserRound />
-            <CircleUserRound />
-            <CircleUserRound />
-            <CircleUserRound />
+            {post.postLike.map((user, index) => (
+              <ProfileHover
+                key={index}
+                authorId={user.user.id}
+                avatarUrl={user.user.avatarUrl}
+                coverUrl={user.user.coverUrl}
+                userJoined={user.user.createdAt}
+                username={user.user.username}
+                firstName={user.user.studentData.firstName}
+                middleName={user.user.studentData.middleName}
+                lastName={user.user.studentData.lastName}
+                department={user.user.studentData.department}
+                className={cn(index !== 0 && "-ml-2", "h-6 w-6")}
+              />
+            ))}
           </div>
           <div className="flex flex-col items-end space-y-1">
             <div className="flex">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="aspect-square rounded-full p-0 hover:bg-transparent"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="h-6 w-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                  />
-                </svg>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="aspect-square rounded-full p-0 hover:bg-transparent"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="h-6 w-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
-                  />
-                </svg>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="aspect-square rounded-full p-0 hover:bg-transparent"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="h-6 w-6"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                  />
-                </svg>
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="iconRound"
+                      onClick={() => handleLike()}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className={cn(
+                          liked && "fill-red-500 stroke-red-500",
+                          "h-6 w-6",
+                        )}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                        />
+                      </svg>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>Like</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={`/f/${post.postId}`}
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "iconRound" }),
+                      )}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="h-6 w-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
+                        />
+                      </svg>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>Comment</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="aspect-square rounded-full p-0 hover:bg-transparent"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="h-6 w-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                        />
+                      </svg>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p>Share</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
             <div className="flex">
-              <p className="h-auto p-0 text-[11px]">1 likes</p>
+              <p className="h-auto p-0 text-[11px]">
+                {post._count.postLike} likes
+              </p>
               <Separator orientation="vertical" className="mx-2 h-auto" />
               <Link
-                href={`/p/${post.postId}`}
+                href={`/f/${post.postId}`}
                 className={cn(
                   buttonVariants({ variant: "link" }),
                   "h-auto p-0 text-[11px] text-muted-foreground",

@@ -44,6 +44,7 @@ export async function GET(req: Request) {
           select: {
             comment: true,
             imageUrls: true,
+            postLike: true,
           },
         },
         author: {
@@ -52,9 +53,16 @@ export async function GET(req: Request) {
           },
         },
         imageUrls: true,
-        comment: {
+        postLike: {
+          orderBy: {
+            id: "desc",
+          },
           include: {
-            user: true,
+            user: {
+              include: {
+                studentData: true,
+              },
+            },
           },
         },
       },

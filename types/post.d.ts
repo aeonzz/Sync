@@ -33,7 +33,24 @@ export type PostProps = {
   _count: {
     comment: number;
     imageUrls: number;
+    postLike: number;
   };
+  postLike: {
+    user: {
+      id: string;
+      studentId: number;
+      username: string | null;
+      avatarUrl: string | null;
+      coverUrl: string;
+      createdAt: Date;
+      studentData: {
+        firstName: string;
+        middleName: string;
+        lastName: string;
+        department: string;
+      };
+    };
+  }[];
   comment: {
     id: number;
     text: string;

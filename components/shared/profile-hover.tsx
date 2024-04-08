@@ -55,7 +55,7 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
           <div
             className={cn(
               className,
-              "absolute z-50 h-9 w-9 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100",
+              "absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100",
             )}
           />
           <Avatar className={cn(className)}>
