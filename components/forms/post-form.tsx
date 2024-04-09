@@ -24,12 +24,12 @@ import { ImagePlus, SmilePlus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FileState, MultiImageDropzone } from "./multi-image";
 import { useEdgeStore } from "@/lib/edgestore";
-import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { useMutationSuccess, useThemeStore } from "@/context/store";
 import { useRouter } from "next/navigation";
 import { Accordion, AccordionContent, AccordionItem } from "../ui/accordion";
 import { createPost } from "@/lib/actions/post.actions";
 import { useSession } from "next-auth/react";
+import Cemoji from "../ui/c-emoji";
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
   hasUserInput: (state: boolean) => void;
@@ -45,7 +45,6 @@ const PostForm: React.FC<PostFormProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openImageInput, setOpenImageInput] = useState(false);
-  const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
   const [accordionValue, setAccourdionValue] = useState("");
   const { edgestore } = useEdgeStore();
@@ -63,10 +62,17 @@ const PostForm: React.FC<PostFormProps> = ({
   });
 
   const watchFormContent = form.watch("content");
-  const handleEmojiClick = (emojiData: EmojiClickData) => {
+  // const handleEmojiClick = (emojiData: EmojiClickData) => {
+  //   const currentContent = form.getValues("content");
+
+  //   const newContent = currentContent + emojiData.emoji;
+
+  //   form.setValue("content", newContent);
+  // };
+  const handleEmojiClick2 = (emojiData: string) => {
     const currentContent = form.getValues("content");
 
-    const newContent = currentContent + emojiData.emoji;
+    const newContent = currentContent + emojiData;
 
     form.setValue("content", newContent);
   };
@@ -85,7 +91,6 @@ const PostForm: React.FC<PostFormProps> = ({
   }
 
   async function onSubmit(data: z.infer<typeof PostValidation>) {
-    setOpenEmojiPicker(false);
     onLoading(true);
     setIsLoading(true);
 
@@ -177,7 +182,7 @@ const PostForm: React.FC<PostFormProps> = ({
             <FormItem>
               <FormControl>
                 <Textarea
-                  placeholder="Write your thoughts here..."
+                  placeholder="What's on your mind?"
                   className={cn(
                     watchFormContent.length >= 90
                       ? "text-md h-[150px]"
@@ -266,27 +271,12 @@ const PostForm: React.FC<PostFormProps> = ({
                 )}
               />
             </Button>
-            <Button
-              className={cn(
-                openEmojiPicker && "bg-yellow-500/15",
-                "group rounded-full transition-all hover:bg-yellow-500/15 active:scale-95",
-              )}
-              size="icon"
-              variant="ghost"
-              onClick={(e) => {
-                e.preventDefault();
-                setOpenEmojiPicker((prev) => !prev);
-              }}
-              disabled={isLoading}
-            >
-              <SmilePlus
-                className={cn(
-                  openEmojiPicker ? "text-yellow-500/70" : "text-slate-500",
-                  "group-hover:text-yellow-500/70",
-                )}
-              />
-            </Button>
-            <div className="absolute -right-[70%] -top-[360px]">
+            <Cemoji
+              isLoading={isLoading}
+              handleEmojiClick={handleEmojiClick2}
+              side="top"
+            />
+            {/* <div className="absolute -right-[70%] -top-[360px]">
               <EmojiPicker
                 open={openEmojiPicker}
                 theme={isDark ? Theme.LIGHT : Theme.DARK}
@@ -298,7 +288,7 @@ const PostForm: React.FC<PostFormProps> = ({
                   showPreview: false,
                 }}
               />
-            </div>
+            </div> */}
           </div>
           <Button
             type="submit"

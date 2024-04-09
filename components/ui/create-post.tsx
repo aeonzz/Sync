@@ -48,7 +48,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="group flex w-full items-center space-x-3">
             <Input
-              placeholder="Write your thoughts here..."
+              placeholder="What's on your mind?"
               className="rounded-none border-none bg-transparent pl-0 transition focus-visible:ring-0 focus-visible:ring-black"
             />
             <svg

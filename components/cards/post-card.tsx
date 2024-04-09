@@ -12,7 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button, buttonVariants } from "../ui/button";
-import { CircleUserRound, MoreHorizontal, Pencil, Trash } from "lucide-react";
+import {
+  CircleUserRound,
+  MoreHorizontal,
+  Pencil,
+  Trash,
+  X,
+} from "lucide-react";
 import Linkify from "linkify-react";
 import { PostProps } from "@/types/post";
 import { cn } from "@/lib/utils";
@@ -32,6 +38,15 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   checkIfUserLikedPost,
   deletePost,
   likePost,
@@ -46,6 +61,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface PostCardProps {
   post: PostProps;
@@ -59,6 +75,7 @@ const options = {
 
 const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
+  const [open, setOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const postedAt = new Date(post.createdAt);
@@ -313,8 +330,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
       </CardContent>
       <CardFooter>
         <div className="flex w-full items-center justify-between">
-          <div className="-mr-5 flex">
-            {post.postLike.map((user, index) => (
+          <div className="-mr-5 flex items-center">
+            {post.postLike.slice(0, 5).map((user, index) => (
               <ProfileHover
                 key={index}
                 authorId={user.user.id}
@@ -329,6 +346,72 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                 className={cn(index !== 0 && "-ml-2", "h-6 w-6")}
               />
             ))}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p
+                    className="ml-1 h-auto cursor-pointer p-0 text-[11px] text-muted-foreground hover:underline"
+                    onClick={() => post.postLike.length !== 0 && setOpen(true)}
+                  >
+                    {post.postLike.length > 1
+                      ? `Liked by ${post.postLike[1].user.username} and ${post._count.postLike - 1} others`
+                      : post.postLike[0]
+                        ? `Liked by ${post.postLike[0].user.username}`
+                        : null}
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  {post.postLike.length > 0 &&
+                    post.postLike.map((user, index) => (
+                      <p key={index} className="text-xs">
+                        {user.user.username}
+                      </p>
+                    ))}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogContent className="max-w-sm">
+                <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                  <X className="h-5 w-5" />
+                  <span className="sr-only">Close</span>
+                </DialogClose>
+                <DialogHeader>
+                  <DialogTitle>Engagers</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="max-h-[316px]">
+                  {post.postLike.map((user, index) => (
+                    <div
+                      key={index}
+                      className="flex w-full items-center justify-between rounded-md p-2 hover:bg-card"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <ProfileHover
+                          authorId={user.user.id}
+                          avatarUrl={user.user.avatarUrl}
+                          coverUrl={user.user.coverUrl}
+                          userJoined={user.user.createdAt}
+                          username={user.user.username}
+                          firstName={user.user.studentData.firstName}
+                          middleName={user.user.studentData.middleName}
+                          lastName={user.user.studentData.lastName}
+                          department={user.user.studentData.department}
+                          side="left"
+                          align="start"
+                          sideOffset={20}
+                        />
+                        <Link
+                          href={`/p/${user.user.id}`}
+                          className="flex items-center gap-1 text-sm hover:underline"
+                        >
+                          {user.user.username}
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
           </div>
           <div className="flex flex-col items-end space-y-1">
             <div className="flex">
@@ -421,21 +504,15 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <div className="flex">
-              <p className="h-auto p-0 text-[11px]">
-                {post._count.postLike} likes
-              </p>
-              <Separator orientation="vertical" className="mx-2 h-auto" />
-              <Link
-                href={`/f/${post.postId}`}
-                className={cn(
-                  buttonVariants({ variant: "link" }),
-                  "h-auto p-0 text-[11px] text-muted-foreground",
-                )}
-              >
-                View all {post._count.comment} comments
-              </Link>
-            </div>
+            <Link
+              href={`/f/${post.postId}`}
+              className={cn(
+                buttonVariants({ variant: "link" }),
+                "h-auto p-0 text-[11px] text-muted-foreground",
+              )}
+            >
+              View all {post._count.comment} comments
+            </Link>
           </div>
         </div>
       </CardFooter>

@@ -13,13 +13,14 @@ import {
 } from "@/components/ui/form";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createComment, updateComment } from "@/lib/actions/comment.actions";
 import { Session } from "next-auth";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Cemoji from "../ui/c-emoji";
 
 interface CommentFormProps {
   avatarUrl: string | null;
@@ -59,6 +60,15 @@ const CommentForm: React.FC<CommentFormProps> = ({
 
   const isDirty = form.formState.isDirty;
 
+
+  const handleEmojiClick2 = (emojiData: string) => {
+    const currentContent = form.getValues("comment");
+
+    const newContent = currentContent + emojiData;
+
+    form.setValue("comment", newContent);
+  };
+
   async function onSubmit(data: { comment: string }) {
     setIsLoading(true);
 
@@ -66,7 +76,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
     if (editData) {
       const createData = {
         text: data.comment,
-        commentId: editData.commentId
+        commentId: editData.commentId,
       };
       response = await updateComment(createData);
     } else {
@@ -80,7 +90,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
     }
 
     if (response.status === 200) {
-      setDialogOpen && setDialogOpen(false)
+      setDialogOpen && setDialogOpen(false);
       setIsLoading(false);
       form.reset();
       setAccourdionValue && setAccourdionValue("");
@@ -121,27 +131,36 @@ const CommentForm: React.FC<CommentFormProps> = ({
                     {...field}
                   />
                 </FormControl>
-                <Button
-                  type="submit"
-                  disabled={!isDirty || isLoading}
-                  variant="ghost"
-                  className="absolute bottom-0 right-0 aspect-square w-fit rounded-full p-1"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
+                <div className="absolute bottom-0 right-0 flex items-center">
+                  <Cemoji
+                    isLoading={isLoading}
+                    handleEmojiClick={handleEmojiClick2}
+                    sideOffset={10}
+                    align="end"
                     className="h-5 w-5"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={!isDirty || isLoading}
+                    variant="ghost"
+                    className="aspect-square w-fit rounded-full p-1"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                    />
-                  </svg>
-                </Button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="h-6 w-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                      />
+                    </svg>
+                  </Button>
+                </div>
                 <FormMessage />
               </FormItem>
             )}

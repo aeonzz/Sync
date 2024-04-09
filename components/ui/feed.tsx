@@ -33,6 +33,7 @@ const Feed = ({ session }: { session: Session | null }) => {
     queryKey: ["post"],
     queryFn: fetchPosts,
     initialPageParam: 0,
+    refetchOnWindowFocus: false,
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
   });
 
