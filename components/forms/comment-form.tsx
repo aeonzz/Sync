@@ -21,6 +21,7 @@ import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Cemoji from "../ui/c-emoji";
+import { useMutationSuccess } from "@/context/store";
 
 interface CommentFormProps {
   avatarUrl: string | null;
@@ -52,6 +53,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
   const initialLetter = username?.charAt(0).toUpperCase();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { setIsMutate } = useMutationSuccess();
   const form = useForm({
     defaultValues: {
       comment: editData ? editData.text : "",
@@ -59,7 +61,6 @@ const CommentForm: React.FC<CommentFormProps> = ({
   });
 
   const isDirty = form.formState.isDirty;
-
 
   const handleEmojiClick2 = (emojiData: string) => {
     const currentContent = form.getValues("comment");
@@ -91,6 +92,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
 
     if (response.status === 200) {
       setDialogOpen && setDialogOpen(false);
+      setIsMutate(true);
       setIsLoading(false);
       form.reset();
       setAccourdionValue && setAccourdionValue("");

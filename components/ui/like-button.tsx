@@ -1,10 +1,13 @@
 "use client";
 
-import { likeComment } from "@/lib/actions/comment.actions";
+import {
+  checkIfUserLikedComment,
+  likeComment,
+} from "@/lib/actions/comment.actions";
 import { Button } from "./button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -25,12 +28,12 @@ import ProfileHover from "../shared/profile-hover";
 import Link from "next/link";
 import { X } from "lucide-react";
 import { ScrollArea } from "./scroll-area";
+import { useMutationSuccess } from "@/context/store";
 
 interface LikeButtonProps {
   userId: string;
   commentId: number;
   likeCount: number;
-  liked: boolean;
   likedBy: {
     id: number;
     user: {
@@ -54,13 +57,15 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   userId,
   commentId,
   likeCount,
-  liked,
   likedBy,
 }) => {
   const router = useRouter();
+  const [liked, setLiked] = useState<boolean>();
   const [open, setOpen] = useState(false);
+  const { setIsMutate } = useMutationSuccess();
 
   async function handleLike() {
+    setLiked((prev) => !prev);
     const data = {
       userId,
       commentId,
@@ -70,6 +75,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 
     if (response.status === 200) {
       router.refresh();
+      setIsMutate(true);
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -77,6 +83,14 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       });
     }
   }
+
+  useEffect(() => {
+    const checkIfUserLiked = async () => {
+      const response = await checkIfUserLikedComment(userId, commentId);
+      setLiked(response);
+    };
+    checkIfUserLiked();
+  }, [liked, commentId, useId]);
 
   return (
     <div className="mr-2 space-y-1">

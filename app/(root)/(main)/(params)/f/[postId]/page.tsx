@@ -52,7 +52,7 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
             Post
           </h2>
         </div>
-        <PostCard post={post.data} isLiked={post.liked} session={session} />
+        <PostCard post={post.data} session={session} />
       </div>
       <div className="relative flex-1">
         <div className="sticky top-0 h-auto w-full overflow-hidden rounded-md">

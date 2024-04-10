@@ -71,7 +71,7 @@ const options = {
   className: "text-blue-500 hover:underline",
 };
 
-const PostCard: React.FC<PostCardProps> = ({ post, session, isLiked }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
   const [open, setOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
@@ -79,7 +79,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, isLiked }) => {
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
   const [liked, setLiked] = useState<boolean>();
-  const { isMutate, setIsMutate } = useMutationSuccess();
+  const { setIsMutate } = useMutationSuccess();
   const router = useRouter();
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
@@ -134,7 +134,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, isLiked }) => {
       setLiked(response);
     };
     checkIfUserLiked();
-  }, [post]);
+  }, [post, session]);
 
 
   return (

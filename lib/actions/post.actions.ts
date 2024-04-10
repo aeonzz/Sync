@@ -59,6 +59,9 @@ export async function getPostById(postId: string, userId: string) {
           orderBy: {
             id: "desc",
           },
+          where: {
+            userId: userId,
+          },
           include: {
             user: {
               include: {
@@ -98,6 +101,9 @@ export async function getPostById(postId: string, userId: string) {
               },
             },
             replies: {
+              where: {
+                deleted: false,
+              },
               orderBy: {
                 id: "asc",
               },
@@ -129,15 +135,7 @@ export async function getPostById(postId: string, userId: string) {
       },
     });
 
-    const likeRecord = await prisma.postLike.findUnique({
-      where: {
-        userId_postId: {
-          userId: userId,
-          postId: postId,
-        },
-      },
-    });
-    return { data: response, liked: likeRecord !== null, error: null, status: 200 };
+    return { data: response, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
     return { data: null, liked: null, error: error.message, status: 500 };

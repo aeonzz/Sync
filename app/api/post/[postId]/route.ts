@@ -1,4 +1,6 @@
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -11,31 +13,32 @@ export async function GET(
     };
   },
 ) {
+
+  const session = await getServerSession(authOptions)
+
   try {
-    const response = await prisma.post.findFirst({
+    const comment = await prisma.comment.findMany({
       where: {
         postId: params.postId,
+        parentId: null,
         deleted: false,
+      },
+      orderBy: {
+        id: "desc",
       },
       include: {
         _count: {
           select: {
-            comment: true,
-            postLike: true,
-            imageUrls: true,
+            commentLike: true,
+            replies: true,
           },
         },
-        author: {
-          include: {
-            studentData: true,
+        commentLike: {
+          where: {
+            userId: session!.user.id,
           },
-        },
-        imageUrls: true,
-        postLike: {
-          orderBy: {
-            id: "desc",
-          },
-          include: {
+          select: {
+            id: true,
             user: {
               include: {
                 studentData: true,
@@ -43,19 +46,22 @@ export async function GET(
             },
           },
         },
-        comment: {
+        user: {
+          include: {
+            studentData: true,
+          },
+        },
+        replies: {
           where: {
-            parentId: null,
             deleted: false,
           },
           orderBy: {
-            id: "desc",
+            id: "asc",
           },
           include: {
             _count: {
               select: {
                 commentLike: true,
-                replies: true,
               },
             },
             commentLike: {
@@ -73,39 +79,12 @@ export async function GET(
                 studentData: true,
               },
             },
-            replies: {
-              orderBy: {
-                id: "asc",
-              },
-              include: {
-                _count: {
-                  select: {
-                    commentLike: true,
-                  },
-                },
-                commentLike: {
-                  select: {
-                    id: true,
-                    user: {
-                      include: {
-                        studentData: true,
-                      },
-                    },
-                  },
-                },
-                user: {
-                  include: {
-                    studentData: true,
-                  },
-                },
-              },
-            },
           },
         },
       },
     });
 
-    return NextResponse.json({ data: response }, { status: 200 });
+    return NextResponse.json({ data: comment }, { status: 200 });
   } catch (error: any) {
     console.log(error);
     return NextResponse.json(

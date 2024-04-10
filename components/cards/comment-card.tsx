@@ -1,12 +1,10 @@
+"use client"
+
 import { Card } from "../ui/card";
 import { CommentProps, PostProps } from "@/types/post";
 import ProfileHover from "../shared/profile-hover";
 import Link from "next/link";
 import { formatDistanceToNowStrict } from "date-fns";
-import {
-  checkIfUserLikedComment,
-  deleteComment,
-} from "@/lib/actions/comment.actions";
 import LikeButton from "../ui/like-button";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
@@ -30,7 +28,7 @@ interface CommentCardProps {
   username: string | null;
 }
 
-const CommentCard: React.FC<CommentCardProps> = async ({
+const CommentCard: React.FC<CommentCardProps> = ({
   comment,
   userId,
   postId,
@@ -41,7 +39,6 @@ const CommentCard: React.FC<CommentCardProps> = async ({
 }) => {
   const commentCreatedAt = new Date(comment.createdAt);
   const commentCreated = formatDistanceToNowStrict(commentCreatedAt);
-  const checkIfUserLiked = await checkIfUserLikedComment(userId, comment.id);
 
   return (
     <div className={cn(className, "mb-3")}>
@@ -103,7 +100,6 @@ const CommentCard: React.FC<CommentCardProps> = async ({
               userId={userId}
               commentId={comment.id}
               likeCount={comment._count.commentLike}
-              liked={checkIfUserLiked}
               likedBy={comment.commentLike}
             />
           </div>
@@ -122,6 +118,9 @@ const CommentCard: React.FC<CommentCardProps> = async ({
                     key={index}
                     reply={reply}
                     userId={userId}
+                    avatarUrl={avatarUrl}
+                    username={username}
+                    postId={postId}
                     postAuthor={postAuthor}
                     className={cn(index === 0 && "mt-3")}
                   />

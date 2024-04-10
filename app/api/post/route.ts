@@ -81,16 +81,11 @@ export async function GET(req: Request) {
     });
     const lastPost = posts[posts.length - 1];
     const nextCursor = lastPost?.sequenceId || undefined;
-
-    const postsUserLiked = posts.filter((post) =>
-      post.postLike.some((like) => like.user.id === session!.user.id),
-    );
-
+    
     return NextResponse.json(
       {
         data: posts,
         nextCursor,
-        liked: postsUserLiked !== null,
       },
       { status: 200 },
     );
