@@ -13,7 +13,7 @@ import { Session } from "next-auth";
 import PostSkeleton from "../loaders/post-skeleton";
 import NoPostMessage from "./no-post-message";
 
-const Feed = ({ session }: { session: Session | null }) => {
+const Feed = ({ session }: { session: Session }) => {
   const { ref, inView } = useInView();
   const { isMutate, setIsMutate } = useMutationSuccess();
   
@@ -46,7 +46,7 @@ const Feed = ({ session }: { session: Session | null }) => {
       ) : (
         <div>
           {group.data.map((post: PostProps) => (
-            <PostCard key={post.postId} post={post} session={session} />
+            <PostCard key={post.postId} post={post} session={session} isLiked={group.liked} />
           ))}
         </div>
       )}

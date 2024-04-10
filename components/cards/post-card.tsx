@@ -46,11 +46,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  checkIfUserLikedPost,
-  deletePost,
-  likePost,
-} from "@/lib/actions/post.actions";
+import { checkIfUserLikedPost, deletePost, likePost } from "@/lib/actions/post.actions";
 import { toast } from "sonner";
 import { useMutationSuccess } from "@/context/store";
 import { Separator } from "../ui/separator";
@@ -62,10 +58,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "../ui/scroll-area";
+import prisma from "@/lib/db";
 
 interface PostCardProps {
   post: PostProps;
-  session: Session | null;
+  session: Session;
+  isLiked?: boolean | undefined;
 }
 
 const options = {
@@ -73,14 +71,14 @@ const options = {
   className: "text-blue-500 hover:underline",
 };
 
-const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, session, isLiked }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
   const [open, setOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState<boolean>();
   const { isMutate, setIsMutate } = useMutationSuccess();
   const router = useRouter();
   const ShortContentWithNoImage =
@@ -108,6 +106,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   }
 
   async function handleLike() {
+    setLiked((prev) => !prev);
     const data = {
       userId: session!.user.id,
       postId: post.postId,
@@ -135,7 +134,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
       setLiked(response);
     };
     checkIfUserLiked();
-  }, [post, isMutate]);
+  }, [post]);
+
 
   return (
     <Card className="mb-4 min-h-[200px]">
@@ -421,7 +421,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                     <Button
                       variant="ghost"
                       size="iconRound"
-                      onClick={() => handleLike()}
+                      onClick={handleLike}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

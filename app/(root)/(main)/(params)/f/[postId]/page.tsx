@@ -18,21 +18,31 @@ interface PostDetailsProps {
 
 const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
   const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+
   const currentUser = await getUserById(session!.user.id);
-  const post = await getPostById(params.postId);
+
+  if (!currentUser.data || currentUser.error || !params.postId) {
+    return <FetchDataError />;
+  }
+
+  const post = await getPostById(params.postId, currentUser.data?.id);
+
+  if (post.error) {
+    return <FetchDataError />;
+  }
 
   if (!post.data) {
     return <NotFound className="w-full" />;
   }
 
-  if (!currentUser.data || currentUser.error || post.error || !params.postId) {
-    return <FetchDataError />;
-  }
-
   if (!post.data.author.onboarded) {
     redirect("/onboarding");
   }
-  
+
   return (
     <div className="flex flex-1 space-x-4">
       <div className="min-h-[400px] w-[550px]">
@@ -42,7 +52,7 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
             Post
           </h2>
         </div>
-        <PostCard post={post.data} session={session} />
+        <PostCard post={post.data} isLiked={post.liked} session={session} />
       </div>
       <div className="relative flex-1">
         <div className="sticky top-0 h-auto w-full overflow-hidden rounded-md">

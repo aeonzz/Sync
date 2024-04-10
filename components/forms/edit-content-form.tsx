@@ -63,8 +63,8 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
   const [accordionValue, setAccourdionValue] = useState("item-1");
   const [isImageLoaded, setIsLoadedImage] = useState(false);
   const [imageToDelete, setImageToDelete] = useState<number[]>([]);
-  const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
   const { edgestore } = useEdgeStore();
+  const router = useRouter();
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
@@ -130,6 +130,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
     const response = await UpdatePost(updateData);
 
     if (response.status === 200) {
+      router.refresh();
       setIsMutate(true);
       setIsEditing(false);
     } else {
@@ -146,7 +147,6 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
     id: number,
   ) {
     e.preventDefault();
-    setSelectedImageId(id);
     setImageToDelete([...imageToDelete, id]);
 
     // if (response.status === 200) {
@@ -312,7 +312,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
               )}
             />
           </Button>
-          <Separator orientation="vertical" className="h-auto mx-3" />
+          <Separator orientation="vertical" className="mx-3 h-auto" />
           <Button
             variant="ghost"
             disabled={isLoading}

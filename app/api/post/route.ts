@@ -34,6 +34,7 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
     const url = new URL(req.url);
     const cursorParam = url.searchParams.get("cursor");
     const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
@@ -57,6 +58,9 @@ export async function GET(req: Request) {
           orderBy: {
             id: "desc",
           },
+          where: {
+            userId: session!.user.id,
+          },
           include: {
             user: {
               include: {
@@ -78,10 +82,15 @@ export async function GET(req: Request) {
     const lastPost = posts[posts.length - 1];
     const nextCursor = lastPost?.sequenceId || undefined;
 
+    const postsUserLiked = posts.filter((post) =>
+      post.postLike.some((like) => like.user.id === session!.user.id),
+    );
+
     return NextResponse.json(
       {
         data: posts,
         nextCursor,
+        liked: postsUserLiked !== null,
       },
       { status: 200 },
     );

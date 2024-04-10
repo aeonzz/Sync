@@ -34,7 +34,7 @@ import prisma from "../db";
 //   }
 // }
 
-export async function getPostById(postId: string) {
+export async function getPostById(postId: string, userId: string) {
   try {
     const response = await prisma.post.findFirst({
       where: {
@@ -129,10 +129,18 @@ export async function getPostById(postId: string) {
       },
     });
 
-    return { data: response, error: null, status: 200 };
+    const likeRecord = await prisma.postLike.findUnique({
+      where: {
+        userId_postId: {
+          userId: userId,
+          postId: postId,
+        },
+      },
+    });
+    return { data: response, liked: likeRecord !== null, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { data: null, error: error.message, status: 500 };
+    return { data: null, liked: null, error: error.message, status: 500 };
   }
 }
 

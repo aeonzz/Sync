@@ -9,6 +9,11 @@ import { redirect } from "next/navigation";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/login");
+  }
+
   const currentUser = await getUserById(session!.user.id);
   if (!currentUser.data || currentUser.error) {
     return <FetchDataError />;
