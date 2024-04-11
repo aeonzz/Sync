@@ -29,6 +29,18 @@ model User {
   comment                  Comment[]
   postLike                 PostLike[]
   commentLike              CommentLike[]
+  followers                Follows[]     @relation("followsMeList")
+  following                Follows[]     @relation("iFollowList")
+}
+
+model Follows {
+  followerId  String
+  followingId String
+
+  follower  User @relation(name: "followsMeList", fields: [followerId], references: [id])
+  following User @relation(name: "iFollowList", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
 }
 
 model Post {
@@ -41,7 +53,7 @@ model Post {
   deleted    Boolean    @default(false)
   author     User       @relation(fields: [authorId], references: [id])
   authorId   String
-  imageUrls  Image[] 
+  imageUrls  Image[]
   comment    Comment[]
   postLike   PostLike[]
 }

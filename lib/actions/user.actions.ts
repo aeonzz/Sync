@@ -2,6 +2,7 @@
 
 import { hash } from "bcrypt";
 import prisma from "../db";
+import { revalidatePath } from "next/cache";
 
 export async function getUserById(userId: string) {
   try {
@@ -94,6 +95,65 @@ export async function resetPassword(
 
     return { error: null, status: 200 };
   } catch (error: any) {
+    return { error: error.message, status: 500 };
+  }
+}
+
+export async function checkIfCurrentUserFollowedUser(followerId: string, followingId: string) {
+  const likeRecord = await prisma.follows.findUnique({
+    where: {
+      followerId_followingId: {
+        followerId,
+        followingId,
+      }
+    },
+  });
+
+  return likeRecord !== null;
+}
+
+
+export async function followUser(followerId: string, followingId: string) {
+  try {
+    const isFollowed = await prisma.follows.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId,
+          followingId,
+        },
+      },
+    });
+
+    if (isFollowed) {
+      await prisma.follows.delete({
+        where: {
+          followerId_followingId: {
+            followerId,
+            followingId,
+          },
+        },
+      });
+    } else {
+      await prisma.follows.create({
+        data: {
+          followerId,
+          followingId,
+        },
+      });
+    }
+
+    const newData = await prisma.follows.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId,
+          followingId,
+        },
+      },
+    });
+
+    return { data: newData !== null, error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
     return { error: error.message, status: 500 };
   }
 }

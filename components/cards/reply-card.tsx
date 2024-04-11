@@ -4,7 +4,7 @@ import { Card } from "../ui/card";
 import { ReplyProps } from "@/types/post";
 import ProfileHover from "../shared/profile-hover";
 import Link from "next/link";
-import { formatDistanceToNowStrict } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { checkIfUserLikedComment, likeComment } from "@/lib/actions/comment.actions";
@@ -52,7 +52,9 @@ const ReplyCard: React.FC<ReplyCardProps> = ({
   className,
 }) => {
   const replyCreatedAt = new Date(reply.createdAt);
-  const replyCreated = formatDistanceToNowStrict(replyCreatedAt);
+  const replyCreated = formatDistanceToNow(replyCreatedAt, {
+    addSuffix: true,
+  });
   const [likedBy, setLikedBy] = useState(reply.commentLike)
   const [liked, setLiked] = useState<boolean>();
   const [open, setOpen] = useState(false);

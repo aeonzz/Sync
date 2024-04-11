@@ -5,20 +5,20 @@ import axios from "axios";
 import React, { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import PostCard from "../cards/post-card";
-import FetchDataError from "./fetch-data-error";
+import FetchDataError from "../ui/fetch-data-error";
 import Loader from "../loaders/loader";
 import { PostProps } from "@/types/post";
 import { useMutationSuccess } from "@/context/store";
 import { Session } from "next-auth";
 import PostSkeleton from "../loaders/post-skeleton";
-import NoPostMessage from "./no-post-message";
+import NoPostMessage from "../ui/no-post-message";
 
 const Feed = ({ session }: { session: Session }) => {
   const { ref, inView } = useInView();
   const { isMutate, setIsMutate } = useMutationSuccess();
   
   const fetchPosts = async ({ pageParam = 0 }) => {
-    const res = await axios.get(`/api/post?cursor=${pageParam}`);
+    const res = await axios.get(`/api/post/followedPost?cursor=${pageParam}`);
     return res.data;
   };
 
@@ -30,11 +30,14 @@ const Feed = ({ session }: { session: Session }) => {
     refetch,
     status,
   } = useInfiniteQuery({
-    queryKey: ["post"],
+    queryKey: ["followedPost"],
     queryFn: fetchPosts,
     initialPageParam: 0,
     refetchOnWindowFocus: false,
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
+    // retry: false,
+    // refetchOnMount: false,
+    // retryOnMount: false
   });
 
   const content = data?.pages.map((group, i) => (

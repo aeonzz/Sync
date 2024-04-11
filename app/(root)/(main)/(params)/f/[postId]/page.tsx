@@ -23,9 +23,9 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
     redirect("/login");
   }
 
-  const currentUser = await getUserById(session!.user.id);
+  const currentUser = await getUserById(session.user.id);
 
-  if (!currentUser.data || currentUser.error || !params.postId) {
+  if (!currentUser.data || currentUser.error) {
     return <FetchDataError />;
   }
 
@@ -35,7 +35,7 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
     return <FetchDataError />;
   }
 
-  if (!post.data) {
+  if (!post.data || !params.postId) {
     return <NotFound className="w-full" />;
   }
 

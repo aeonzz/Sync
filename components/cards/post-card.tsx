@@ -360,7 +360,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                     onClick={() => likedBy.length !== 0 && setOpen(true)}
                   >
                     {likedBy.length > 1
-                      ? `Liked by ${likedBy[1].user.username} and ${post._count.postLike - 1} others`
+                      ? `Liked by ${likedBy[1].user.username} and ${likedBy.length - 1} others`
                       : likedBy[0]
                         ? `Liked by ${likedBy[0].user.username}`
                         : null}

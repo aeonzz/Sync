@@ -1,6 +1,5 @@
-import RightSideBar from "@/components/shared/right-sidebar";
+import Explore from "@/components/screens/explore";
 import CreatePost from "@/components/ui/create-post";
-import Feed from "@/components/screens/feed";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getUserById } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";
@@ -26,7 +25,7 @@ export default async function Home() {
   return (
     <>
       <CreatePost currentUser={currentUser.data} />
-      <Feed session={session} />
+      <Explore session={session} />
     </>
   );
 }

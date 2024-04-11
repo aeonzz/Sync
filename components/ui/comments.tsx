@@ -33,12 +33,15 @@ const Comments: React.FC<CommentsProps> = ({
     isLoading,
     refetch,
   } = useQuery({
-    // refetchOnWindowFocus: false,
+    refetchOnWindowFocus: false,
     queryKey: ["commentasds"],
     queryFn: async () => {
       const response = await axios.get(`/api/post/${postId}`);
       return response.data;
     },
+    // retry: false,
+    // refetchOnMount: false,
+    // retryOnMount: false
   });
 
   const handleRefetch = () => {
