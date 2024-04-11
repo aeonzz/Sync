@@ -34,7 +34,7 @@ import prisma from "../db";
 //   }
 // }
 
-export async function getPostById(postId: string, userId: string) {
+export async function getPostById(postId: string) {
   try {
     const response = await prisma.post.findFirst({
       where: {
@@ -59,9 +59,9 @@ export async function getPostById(postId: string, userId: string) {
           orderBy: {
             id: "desc",
           },
-          where: {
-            userId: userId,
-          },
+          // where: {
+          //   userId: userId,
+          // },
           include: {
             user: {
               include: {
@@ -289,10 +289,37 @@ export async function likePost({ userId, postId }: likePostProps) {
       });
     }
 
-    return { error: null, status: 200 };
+    const newLikes = await prisma.postLike.findMany({
+      where: {
+        postId: postId,
+      },
+      select: {
+        id: true,
+        user: {
+          select: {
+            id: true,
+            studentId: true,
+            username: true,
+            avatarUrl: true,
+            coverUrl: true,
+            createdAt: true,
+            studentData: {
+              select: {
+                firstName: true,
+                middleName: true,
+                lastName: true,
+                department: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return { data: newLikes, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { error: error.message, status: 500 };
+    return { data: null, error: error.message, status: 500 };
   }
 }
 

@@ -7,7 +7,7 @@ import {
 import { Button } from "./button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -59,13 +59,13 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   likeCount,
   likedBy,
 }) => {
-  const router = useRouter();
+  const [likers, setLikers] = useState(likedBy)
   const [liked, setLiked] = useState<boolean>();
   const [open, setOpen] = useState(false);
   const { setIsMutate } = useMutationSuccess();
+  const router = useRouter()
 
   async function handleLike() {
-    setLiked((prev) => !prev);
     const data = {
       userId,
       commentId,
@@ -74,8 +74,8 @@ const LikeButton: React.FC<LikeButtonProps> = ({
     const response = await likeComment(data);
 
     if (response.status === 200) {
-      router.refresh();
-      setIsMutate(true);
+      setLiked((prev) => !prev);
+      router.refresh()
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -90,7 +90,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       setLiked(response);
     };
     checkIfUserLiked();
-  }, [liked, commentId, useId]);
+  }, [liked, commentId, userId]);
 
   return (
     <div className="mr-2 space-y-1">
@@ -100,7 +100,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
             <Button
               variant="ghost"
               size="iconRound"
-              onClick={() => handleLike()}
+              onClick={handleLike}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

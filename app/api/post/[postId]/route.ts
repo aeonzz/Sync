@@ -14,8 +14,6 @@ export async function GET(
   },
 ) {
 
-  const session = await getServerSession(authOptions)
-
   try {
     const comment = await prisma.comment.findMany({
       where: {
@@ -34,9 +32,6 @@ export async function GET(
           },
         },
         commentLike: {
-          where: {
-            userId: session!.user.id,
-          },
           select: {
             id: true,
             user: {

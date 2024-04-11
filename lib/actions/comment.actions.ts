@@ -63,10 +63,38 @@ export async function likeComment({ userId, commentId }: likeCommentProps) {
       });
     }
 
-    return { error: null, status: 200 };
+    const newLikes = await prisma.commentLike.findMany({
+      where: {
+        commentId: commentId,
+      },
+      select: {
+        id: true,
+        user: {
+          select: {
+            id: true,
+            studentId: true,
+            username: true,
+            avatarUrl: true,
+            coverUrl: true,
+            createdAt: true,
+            studentData: {
+              select: {
+                firstName: true,
+                middleName: true,
+                lastName: true,
+                department: true,
+              }
+            }
+          },
+        },
+      },
+    });
+
+
+    return { data: newLikes, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { error: error.message, status: 500 };
+    return { data: null, error: error.message, status: 500 };
   }
 }
 
@@ -105,11 +133,10 @@ export async function deleteComment(commentId: number) {
 
 interface UpdateCommentParams {
   text: string;
-  commentId: number
+  commentId: number;
 }
 
-
-export async function updateComment({text, commentId} : UpdateCommentParams) {
+export async function updateComment({ text, commentId }: UpdateCommentParams) {
   try {
     await prisma.comment.update({
       where: {

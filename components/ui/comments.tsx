@@ -8,8 +8,9 @@ import { comment } from "postcss";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useMutationSuccess } from "@/context/store";
+import { useRouter } from "next/navigation";
 
-interface GgProps {
+interface CommentsProps {
   userId: string;
   postAuthor: string;
   avatarUrl: string | null;
@@ -17,15 +18,14 @@ interface GgProps {
   postId: string;
 }
 
-const Gg: React.FC<GgProps> = ({
+const Comments: React.FC<CommentsProps> = ({
   userId,
   postAuthor,
   avatarUrl,
   username,
   postId,
 }) => {
-
-  
+  const router = useRouter()
   const { isMutate, setIsMutate } = useMutationSuccess();
 
   const {
@@ -33,6 +33,7 @@ const Gg: React.FC<GgProps> = ({
     isLoading,
     refetch,
   } = useQuery({
+    // refetchOnWindowFocus: false,
     queryKey: ["commentasds"],
     queryFn: async () => {
       const response = await axios.get(`/api/post/${postId}`);
@@ -81,4 +82,4 @@ const Gg: React.FC<GgProps> = ({
   );
 };
 
-export default Gg;
+export default Comments;

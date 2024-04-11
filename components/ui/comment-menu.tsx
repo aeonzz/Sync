@@ -31,6 +31,7 @@ import {
   DialogTrigger,
 } from "./dialog";
 import CommentForm from "../forms/comment-form";
+import { useMutationSuccess } from "@/context/store";
 
 interface CommentMenuProps {
   commentId: number;
@@ -51,14 +52,14 @@ const CommentMenu: React.FC<CommentMenuProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const router = useRouter();
+  const { setIsMutate } = useMutationSuccess();
 
   async function handleDelete() {
     const response = await deleteComment(commentId);
 
     if (response.status === 200) {
       setOpen(false);
-      router.refresh();
+      setIsMutate(true);
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -102,7 +103,7 @@ const CommentMenu: React.FC<CommentMenuProps> = ({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleDelete()}>
+                <AlertDialogAction onClick={handleDelete}>
                   Continue
                 </AlertDialogAction>
               </AlertDialogFooter>

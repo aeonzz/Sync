@@ -41,7 +41,7 @@ model Post {
   deleted    Boolean    @default(false)
   author     User       @relation(fields: [authorId], references: [id])
   authorId   String
-  imageUrls  Image[]
+  imageUrls  Image[] 
   comment    Comment[]
   postLike   PostLike[]
 }

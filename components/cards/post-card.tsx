@@ -46,7 +46,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { checkIfUserLikedPost, deletePost, likePost } from "@/lib/actions/post.actions";
+import {
+  checkIfUserLikedPost,
+  deletePost,
+  likePost,
+} from "@/lib/actions/post.actions";
 import { toast } from "sonner";
 import { useMutationSuccess } from "@/context/store";
 import { Separator } from "../ui/separator";
@@ -73,14 +77,15 @@ const options = {
 
 const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
+  const [likedBy, setLikedBy] = useState(post.postLike)
   const [open, setOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
-  const [liked, setLiked] = useState<boolean>();
   const { setIsMutate } = useMutationSuccess();
-  const router = useRouter();
+  const [liked, setLiked] = useState<boolean | null>();
+  const router = useRouter()
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
 
@@ -97,6 +102,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
 
     if (response.status === 200) {
       setIsMutate(true);
+      router.refresh()
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -106,7 +112,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   }
 
   async function handleLike() {
-    setLiked((prev) => !prev);
     const data = {
       userId: session!.user.id,
       postId: post.postId,
@@ -115,8 +120,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
     const response = await likePost(data);
 
     if (response.status === 200) {
-      setIsMutate(true);
-      router.refresh();
+      setLiked((prev) => !prev);
+      setLikedBy(response.data ?? [])
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -136,6 +141,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
     checkIfUserLiked();
   }, [post, session]);
 
+  
 
   return (
     <Card className="mb-4 min-h-[200px]">
@@ -331,7 +337,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
       <CardFooter>
         <div className="flex w-full items-center justify-between">
           <div className="-mr-5 flex items-center">
-            {post.postLike.slice(0, 5).map((user, index) => (
+            {likedBy.slice(0, 5).map((user, index) => (
               <ProfileHover
                 key={index}
                 authorId={user.user.id}
@@ -351,18 +357,18 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                 <TooltipTrigger asChild>
                   <p
                     className="ml-1 h-auto cursor-pointer p-0 text-[11px] text-muted-foreground hover:underline"
-                    onClick={() => post.postLike.length !== 0 && setOpen(true)}
+                    onClick={() => likedBy.length !== 0 && setOpen(true)}
                   >
-                    {post.postLike.length > 1
-                      ? `Liked by ${post.postLike[1].user.username} and ${post._count.postLike - 1} others`
-                      : post.postLike[0]
-                        ? `Liked by ${post.postLike[0].user.username}`
+                    {likedBy.length > 1
+                      ? `Liked by ${likedBy[1].user.username} and ${post._count.postLike - 1} others`
+                      : likedBy[0]
+                        ? `Liked by ${likedBy[0].user.username}`
                         : null}
                   </p>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  {post.postLike.length > 0 &&
-                    post.postLike.map((user, index) => (
+                  {likedBy.length > 0 &&
+                    likedBy.map((user, index) => (
                       <p key={index} className="text-xs">
                         {user.user.username}
                       </p>
@@ -380,7 +386,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                   <DialogTitle>Engagers</DialogTitle>
                 </DialogHeader>
                 <ScrollArea className="max-h-[316px]">
-                  {post.postLike.map((user, index) => (
+                  {likedBy.map((user, index) => (
                     <div
                       key={index}
                       className="flex w-full items-center justify-between rounded-md p-2 hover:bg-card"
@@ -474,7 +480,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                     <p>Comment</p>
                   </TooltipContent>
                 </Tooltip>
-
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button

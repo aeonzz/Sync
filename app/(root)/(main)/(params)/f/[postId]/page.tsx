@@ -29,7 +29,7 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
     return <FetchDataError />;
   }
 
-  const post = await getPostById(params.postId, currentUser.data?.id);
+  const post = await getPostById(params.postId);
 
   if (post.error) {
     return <FetchDataError />;

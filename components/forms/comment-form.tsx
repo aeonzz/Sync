@@ -96,7 +96,6 @@ const CommentForm: React.FC<CommentFormProps> = ({
       setIsLoading(false);
       form.reset();
       setAccourdionValue && setAccourdionValue("");
-      router.refresh();
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
