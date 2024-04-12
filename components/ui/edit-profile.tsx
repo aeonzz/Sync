@@ -36,8 +36,11 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
   isAlreadyFollowed,
 }) => {
   const [open, setOpen] = useState(false);
-  const [isFollowed, setIsFollowed] = useState<boolean | undefined>(isAlreadyFollowed);
+  const [isFollowed, setIsFollowed] = useState<boolean | undefined>(
+    isAlreadyFollowed,
+  );
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   async function handleFollow() {
     setIsLoading(true);
@@ -46,6 +49,7 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
     if (response.status === 200) {
       setIsLoading(false);
       setIsFollowed(response.data);
+      router.refresh();
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {

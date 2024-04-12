@@ -60,31 +60,30 @@ const CommentCard: React.FC<CommentCardProps> = ({
   avatarUrl,
   username,
 }) => {
-
   const commentCreatedAt = new Date(comment.createdAt);
   const commentCreated = formatDistanceToNow(commentCreatedAt, {
     addSuffix: true,
   });
-  const [likedBy, setLikedBy] = useState(comment.commentLike)
+  const [likedBy, setLikedBy] = useState(comment.commentLike);
   const [liked, setLiked] = useState<boolean>();
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsloading] = useState(false)
+  const [isLoading, setIsloading] = useState(false);
 
   async function handleLike() {
-    setIsloading(true)
+    setIsloading(true);
     const data = {
       userId,
       commentId: comment.id,
     };
 
     const response = await likeComment(data);
-    
+
     if (response.status === 200) {
-      setIsloading(false)
+      setIsloading(false);
       setLiked((prev) => !prev);
-      setLikedBy(response.data ?? [])
+      setLikedBy(response.data ?? []);
     } else {
-      setIsloading(false)
+      setIsloading(false);
       toast.error("Uh oh! Something went wrong.", {
         description:
           "An error occurred while making the request. Please try again later",
@@ -106,6 +105,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
         <div className="flex flex-col items-center justify-start gap-1">
           <ProfileHover
             authorId={comment.user.id}
+            currentUserId={userId}
             avatarUrl={comment.user.avatarUrl}
             coverUrl={comment.user.coverUrl}
             userJoined={comment.user.createdAt}
@@ -226,6 +226,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
                         <div className="flex items-center space-x-2">
                           <ProfileHover
                             authorId={user.user.id}
+                            currentUserId={userId}
                             avatarUrl={user.user.avatarUrl}
                             coverUrl={user.user.coverUrl}
                             userJoined={user.user.createdAt}
@@ -260,7 +261,10 @@ const CommentCard: React.FC<CommentCardProps> = ({
           </div>
           <Accordion type="single" collapsible>
             <AccordionItem value="item-1" className="border-transparent">
-              <AccordionTrigger disabled={isLoading} className="mt-1 !flex-none justify-start gap-1 py-0 pl-3 text-xs text-muted-foreground">
+              <AccordionTrigger
+                disabled={isLoading}
+                className="mt-1 !flex-none justify-start gap-1 py-0 pl-3 text-xs text-muted-foreground"
+              >
                 {comment.replies.length > 0 ? (
                   <p>View {comment._count.replies} replies</p>
                 ) : (

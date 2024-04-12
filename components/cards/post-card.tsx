@@ -63,6 +63,7 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "../ui/scroll-area";
 import prisma from "@/lib/db";
+import Ff from "../ui/ff";
 
 interface PostCardProps {
   post: PostProps;
@@ -77,7 +78,7 @@ const options = {
 
 const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
-  const [likedBy, setLikedBy] = useState(post.postLike)
+  const [likedBy, setLikedBy] = useState(post.postLike);
   const [open, setOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
@@ -85,7 +86,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const [isEditing, setIsEditing] = useState(false);
   const { setIsMutate } = useMutationSuccess();
   const [liked, setLiked] = useState<boolean | null>();
-  const router = useRouter()
+  const router = useRouter();
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
 
@@ -102,7 +103,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
 
     if (response.status === 200) {
       setIsMutate(true);
-      router.refresh()
+      router.refresh();
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -121,7 +122,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
 
     if (response.status === 200) {
       setLiked((prev) => !prev);
-      setLikedBy(response.data ?? [])
+      setLikedBy(response.data ?? []);
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -141,13 +142,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
     checkIfUserLiked();
   }, [post, session]);
 
-  
-
   return (
     <Card className="mb-4 min-h-[200px]">
       <CardHeader className="flex-row items-center justify-between">
         <div className="relative flex items-center space-x-2">
           <ProfileHover
+            currentUserId={session.user.id}
             authorId={post.author.id}
             avatarUrl={post.author.avatarUrl}
             coverUrl={post.author.coverUrl}
@@ -340,6 +340,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             {likedBy.slice(0, 5).map((user, index) => (
               <ProfileHover
                 key={index}
+                currentUserId={session.user.id}
                 authorId={user.user.id}
                 avatarUrl={user.user.avatarUrl}
                 coverUrl={user.user.coverUrl}
@@ -387,33 +388,47 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                 </DialogHeader>
                 <ScrollArea className="max-h-[316px]">
                   {likedBy.map((user, index) => (
-                    <div
+                    <Ff
                       key={index}
-                      className="flex w-full items-center justify-between rounded-md p-2 hover:bg-card"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <ProfileHover
-                          authorId={user.user.id}
-                          avatarUrl={user.user.avatarUrl}
-                          coverUrl={user.user.coverUrl}
-                          userJoined={user.user.createdAt}
-                          username={user.user.username}
-                          firstName={user.user.studentData.firstName}
-                          middleName={user.user.studentData.middleName}
-                          lastName={user.user.studentData.lastName}
-                          department={user.user.studentData.department}
-                          side="left"
-                          align="start"
-                          sideOffset={20}
-                        />
-                        <Link
-                          href={`/p/${user.user.id}`}
-                          className="flex items-center gap-1 text-sm hover:underline"
-                        >
-                          {user.user.username}
-                        </Link>
-                      </div>
-                    </div>
+                      authorId={user.user.id}
+                      currentUserId={session.user.id}
+                      avatarUrl={user.user.avatarUrl}
+                      coverUrl={user.user.coverUrl}
+                      userJoined={user.user.createdAt}
+                      username={user.user.username}
+                      firstName={user.user.studentData.firstName}
+                      middleName={user.user.studentData.middleName}
+                      lastName={user.user.studentData.lastName}
+                      department={user.user.studentData.department}
+                    />
+                    // <div
+                    //   key={index}
+                    //   className="flex w-full items-center justify-between rounded-md p-2 hover:bg-card"
+                    // >
+                    //   <div className="flex items-center space-x-2">
+                    //     <ProfileHover
+                    //       authorId={user.user.id}
+                    //       currentUserId={session.user.id}
+                    //       avatarUrl={user.user.avatarUrl}
+                    //       coverUrl={user.user.coverUrl}
+                    //       userJoined={user.user.createdAt}
+                    //       username={user.user.username}
+                    //       firstName={user.user.studentData.firstName}
+                    //       middleName={user.user.studentData.middleName}
+                    //       lastName={user.user.studentData.lastName}
+                    //       department={user.user.studentData.department}
+                    //       side="left"
+                    //       align="start"
+                    //       sideOffset={20}
+                    //     />
+                    //     <Link
+                    //       href={`/p/${user.user.id}`}
+                    //       className="flex items-center gap-1 text-sm hover:underline"
+                    //     >
+                    //       {user.user.username}
+                    //     </Link>
+                    //   </div>
+                    // </div>
                   ))}
                 </ScrollArea>
               </DialogContent>

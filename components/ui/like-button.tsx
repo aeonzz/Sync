@@ -163,6 +163,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
                 <div className="flex items-center space-x-2">
                   <ProfileHover
                     authorId={user.user.id}
+                    currentUserId={userId}
                     avatarUrl={user.user.avatarUrl}
                     coverUrl={user.user.coverUrl}
                     userJoined={user.user.createdAt}

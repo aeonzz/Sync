@@ -1,3 +1,5 @@
+"use client";
+
 import {
   HoverCard,
   HoverCardContent,
@@ -10,10 +12,21 @@ import { PostProps } from "@/types/post";
 import { format } from "date-fns";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { UserProps } from "@/types/user";
+import { Button } from "../ui/button";
+import { useEffect, useState } from "react";
+import {
+  checkIfCurrentUserFollowedUser,
+  followUser,
+} from "@/lib/actions/user.actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useMutationSuccess } from "@/context/store";
 
 interface ProfileHoverProps {
   className?: string | undefined;
   authorId: string;
+  currentUserId: string;
   avatarUrl: string | null;
   coverUrl: string;
   userJoined: Date;
@@ -41,12 +54,44 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
   side,
   align,
   sideOffset,
+  currentUserId,
 }) => {
   const profile = avatarUrl ? avatarUrl : undefined;
   const authorCreatedAt = new Date(userJoined);
   const date = format(authorCreatedAt, "PP");
   const initialLetter = username?.charAt(0).toUpperCase();
   const fullname = `${firstName} ${middleName.charAt(0).toUpperCase()} ${lastName}`;
+  const [isFollowed, setIsFollowed] = useState<boolean>();
+  const [isLoading, setIsLoading] = useState(false);
+  const { setIsMutate } = useMutationSuccess();
+
+  async function handleFollow() {
+    setIsLoading(true);
+    const response = await followUser(currentUserId, authorId);
+
+    if (response.status === 200) {
+      setIsLoading(false);
+      setIsFollowed(response.data);
+      setIsMutate(true);
+    } else {
+      setIsLoading(false);
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    }
+  }
+
+  useEffect(() => {
+    const isAlreadyFollowed = async () => {
+      const response = await checkIfCurrentUserFollowedUser(
+        currentUserId,
+        authorId,
+      );
+      setIsFollowed(response);
+    };
+    isAlreadyFollowed();
+  }, [currentUserId, authorId]);
 
   return (
     <HoverCard openDelay={200} closeDelay={100}>
@@ -65,7 +110,7 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
         </Link>
       </HoverCardTrigger>
       <HoverCardContent
-        className="w-[250px] space-y-4"
+        className="w-[250px]"
         hideWhenDetached={true}
         sideOffset={sideOffset ? sideOffset : 10}
         side={side}
@@ -85,7 +130,19 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
           </Avatar>
         </div>
         <div className="flex justify-between space-x-4 p-4">
-          <div className="w-full space-y-1">
+          <div className="relative w-full space-y-1 pt-4">
+            <div className="absolute right-0 top-0">
+              {currentUserId !== authorId && (
+                <Button
+                  size="sm"
+                  onClick={handleFollow}
+                  disabled={isLoading}
+                  variant={isFollowed ? "outline" : "default"}
+                >
+                  {isFollowed ? <span>Unfollow</span> : <span>Follow</span>}
+                </Button>
+              )}
+            </div>
             <Link
               href={`/u/${authorId}`}
               className="flex items-center text-xl font-semibold underline-offset-4 hover:underline"

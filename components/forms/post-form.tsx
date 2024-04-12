@@ -295,7 +295,7 @@ const PostForm: React.FC<PostFormProps> = ({
             className="w-full transition-none"
             disabled={isLoading}
           >
-            {isLoading ? <Loader /> : <p>Post</p>}
+            {isLoading ? <Loader /> : <span>Post</span>}
           </Button>
         </div>
       </form>

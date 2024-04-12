@@ -25,7 +25,6 @@ const Comments: React.FC<CommentsProps> = ({
   username,
   postId,
 }) => {
-  const router = useRouter()
   const { isMutate, setIsMutate } = useMutationSuccess();
 
   const {
@@ -34,7 +33,7 @@ const Comments: React.FC<CommentsProps> = ({
     refetch,
   } = useQuery({
     refetchOnWindowFocus: false,
-    queryKey: ["commentasds"],
+    queryKey: ["comments"],
     queryFn: async () => {
       const response = await axios.get(`/api/post/${postId}`);
       return response.data;
