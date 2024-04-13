@@ -1,80 +1,48 @@
 "use client";
 
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "../ui/hover-card";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import Link from "next/link";
-import { BadgeCheck, CalendarDays } from "lucide-react";
-import { PostProps } from "@/types/post";
-import { format } from "date-fns";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import React, { useState } from "react";
 import { UserProps } from "@/types/user";
+import Loader from "../loaders/loader";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import Image from "next/image";
 import { Button } from "../ui/button";
-import { useEffect, useState } from "react";
-import {
-  checkIfCurrentUserFollowedUser,
-  followUser,
-} from "@/lib/actions/user.actions";
+import { format } from "date-fns";
+import { CalendarDays } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { useMutationSuccess } from "@/context/store";
+import { followUser } from "@/lib/actions/user.actions";
 
 interface ProfileHoverProps {
-  className?: string | undefined;
-  authorId: string;
+  userId: string;
   currentUserId: string;
-  avatarUrl: string | null;
-  coverUrl: string;
-  userJoined: Date;
-  username: string | null;
-  firstName: string;
-  middleName: string;
-  lastName: string;
-  department: string;
-  side?: "top" | "right" | "bottom" | "left" | undefined;
-  align?: "center" | "start" | "end" | undefined;
-  sideOffset?: number | undefined;
+  showFollowButton: boolean;
 }
 
-const ProfileHover: React.FC<ProfileHoverProps> = ({
-  authorId,
-  avatarUrl,
-  className,
-  coverUrl,
-  userJoined,
-  username,
-  firstName,
-  middleName,
-  lastName,
-  department,
-  side,
-  align,
-  sideOffset,
-  currentUserId,
-}) => {
-  const profile = avatarUrl ? avatarUrl : undefined;
-  const authorCreatedAt = new Date(userJoined);
-  const date = format(authorCreatedAt, "PP");
-  const initialLetter = username?.charAt(0).toUpperCase();
-  const fullname = `${firstName} ${middleName.charAt(0).toUpperCase()} ${lastName}`;
-  const [isFollowed, setIsFollowed] = useState<boolean>();
-  const [isLoading, setIsLoading] = useState(false);
-  const { setIsMutate } = useMutationSuccess();
+interface User {
+  data: UserProps & { isFollowedByCurrentUser: boolean };
+}
+
+const ProfileHover: React.FC<ProfileHoverProps> = ({ userId, currentUserId, showFollowButton }) => {
+  const queryClient = useQueryClient();
+
+  const { data, isLoading: queryLoading } = useQuery<User>({
+    queryFn: async () => {
+      const response = await axios.get(`/api/user/${userId}`);
+      return response.data;
+    },
+    queryKey: ["userProfile", [userId]],
+  });
+
+  if (!data) return null;
 
   async function handleFollow() {
-    setIsLoading(true);
-    const response = await followUser(currentUserId, authorId);
+    const response = await followUser(currentUserId, userId);
 
     if (response.status === 200) {
-      setIsLoading(false);
-      setIsFollowed(response.data);
-      setIsMutate(true);
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
     } else {
-      setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
         description:
           "An error occurred while making the request. Please try again later",
@@ -82,85 +50,76 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
     }
   }
 
-  useEffect(() => {
-    const isAlreadyFollowed = async () => {
-      const response = await checkIfCurrentUserFollowedUser(
-        currentUserId,
-        authorId,
-      );
-      setIsFollowed(response);
-    };
-    isAlreadyFollowed();
-  }, [currentUserId, authorId]);
+  const profile = data?.data.avatarUrl ? data.data.avatarUrl : undefined;
+  const initialLetter = data?.data.username?.charAt(0).toUpperCase();
+  const authorCreatedAt = new Date(data.data.createdAt);
+  const date = format(authorCreatedAt, "PP");
+  const fullname = `${data?.data.studentData.firstName} ${data?.data.studentData.middleName.charAt(0).toUpperCase()} ${data?.data.studentData.lastName}`;
 
   return (
-    <HoverCard openDelay={200} closeDelay={100}>
-      <HoverCardTrigger asChild>
-        <Link href={`/u/${authorId}`} className="group relative">
-          <div
-            className={cn(
-              className,
-              "absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100",
-            )}
-          />
-          <Avatar className={cn(className)}>
-            <AvatarImage src={profile} className="object-cover" alt={profile} />
-            <AvatarFallback>{initialLetter}</AvatarFallback>
-          </Avatar>
-        </Link>
-      </HoverCardTrigger>
-      <HoverCardContent
-        className="w-[250px]"
-        hideWhenDetached={true}
-        sideOffset={sideOffset ? sideOffset : 10}
-        side={side}
-        align={align}
-      >
-        <div className="relative h-16 w-[250px]">
-          <Image
-            src={coverUrl}
-            alt={coverUrl}
-            fill
-            objectFit="cover"
-            objectPosition="center"
-          />
-          <Avatar className="absolute -bottom-8 left-3 h-16 w-16 border-2 border-popover">
-            <AvatarImage src={profile} alt={profile} />
-            <AvatarFallback>{initialLetter}</AvatarFallback>
-          </Avatar>
-        </div>
-        <div className="flex justify-between space-x-4 p-4">
-          <div className="relative w-full space-y-1 pt-4">
-            <div className="absolute right-0 top-0">
-              {currentUserId !== authorId && (
-                <Button
-                  size="sm"
-                  onClick={handleFollow}
-                  disabled={isLoading}
-                  variant={isFollowed ? "outline" : "default"}
-                >
-                  {isFollowed ? <span>Unfollow</span> : <span>Follow</span>}
-                </Button>
+    <>
+      {queryLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <div className="relative h-16 w-[250px]">
+            <Image
+              src={data.data.coverUrl}
+              alt={data.data.coverUrl}
+              fill
+              objectFit="cover"
+              objectPosition="center"
+            />
+            <Avatar className="absolute -bottom-8 left-3 h-16 w-16 border-2 border-popover">
+              <AvatarImage src={profile} alt={profile} />
+              <AvatarFallback>{initialLetter}</AvatarFallback>
+            </Avatar>
+          </div>
+          <div className="flex justify-between space-x-4 p-4">
+            <div className="relative w-full space-y-1 pt-4">
+              {showFollowButton && (
+                <div className="absolute right-0 top-0">
+                  {currentUserId !== userId && (
+                    <Button
+                      size="sm"
+                      variant={
+                        data.data.isFollowedByCurrentUser
+                          ? "outline"
+                          : "default"
+                      }
+                      className="!w-24"
+                      onClick={handleFollow}
+                    >
+                      {data.data.isFollowedByCurrentUser ? (
+                        <span>Unfollow</span>
+                      ) : (
+                        <span>Follow</span>
+                      )}
+                    </Button>
+                  )}
+                </div>
               )}
-            </div>
-            <Link
-              href={`/u/${authorId}`}
-              className="flex items-center text-xl font-semibold underline-offset-4 hover:underline"
-            >
-              {username}
-            </Link>
-            <h4 className="text-xs text-muted-foreground">{fullname}</h4>
-            <h4 className="text-xs text-muted-foreground">{department}</h4>
-            <div className="flex items-center pt-2">
-              <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{" "}
-              <span className="text-xs text-muted-foreground">
-                {`Joined ${date}`}
-              </span>
+              <Link
+                href={`/u/${userId}`}
+                className="flex items-center text-xl font-semibold underline-offset-4 hover:underline"
+              >
+                {data.data.username}
+              </Link>
+              <h4 className="text-xs text-muted-foreground">{fullname}</h4>
+              <h4 className="text-xs text-muted-foreground">
+                {data.data.studentData.department}
+              </h4>
+              <div className="flex items-center pt-2">
+                <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{" "}
+                <span className="text-xs text-muted-foreground">
+                  {`Joined ${date}`}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      </HoverCardContent>
-    </HoverCard>
+        </>
+      )}
+    </>
   );
 };
 

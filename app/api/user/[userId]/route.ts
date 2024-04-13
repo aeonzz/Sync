@@ -1,4 +1,6 @@
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -11,6 +13,7 @@ export async function GET(
     };
   },
 ) {
+  const session = await getServerSession(authOptions);
   const { userId } = params;
   try {
     const user = await prisma.user.findFirst({
@@ -21,8 +24,22 @@ export async function GET(
         studentData: true,
       },
     });
+    
+    const followRecord = await prisma.follows.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId: session!.user.id,
+          followingId: userId,
+        },
+      },
+    });
 
-    return NextResponse.json({ data: user }, { status: 200 });
+    const userWithFollowStatus = {
+      ...user,
+      isFollowedByCurrentUser: followRecord !== null,
+    };
+
+    return NextResponse.json({ data: userWithFollowStatus }, { status: 200 });
   } catch (error: any) {
     console.log(error);
     return NextResponse.json(

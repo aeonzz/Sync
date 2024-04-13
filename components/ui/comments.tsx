@@ -1,7 +1,7 @@
 "use client";
 
 import { CommentProps } from "@/types/post";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import CommentCard from "../cards/comment-card";
 import { comment } from "postcss";
@@ -26,25 +26,23 @@ const Comments: React.FC<CommentsProps> = ({
   postId,
 }) => {
   const { isMutate, setIsMutate } = useMutationSuccess();
+  const queryClient = useQueryClient();
 
   const {
     data: comments,
     isLoading,
-    refetch,
   } = useQuery({
-    refetchOnWindowFocus: false,
-    queryKey: ["comments"],
     queryFn: async () => {
       const response = await axios.get(`/api/post/${postId}`);
       return response.data;
     },
-    // retry: false,
-    // refetchOnMount: false,
-    // retryOnMount: false
+    refetchOnWindowFocus: false,
+    queryKey: ["comments"],
+    gcTime: 0,
   });
 
   const handleRefetch = () => {
-    refetch();
+    queryClient.invalidateQueries({ queryKey: ["comments"] });
     setIsMutate(false);
   };
 
@@ -58,8 +56,8 @@ const Comments: React.FC<CommentsProps> = ({
     <div>
       {isLoading ? (
         <h1>loading</h1>
-      ) : (
-        <>
+        ) : (
+          <>
           {comments?.data.length > 0 ? (
             comments?.data.map((comment: CommentProps, index: number) => (
               <CommentCard

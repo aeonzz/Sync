@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card";
-import ProfileHover from "../shared/profile-hover";
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import {
@@ -53,7 +52,6 @@ import {
 } from "@/lib/actions/post.actions";
 import { toast } from "sonner";
 import { useMutationSuccess } from "@/context/store";
-import { Separator } from "../ui/separator";
 import { useRouter } from "next/navigation";
 import {
   Tooltip,
@@ -62,8 +60,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "../ui/scroll-area";
-import prisma from "@/lib/db";
-import Ff from "../ui/ff";
+import Reactors from "../ui/reactors";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import ProfileHover from "../shared/profile-hover";
 
 interface PostCardProps {
   post: PostProps;
@@ -146,19 +150,33 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
     <Card className="mb-4 min-h-[200px]">
       <CardHeader className="flex-row items-center justify-between">
         <div className="relative flex items-center space-x-2">
-          <ProfileHover
-            currentUserId={session.user.id}
-            authorId={post.author.id}
-            avatarUrl={post.author.avatarUrl}
-            coverUrl={post.author.coverUrl}
-            userJoined={post.author.createdAt}
-            username={post.author.username}
-            firstName={post.author.studentData.firstName}
-            middleName={post.author.studentData.middleName}
-            lastName={post.author.studentData.lastName}
-            department={post.author.studentData.department}
-            className="h-9 w-9"
-          />
+          <HoverCard openDelay={200} closeDelay={100}>
+            <HoverCardTrigger asChild>
+              <Link href={`/u/${post.author.id}`} className="group relative">
+                <div className="absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
+                <Avatar>
+                  <AvatarImage
+                    src={post.author.avatarUrl ?? undefined}
+                    className="object-cover"
+                    alt={post.author.avatarUrl ?? undefined}
+                  />
+                  <AvatarFallback>
+                    {post.author.username?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            </HoverCardTrigger>
+            <HoverCardContent
+              className="min-h-32 w-[250px]"
+              hideWhenDetached={true}
+            >
+              <ProfileHover
+                userId={post.author.id}
+                showFollowButton={true}
+                currentUserId={session.user.id}
+              />
+            </HoverCardContent>
+          </HoverCard>
           <div className="flex flex-col">
             <Link
               href="/"
@@ -338,20 +356,33 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
         <div className="flex w-full items-center justify-between">
           <div className="-mr-5 flex items-center">
             {likedBy.slice(0, 5).map((user, index) => (
-              <ProfileHover
-                key={index}
-                currentUserId={session.user.id}
-                authorId={user.user.id}
-                avatarUrl={user.user.avatarUrl}
-                coverUrl={user.user.coverUrl}
-                userJoined={user.user.createdAt}
-                username={user.user.username}
-                firstName={user.user.studentData.firstName}
-                middleName={user.user.studentData.middleName}
-                lastName={user.user.studentData.lastName}
-                department={user.user.studentData.department}
-                className={cn(index !== 0 && "-ml-2", "h-6 w-6")}
-              />
+              <HoverCard openDelay={200} closeDelay={100} key={index}>
+                <HoverCardTrigger asChild>
+                  <Link href={`/u/${user.user.id}`} className="group relative">
+                    <div className="absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
+                    <Avatar className={cn(index !== 0 && "-ml-2", "h-6 w-6")}>
+                      <AvatarImage
+                        src={user.user.avatarUrl ?? undefined}
+                        className="object-cover"
+                        alt={user.user.avatarUrl ?? undefined}
+                      />
+                      <AvatarFallback>
+                        {user.user.username?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
+                </HoverCardTrigger>
+                <HoverCardContent
+                  className="min-h-32 w-[250px]"
+                  hideWhenDetached={true}
+                >
+                  <ProfileHover
+                    userId={user.user.id}
+                    showFollowButton={true}
+                    currentUserId={session.user.id}
+                  />
+                </HoverCardContent>
+              </HoverCard>
             ))}
             <TooltipProvider>
               <Tooltip>
@@ -387,49 +418,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                   <DialogTitle>Engagers</DialogTitle>
                 </DialogHeader>
                 <ScrollArea className="max-h-[316px]">
-                  {likedBy.map((user, index) => (
-                    <Ff
-                      key={index}
-                      authorId={user.user.id}
-                      currentUserId={session.user.id}
-                      avatarUrl={user.user.avatarUrl}
-                      coverUrl={user.user.coverUrl}
-                      userJoined={user.user.createdAt}
-                      username={user.user.username}
-                      firstName={user.user.studentData.firstName}
-                      middleName={user.user.studentData.middleName}
-                      lastName={user.user.studentData.lastName}
-                      department={user.user.studentData.department}
-                    />
-                    // <div
-                    //   key={index}
-                    //   className="flex w-full items-center justify-between rounded-md p-2 hover:bg-card"
-                    // >
-                    //   <div className="flex items-center space-x-2">
-                    //     <ProfileHover
-                    //       authorId={user.user.id}
-                    //       currentUserId={session.user.id}
-                    //       avatarUrl={user.user.avatarUrl}
-                    //       coverUrl={user.user.coverUrl}
-                    //       userJoined={user.user.createdAt}
-                    //       username={user.user.username}
-                    //       firstName={user.user.studentData.firstName}
-                    //       middleName={user.user.studentData.middleName}
-                    //       lastName={user.user.studentData.lastName}
-                    //       department={user.user.studentData.department}
-                    //       side="left"
-                    //       align="start"
-                    //       sideOffset={20}
-                    //     />
-                    //     <Link
-                    //       href={`/p/${user.user.id}`}
-                    //       className="flex items-center gap-1 text-sm hover:underline"
-                    //     >
-                    //       {user.user.username}
-                    //     </Link>
-                    //   </div>
-                    // </div>
-                  ))}
+                  <Reactors
+                    postId={post.postId}
+                    currentUserId={session.user.id}
+                />
                 </ScrollArea>
               </DialogContent>
             </Dialog>

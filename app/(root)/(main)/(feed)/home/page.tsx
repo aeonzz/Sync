@@ -11,7 +11,7 @@ export default async function Home() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/login");
+    redirect("/auth");
   }
 
   const currentUser = await getUserById(session!.user.id);

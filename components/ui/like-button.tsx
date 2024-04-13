@@ -24,11 +24,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import ProfileHover from "../shared/profile-hover";
 import Link from "next/link";
 import { X } from "lucide-react";
 import { ScrollArea } from "./scroll-area";
 import { useMutationSuccess } from "@/context/store";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import ProfileHover from "../shared/profile-hover";
 
 interface LikeButtonProps {
   userId: string;
@@ -59,11 +65,11 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   likeCount,
   likedBy,
 }) => {
-  const [likers, setLikers] = useState(likedBy)
+  const [likers, setLikers] = useState(likedBy);
   const [liked, setLiked] = useState<boolean>();
   const [open, setOpen] = useState(false);
   const { setIsMutate } = useMutationSuccess();
-  const router = useRouter()
+  const router = useRouter();
 
   async function handleLike() {
     const data = {
@@ -75,7 +81,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
 
     if (response.status === 200) {
       setLiked((prev) => !prev);
-      router.refresh()
+      router.refresh();
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -97,11 +103,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="iconRound"
-              onClick={handleLike}
-            >
+            <Button variant="ghost" size="iconRound" onClick={handleLike}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -161,21 +163,38 @@ const LikeButton: React.FC<LikeButtonProps> = ({
                 className="flex w-full items-center justify-between rounded-md p-2 hover:bg-card"
               >
                 <div className="flex items-center space-x-2">
-                  <ProfileHover
-                    authorId={user.user.id}
-                    currentUserId={userId}
-                    avatarUrl={user.user.avatarUrl}
-                    coverUrl={user.user.coverUrl}
-                    userJoined={user.user.createdAt}
-                    username={user.user.username}
-                    firstName={user.user.studentData.firstName}
-                    middleName={user.user.studentData.middleName}
-                    lastName={user.user.studentData.lastName}
-                    department={user.user.studentData.department}
-                    side="left"
-                    align="start"
-                    sideOffset={20}
-                  />
+                  <HoverCard openDelay={200} closeDelay={100} key={index}>
+                    <HoverCardTrigger asChild>
+                      <Link
+                        href={`/u/${user.user.id}`}
+                        className="group relative"
+                      >
+                        <div className="absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
+                        <Avatar
+                          className={cn(index !== 0 && "-ml-2", "h-6 w-6")}
+                        >
+                          <AvatarImage
+                            src={user.user.avatarUrl ?? undefined}
+                            className="object-cover"
+                            alt={user.user.avatarUrl ?? undefined}
+                          />
+                          <AvatarFallback>
+                            {user.user.username?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Link>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="min-h-32 w-[250px]"
+                      hideWhenDetached={true}
+                    >
+                      <ProfileHover
+                        userId={user.user.id}
+                        showFollowButton={true}
+                        currentUserId={userId}
+                      />
+                    </HoverCardContent>
+                  </HoverCard>
                   <Link
                     href={`/p/${user.user.id}`}
                     className="flex items-center gap-1 text-sm hover:underline"

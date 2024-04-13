@@ -34,6 +34,7 @@ model User {
 }
 
 model Follows {
+  id          Int    @id @default(autoincrement())
   followerId  String
   followingId String
 

@@ -1,13 +1,15 @@
-"use client"
+"use client";
 
 import { Card } from "../ui/card";
 import { ReplyProps } from "@/types/post";
-import ProfileHover from "../shared/profile-hover";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
-import { checkIfUserLikedComment, likeComment } from "@/lib/actions/comment.actions";
+import {
+  checkIfUserLikedComment,
+  likeComment,
+} from "@/lib/actions/comment.actions";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
 import LikeButton from "../ui/like-button";
@@ -31,6 +33,13 @@ import { ScrollArea } from "../ui/scroll-area";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import ProfileHover from "../shared/profile-hover";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface ReplyCardProps {
   reply: ReplyProps;
@@ -55,7 +64,7 @@ const ReplyCard: React.FC<ReplyCardProps> = ({
   const replyCreated = formatDistanceToNow(replyCreatedAt, {
     addSuffix: true,
   });
-  const [likedBy, setLikedBy] = useState(reply.commentLike)
+  const [likedBy, setLikedBy] = useState(reply.commentLike);
   const [liked, setLiked] = useState<boolean>();
   const [open, setOpen] = useState(false);
 
@@ -66,10 +75,10 @@ const ReplyCard: React.FC<ReplyCardProps> = ({
     };
 
     const response = await likeComment(data);
-    
+
     if (response.status === 200) {
       setLiked((prev) => !prev);
-      setLikedBy(response.data ?? [])
+      setLikedBy(response.data ?? []);
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -90,19 +99,33 @@ const ReplyCard: React.FC<ReplyCardProps> = ({
     <div className={cn(className, "mb-3")}>
       <div className="flex space-x-2">
         <div className="flex flex-col items-center justify-start gap-1">
-          <ProfileHover
-            authorId={reply.user.id}
-            currentUserId={userId}
-            avatarUrl={reply.user.avatarUrl}
-            coverUrl={reply.user.coverUrl}
-            userJoined={reply.user.createdAt}
-            username={reply.user.username}
-            firstName={reply.user.studentData.firstName}
-            middleName={reply.user.studentData.middleName}
-            lastName={reply.user.studentData.lastName}
-            department={reply.user.studentData.department}
-            className="h-7 w-7"
-          />
+          <HoverCard openDelay={200} closeDelay={100}>
+            <HoverCardTrigger asChild>
+              <Link href={`/u/${reply.user.id}`} className="group relative">
+                <div className="absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
+                <Avatar>
+                  <AvatarImage
+                    src={reply.user.avatarUrl ?? undefined}
+                    className="object-cover"
+                    alt={reply.user.avatarUrl ?? undefined}
+                  />
+                  <AvatarFallback>
+                    {reply.user.username?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            </HoverCardTrigger>
+            <HoverCardContent
+              className="min-h-32 w-[250px]"
+              hideWhenDetached={true}
+            >
+              <ProfileHover
+                userId={reply.user.id}
+                showFollowButton={true}
+                currentUserId={userId}
+              />
+            </HoverCardContent>
+          </HoverCard>
           <div className="h-full w-px bg-stone-800" />
         </div>
         <div className="w-full">
@@ -144,7 +167,7 @@ const ReplyCard: React.FC<ReplyCardProps> = ({
                 />
               )}
             </div>
-            
+
             <div className="mr-2 space-y-1">
               <TooltipProvider delayDuration={300}>
                 <Tooltip>
@@ -213,21 +236,38 @@ const ReplyCard: React.FC<ReplyCardProps> = ({
                         className="flex w-full items-center justify-between rounded-md p-2 hover:bg-card"
                       >
                         <div className="flex items-center space-x-2">
-                          <ProfileHover
-                            authorId={user.user.id}
-                            currentUserId={userId}
-                            avatarUrl={user.user.avatarUrl}
-                            coverUrl={user.user.coverUrl}
-                            userJoined={user.user.createdAt}
-                            username={user.user.username}
-                            firstName={user.user.studentData.firstName}
-                            middleName={user.user.studentData.middleName}
-                            lastName={user.user.studentData.lastName}
-                            department={user.user.studentData.department}
-                            side="left"
-                            align="start"
-                            sideOffset={20}
-                          />
+                          <HoverCard openDelay={200} closeDelay={100}>
+                            <HoverCardTrigger asChild>
+                              <Link
+                                href={`/u/${reply.user.id}`}
+                                className="group relative"
+                              >
+                                <div className="absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
+                                <Avatar>
+                                  <AvatarImage
+                                    src={reply.user.avatarUrl ?? undefined}
+                                    className="object-cover"
+                                    alt={reply.user.avatarUrl ?? undefined}
+                                  />
+                                  <AvatarFallback>
+                                    {reply.user.username
+                                      ?.charAt(0)
+                                      .toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </Link>
+                            </HoverCardTrigger>
+                            <HoverCardContent
+                              className="min-h-32 w-[250px]"
+                              hideWhenDetached={true}
+                            >
+                              <ProfileHover
+                                userId={reply.user.id}
+                                showFollowButton={true}
+                                currentUserId={userId}
+                              />
+                            </HoverCardContent>
+                          </HoverCard>
                           <Link
                             href={`/p/${user.user.id}`}
                             className="flex items-center gap-1 text-sm hover:underline"

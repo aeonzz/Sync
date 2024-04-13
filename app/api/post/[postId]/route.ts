@@ -3,21 +3,19 @@ import prisma from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  req: Request,
-  {
-    params,
-  }: {
-    params: {
-      postId: string;
-    };
-  },
-) {
+interface Context {
+  params: {
+    postId: string;
+  };
+}
+
+export async function GET(req: Request, params: Context) {
+  const { postId } = params.params;
 
   try {
     const comment = await prisma.comment.findMany({
       where: {
-        postId: params.postId,
+        postId: postId,
         parentId: null,
         deleted: false,
       },

@@ -2,7 +2,6 @@
 
 import { Card } from "../ui/card";
 import { CommentProps, PostProps } from "@/types/post";
-import ProfileHover from "../shared/profile-hover";
 import Link from "next/link";
 import { formatDistanceToNow, formatDistanceToNowStrict } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -40,6 +39,13 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import { X } from "lucide-react";
+import ProfileHover from "../shared/profile-hover";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface CommentCardProps {
   comment: CommentProps;
@@ -103,19 +109,33 @@ const CommentCard: React.FC<CommentCardProps> = ({
     <div className={cn(className, "mb-3")}>
       <div className="flex space-x-2">
         <div className="flex flex-col items-center justify-start gap-1">
-          <ProfileHover
-            authorId={comment.user.id}
-            currentUserId={userId}
-            avatarUrl={comment.user.avatarUrl}
-            coverUrl={comment.user.coverUrl}
-            userJoined={comment.user.createdAt}
-            username={comment.user.username}
-            firstName={comment.user.studentData.firstName}
-            middleName={comment.user.studentData.middleName}
-            lastName={comment.user.studentData.lastName}
-            department={comment.user.studentData.department}
-            className="h-7 w-7"
-          />
+          <HoverCard openDelay={200} closeDelay={100}>
+            <HoverCardTrigger asChild>
+              <Link href={`/u/${comment.user.id}`} className="group relative">
+                <div className="absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
+                <Avatar>
+                  <AvatarImage
+                    src={comment.user.avatarUrl ?? undefined}
+                    className="object-cover"
+                    alt={comment.user.avatarUrl ?? undefined}
+                  />
+                  <AvatarFallback>
+                    {comment.user.username?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+            </HoverCardTrigger>
+            <HoverCardContent
+              className="min-h-32 w-[250px]"
+              hideWhenDetached={true}
+            >
+              <ProfileHover
+                userId={comment.user.id}
+                showFollowButton={true}
+                currentUserId={userId}
+              />
+            </HoverCardContent>
+          </HoverCard>
           <div className="h-[calc(100%-45px)] w-px bg-stone-800" />
         </div>
         <div className="w-full">
@@ -224,21 +244,38 @@ const CommentCard: React.FC<CommentCardProps> = ({
                         className="flex w-full items-center justify-between rounded-md p-2 hover:bg-card"
                       >
                         <div className="flex items-center space-x-2">
-                          <ProfileHover
-                            authorId={user.user.id}
-                            currentUserId={userId}
-                            avatarUrl={user.user.avatarUrl}
-                            coverUrl={user.user.coverUrl}
-                            userJoined={user.user.createdAt}
-                            username={user.user.username}
-                            firstName={user.user.studentData.firstName}
-                            middleName={user.user.studentData.middleName}
-                            lastName={user.user.studentData.lastName}
-                            department={user.user.studentData.department}
-                            side="left"
-                            align="start"
-                            sideOffset={20}
-                          />
+                          <HoverCard openDelay={200} closeDelay={100}>
+                            <HoverCardTrigger asChild>
+                              <Link
+                                href={`/u/${comment.user.id}`}
+                                className="group relative"
+                              >
+                                <div className="absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
+                                <Avatar>
+                                  <AvatarImage
+                                    src={comment.user.avatarUrl ?? undefined}
+                                    className="object-cover"
+                                    alt={comment.user.avatarUrl ?? undefined}
+                                  />
+                                  <AvatarFallback>
+                                    {comment.user.username
+                                      ?.charAt(0)
+                                      .toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                              </Link>
+                            </HoverCardTrigger>
+                            <HoverCardContent
+                              className="min-h-32 w-[250px]"
+                              hideWhenDetached={true}
+                            >
+                              <ProfileHover
+                                userId={comment.user.id}
+                                showFollowButton={true}
+                                currentUserId={userId}
+                              />
+                            </HoverCardContent>
+                          </HoverCard>
                           <Link
                             href={`/p/${user.user.id}`}
                             className="flex items-center gap-1 text-sm hover:underline"

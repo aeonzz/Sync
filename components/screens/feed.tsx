@@ -18,7 +18,7 @@ const Feed = ({ session }: { session: Session }) => {
   const { isMutate, setIsMutate } = useMutationSuccess();
   
   const fetchPosts = async ({ pageParam = 0 }) => {
-    const res = await axios.get(`/api/post/followedPost?cursor=${pageParam}`);
+    const res = await axios.get(`/api/post/followed-post?cursor=${pageParam}`);
     return res.data;
   };
 
