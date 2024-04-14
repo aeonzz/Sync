@@ -11,7 +11,7 @@ import { emojis } from "@/constants";
 import { cn } from "@/lib/utils";
 import { SmilePlus } from "lucide-react";
 
-interface EmojiProps {
+interface EmojiPickerProps {
   handleEmojiClick: (emoji: string) => void;
   isLoading: boolean;
   className?: string | undefined;
@@ -20,7 +20,7 @@ interface EmojiProps {
   sideOffset?: number | undefined;
 }
 
-const Emoji: React.FC<EmojiProps> = ({
+const EmojiPicker: React.FC<EmojiPickerProps> = ({
   handleEmojiClick,
   isLoading,
   side,
@@ -78,4 +78,4 @@ const Emoji: React.FC<EmojiProps> = ({
   );
 };
 
-export default Emoji;
+export default EmojiPicker;

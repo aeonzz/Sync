@@ -6,3 +6,9 @@ export const PostValidation = z.object({
     message: "Description must be at least 10 characters.",
   }),
 });
+
+export const commentValidation = z.object({
+  comment: z.string().min(1, {
+    message: "Comments must be at least 1 character."
+  })
+})

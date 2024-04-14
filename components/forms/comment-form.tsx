@@ -5,23 +5,22 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useEffect, useState } from "react";
 import { createComment, updateComment } from "@/lib/actions/comment.actions";
-import { Session } from "next-auth";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import Cemoji from "../ui/c-emoji";
+import EmojiPicker from "../ui/emoji-picker";
 import { useMutationSuccess } from "@/context/store";
+import { commentValidation } from "@/lib/validations/post";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface CommentFormProps {
   avatarUrl: string | null;
@@ -51,16 +50,14 @@ const CommentForm: React.FC<CommentFormProps> = ({
 }) => {
   const avatar = avatarUrl ? avatarUrl : undefined;
   const initialLetter = username?.charAt(0).toUpperCase();
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { setIsMutate } = useMutationSuccess();
-  const form = useForm({
+  const form = useForm<z.infer<typeof commentValidation>>({
+    resolver: zodResolver(commentValidation),
     defaultValues: {
       comment: editData ? editData.text : "",
     },
   });
-
-  const isDirty = form.formState.isDirty;
 
   const handleEmojiClick2 = (emojiData: string) => {
     const currentContent = form.getValues("comment");
@@ -70,7 +67,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
     form.setValue("comment", newContent);
   };
 
-  async function onSubmit(data: { comment: string }) {
+  async function onSubmit(data: z.infer<typeof commentValidation>) {
     setIsLoading(true);
 
     let response;
@@ -133,7 +130,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                   />
                 </FormControl>
                 <div className="absolute bottom-0 right-0 flex items-center">
-                  <Cemoji
+                  <EmojiPicker
                     isLoading={isLoading}
                     handleEmojiClick={handleEmojiClick2}
                     sideOffset={10}
@@ -142,7 +139,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                   />
                   <Button
                     type="submit"
-                    disabled={!isDirty || isLoading}
+                    disabled={isLoading}
                     variant="ghost"
                     className="aspect-square w-fit rounded-full p-1"
                   >
@@ -162,7 +159,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                     </svg>
                   </Button>
                 </div>
-                <FormMessage />
+                <FormMessage className="z-50" />
               </FormItem>
             )}
           />

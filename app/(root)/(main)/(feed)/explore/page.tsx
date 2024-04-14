@@ -1,5 +1,6 @@
-import Explore from "@/components/screens/explore";
+import ExplorePage from "@/components/screens/explore-page";
 import CreatePost from "@/components/ui/create-post";
+import ExploreSearch from "@/components/ui/explore-search";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getUserById } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";
@@ -24,8 +25,8 @@ export default async function Home() {
 
   return (
     <>
-      <CreatePost currentUser={currentUser.data} />
-      <Explore session={session} />
+      <ExploreSearch />
+      <ExplorePage session={session} />
     </>
   );
 }

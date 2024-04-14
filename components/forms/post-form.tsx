@@ -29,7 +29,7 @@ import { useRouter } from "next/navigation";
 import { Accordion, AccordionContent, AccordionItem } from "../ui/accordion";
 import { createPost } from "@/lib/actions/post.actions";
 import { useSession } from "next-auth/react";
-import Cemoji from "../ui/c-emoji";
+import EmojiPicker from "../ui/emoji-picker";
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
   hasUserInput: (state: boolean) => void;
@@ -271,7 +271,7 @@ const PostForm: React.FC<PostFormProps> = ({
                 )}
               />
             </Button>
-            <Cemoji
+            <EmojiPicker
               isLoading={isLoading}
               handleEmojiClick={handleEmojiClick2}
               side="top"

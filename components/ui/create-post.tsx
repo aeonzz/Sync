@@ -43,10 +43,27 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
   const fullname = `${currentUser.studentData.firstName} ${currentUser.studentData.middleName.charAt(0).toUpperCase()} ${currentUser.studentData.lastName}`;
 
   return (
-    <Card className="w-full mb-4">
+    <Card className="mb-4 w-full">
       <div className="flex items-center px-5 pb-2 pt-1">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="group flex w-full items-center space-x-3">
+            <Avatar className="group/avatar relative h-9 w-9 dark:border">
+              <Link href={`/u/${currentUser.id}`} className="relative">
+                <div className="absolute z-10 h-9 w-9 bg-stone-950 opacity-0 transition group-hover/avatar:opacity-40"></div>
+                <AvatarImage
+                  src={
+                    currentUser.avatarUrl ? currentUser.avatarUrl : undefined
+                  }
+                  alt={
+                    currentUser.username ? currentUser.username : "No avatar"
+                  }
+                  className="object-cover"
+                />
+                <AvatarFallback className="h-9 w-9 bg-stone-900 pb-1 pr-1">
+                  {initialLetter}
+                </AvatarFallback>
+              </Link>
+            </Avatar>
             <Input
               placeholder="What's on your mind?"
               className="rounded-none border-none bg-transparent pl-0 transition focus-visible:ring-0 focus-visible:ring-black"
@@ -112,7 +129,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
             </DialogHeader>
             <div className="flex items-center space-x-2">
               <Avatar className="group relative h-9 w-9 dark:border">
-                <Link href="/user/profile" className="relative">
+                <Link href={`/u/${currentUser.id}`} className="relative">
                   <div className="absolute z-10 h-9 w-9 bg-stone-950 opacity-0 transition group-hover:opacity-40"></div>
                   <AvatarImage
                     src={
