@@ -8,7 +8,7 @@ export default function FeedLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <section className="pt-4">
+    <section>
       <div className="flex space-x-4">
         <div className="min-h-[400px] w-[550px]">{children}</div>
         <div className="relative flex-1">

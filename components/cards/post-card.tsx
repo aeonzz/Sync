@@ -72,7 +72,6 @@ import ProfileHover from "../shared/profile-hover";
 interface PostCardProps {
   post: PostProps;
   session: Session;
-  isLiked?: boolean | undefined;
 }
 
 const options = {
@@ -89,7 +88,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
   const { setIsMutate } = useMutationSuccess();
-  const [liked, setLiked] = useState<boolean | null>();
+  const [liked, setLiked] = useState(post.isLikedByCurrentUser);
   const router = useRouter();
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
@@ -135,16 +134,16 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
     }
   }
 
-  useEffect(() => {
-    const checkIfUserLiked = async () => {
-      const response = await checkIfUserLikedPost(
-        session!.user.id,
-        post.postId,
-      );
-      setLiked(response);
-    };
-    checkIfUserLiked();
-  }, [post, session]);
+  // useEffect(() => {
+  //   const checkIfUserLiked = async () => {
+  //     const response = await checkIfUserLikedPost(
+  //       session!.user.id,
+  //       post.postId,
+  //     );
+  //     setLiked(response.liked);
+  //   };
+  //   checkIfUserLiked();
+  // }, [post, session]);
 
   return (
     <Card className="mb-4 min-h-[200px]">
@@ -421,7 +420,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                   <Reactors
                     postId={post.postId}
                     currentUserId={session.user.id}
-                />
+                  />
                 </ScrollArea>
               </DialogContent>
             </Dialog>

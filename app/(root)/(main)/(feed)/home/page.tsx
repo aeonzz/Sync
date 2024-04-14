@@ -6,6 +6,8 @@ import { getUserById } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import HomeTabs from "@/components/screens/home-tabs";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -24,9 +26,6 @@ export default async function Home() {
   }
 
   return (
-    <>
-      <CreatePost currentUser={currentUser.data} />
-      <Feed session={session} />
-    </>
+    <HomeTabs session={session} currentUserData={currentUser.data} />
   );
 }

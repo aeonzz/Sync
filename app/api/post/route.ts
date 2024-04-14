@@ -37,6 +37,22 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const cursorParam = url.searchParams.get("cursor");
     const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
+    const session = await getServerSession(authOptions);
+
+    const followingPosts = await prisma.follows.findMany({
+      where: { followerId: session?.user.id },
+      select: {
+        following: {
+          select: {
+            post: {
+              select: {
+                postId: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
     const posts = await prisma.post.findMany({
       include: {
@@ -67,6 +83,18 @@ export async function GET(req: Request) {
         },
       },
       where: {
+        OR: [
+          {
+            postId: {
+              in: followingPosts.flatMap((follow) =>
+                follow.following.post.map((post) => post.postId),
+              ),
+            },
+          },
+          {
+            authorId: session?.user.id,
+          },
+        ],
         sequenceId: cursor ? { lt: cursor } : undefined,
         deleted: false,
       },
@@ -77,7 +105,7 @@ export async function GET(req: Request) {
     });
     const lastPost = posts[posts.length - 1];
     const nextCursor = lastPost?.sequenceId || undefined;
-    
+
     return NextResponse.json(
       {
         data: posts,

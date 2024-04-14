@@ -13,13 +13,13 @@ import { Session } from "next-auth";
 import PostSkeleton from "../loaders/post-skeleton";
 import NoPostMessage from "../ui/no-post-message";
 
-const Feed = ({ session }: { session: Session }) => {
+const FollowingTab = ({ session }: { session: Session }) => {
   const { ref, inView } = useInView();
   const queryClient = useQueryClient();
   const { isMutate, setIsMutate } = useMutationSuccess();
 
   const fetchPosts = async ({ pageParam = 0 }) => {
-    const res = await axios.get(`/api/post?cursor=${pageParam}`);
+    const res = await axios.get(`/api/post/followed-post?cursor=${pageParam}`);
     return res.data;
   };
 
@@ -31,7 +31,7 @@ const Feed = ({ session }: { session: Session }) => {
     refetch,
     status,
   } = useInfiniteQuery({
-    queryKey: ["feed"],
+    queryKey: ["followedPost"],
     queryFn: fetchPosts,
     initialPageParam: 0,
     refetchOnWindowFocus: false,
@@ -57,7 +57,7 @@ const Feed = ({ session }: { session: Session }) => {
   ));
 
   const handleRefetch = () => {
-    queryClient.invalidateQueries({ queryKey: ["feed"] });
+    queryClient.invalidateQueries({ queryKey: ["followedPost"] });
     setIsMutate(false);
   };
 
@@ -90,4 +90,4 @@ const Feed = ({ session }: { session: Session }) => {
   );
 };
 
-export default Feed;
+export default FollowingTab;

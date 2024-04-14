@@ -37,8 +37,7 @@ const Comments: React.FC<CommentsProps> = ({
       return response.data;
     },
     refetchOnWindowFocus: false,
-    queryKey: ["comments"],
-    gcTime: 0,
+    queryKey: ["comments", [postId]],
   });
 
   const handleRefetch = () => {

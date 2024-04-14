@@ -130,6 +130,7 @@ export type PostProps = {
       };
     };
   }[];
+  isLikedByCurrentUser: boolean;
 };
 
 export type CommentProps = {

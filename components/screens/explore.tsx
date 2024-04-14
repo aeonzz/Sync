@@ -49,7 +49,7 @@ const Explore = ({ session }: { session: Session }) => {
       ) : (
         <div>
           {group.data.map((post: PostProps) => (
-            <PostCard key={post.postId} post={post} session={session} isLiked={group.liked} />
+            <PostCard key={post.postId} post={post} session={session}/>
           ))}
         </div>
       )}
