@@ -1,11 +1,27 @@
-import React from 'react'
+import { cn } from "@/lib/utils";
+import React from "react";
 
-const Loader = () => {
+const Loader = ({ className }: { className?: string | undefined }) => {
   return (
     <div className="flex flex-row gap-1">
-      <div className="w-1.5 h-1.5 rounded-full bg-foreground animate-bounce"></div>
-      <div className="w-1.5 h-1.5 rounded-full bg-foreground animate-bounce [animation-delay:-.1s]"></div>
-      <div className="w-1.5 h-1.5 rounded-full bg-foreground animate-bounce [animation-delay:-.3s]"></div>
+      <div
+        className={cn(
+          className,
+          "h-1.5 w-1.5 animate-bounce rounded-full bg-foreground",
+        )}
+      ></div>
+      <div
+        className={cn(
+          className,
+          "h-1.5 w-1.5 animate-bounce rounded-full bg-foreground [animation-delay:-.1s]",
+        )}
+      ></div>
+      <div
+        className={cn(
+          className,
+          "h-1.5 w-1.5 animate-bounce rounded-full bg-foreground [animation-delay:-.3s]",
+        )}
+      ></div>
     </div>
   );
 };

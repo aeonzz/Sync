@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const studentIdInt: number = +studentId;
 
     const existingUserByEmail = await prisma.user.findUnique({
-      where: { email: email }
+      where: { email: email },
     });
 
     if (existingUserByEmail) {

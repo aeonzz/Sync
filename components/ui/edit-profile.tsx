@@ -72,33 +72,35 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
           {isFollowed ? <span>Unfollow</span> : <span>Follow</span>}
         </Button>
       )}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm">
-            Edit profile
-          </Button>
-        </DialogTrigger>
-        <DialogContent
-          onInteractOutside={(e) => {
-            if (isLoading) {
-              e.preventDefault();
-            }
-          }}
-          className="h-[90%] !max-w-[520px]"
-        >
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-          </DialogHeader>
-          <ScrollArea className="w-full" type="scroll">
-            <EditProfileForm
-              userData={userData}
-              setOpen={setOpen}
-              setIsLoading={setIsLoading}
-              isLoading={isLoading}
-            />
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
+      {currentUser.id === paramsId && (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              Edit profile
+            </Button>
+          </DialogTrigger>
+          <DialogContent
+            onInteractOutside={(e) => {
+              if (isLoading) {
+                e.preventDefault();
+              }
+            }}
+            className="h-[90%] !max-w-[520px]"
+          >
+            <DialogHeader>
+              <DialogTitle>Edit profile</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="w-full" type="scroll">
+              <EditProfileForm
+                userData={userData}
+                setOpen={setOpen}
+                setIsLoading={setIsLoading}
+                isLoading={isLoading}
+              />
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

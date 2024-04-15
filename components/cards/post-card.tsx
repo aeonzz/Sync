@@ -178,7 +178,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
           </HoverCard>
           <div className="flex flex-col">
             <Link
-              href="/"
+              href={`/u/${post.author.id}`}
               className="flex items-center gap-1 font-semibold hover:underline"
             >
               {post.author.username}
