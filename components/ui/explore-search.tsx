@@ -49,6 +49,31 @@ const ExploreSearch = () => {
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
+  const renderColoredText = (text: string) => {
+    if (!searchTerm) {
+      return text;
+    }
+
+    const regex = new RegExp(`(${searchTerm})`, "gi");
+
+    const parts = text.split(regex);
+
+    const highlightedtext = parts.map((part, index) =>
+      regex.test(part) ? (
+        <span
+          key={index}
+          className="-mr-[2px] border border-primary/50 bg-primary/20"
+        >
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    );
+
+    return highlightedtext;
+  };
+
   return (
     <Card className="my-4 w-full">
       <div className="flex items-center px-5 pb-2 pt-1">
@@ -70,7 +95,6 @@ const ExploreSearch = () => {
             </svg>
             <Input
               placeholder={open ? "" : "Search..."}
-              value={searchTerm}
               readOnly
               className="rounded-none border-none bg-transparent pl-0 transition focus-visible:ring-0 focus-visible:ring-black"
             />
@@ -99,17 +123,11 @@ const ExploreSearch = () => {
             <div className="min-h-14 w-[85%] rounded-md border bg-popover p-1">
               <div className="h-auto w-full">
                 <Tabs defaultValue="user" className="w-full">
-                  <TabsList className="w-full bg-transparent">
-                    <TabsTrigger
-                      value="user"
-                      className="flex-1 data-[state=active]:bg-primary"
-                    >
+                  <TabsList className="w-full">
+                    <TabsTrigger value="user" className="flex-1">
                       Users
                     </TabsTrigger>
-                    <TabsTrigger
-                      value="post"
-                      className="flex-1 data-[state=active]:bg-primary"
-                    >
+                    <TabsTrigger value="post" className="flex-1">
                       Posts
                     </TabsTrigger>
                   </TabsList>
@@ -128,8 +146,9 @@ const ExploreSearch = () => {
                       </div>
                     )}
                     <div className="max-h-[420px] w-full flex-col items-center justify-center overflow-y-scroll">
-                      {searchUsersResults?.map((user) => (
+                      {searchUsersResults?.map((user, index) => (
                         <Link
+                          key={index}
                           href={`/u/${user.id}`}
                           className="flex h-14 w-full items-center rounded-sm px-2 hover:bg-accent/50"
                         >
@@ -150,16 +169,33 @@ const ExploreSearch = () => {
                             </Avatar>
                             <div>
                               <p className="flex items-center gap-1 hover:underline">
-                                {user.username}
+                                {renderColoredText(user.username ?? "")}
                               </p>
-                              <p className="text-xs text-muted-foreground">{`${user.studentData.firstName} ${user.studentData.middleName.charAt(0).toUpperCase()} ${user.studentData.lastName}`}</p>
+                              <p className="text-xs text-muted-foreground">
+                                <span>
+                                  {renderColoredText(
+                                    user.studentData.firstName,
+                                  )}
+                                </span>{" "}
+                                <span>
+                                  {renderColoredText(
+                                    user.studentData.middleName,
+                                  )}
+                                </span>{" "}
+                                <span>
+                                  {renderColoredText(user.studentData.lastName)}
+                                </span>
+                              </p>
                             </div>
                           </div>
                         </Link>
                       ))}
                     </div>
                   </TabsContent>
-                  <TabsContent value="post">
+                  <TabsContent
+                    value="post"
+                    className="flex flex-col items-center justify-center"
+                  >
                     {!isLoading && searchPostsResults?.length === 0 && (
                       <div className="py-3">
                         <h4 className="w-full text-sm">No results</h4>
@@ -170,7 +206,45 @@ const ExploreSearch = () => {
                         <Loader className="!bg-primary" />
                       </div>
                     )}
-                    {searchPostsResults?.map((post) => <p>{post.content}</p>)}
+                    <div className="max-h-[420px] w-full flex-col items-center justify-center overflow-y-scroll">
+                      {searchPostsResults?.map((post, index) => (
+                        <Link
+                          key={index}
+                          href={`/f/${post.postId}`}
+                          className="overfolow-hidden flex h-24 w-full items-center space-x-4 rounded-sm px-2 hover:bg-accent/50"
+                        >
+                          <div className="flex max-w-56 items-center space-x-2">
+                            <Avatar>
+                              <AvatarImage
+                                src={
+                                  post.author.avatarUrl
+                                    ? post.author.avatarUrl
+                                    : undefined
+                                }
+                                className="object-cover"
+                                alt={
+                                  post.author.avatarUrl
+                                    ? post.author.avatarUrl
+                                    : undefined
+                                }
+                              />
+                              <AvatarFallback>
+                                {post.author.username?.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="flex items-center gap-1 hover:underline">
+                                {post.author.username}
+                              </p>
+                              <p className="text-xs text-muted-foreground">{`${post.author.studentData.firstName} ${post.author.studentData.middleName.charAt(0).toUpperCase()} ${post.author.studentData.lastName}`}</p>
+                            </div>
+                          </div>
+                          <p className="flex-1 whitespace-pre-wrap break-words break-all text-xs text-muted-foreground">
+                            {renderColoredText(post.content)}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
                   </TabsContent>
                 </Tabs>
               </div>

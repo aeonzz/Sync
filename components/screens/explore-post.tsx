@@ -19,7 +19,7 @@ const ExplorePost = ({ session }: { session: Session }) => {
   const queryClient = useQueryClient();
 
   const fetchPosts = async ({ pageParam = 0 }) => {
-    const res = await axios.get(`/api/post?cursor=${pageParam}`);
+    const res = await axios.get(`/api/post/explore-post?cursor=${pageParam}`);
     return res.data;
   };
 

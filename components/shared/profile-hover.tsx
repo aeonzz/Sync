@@ -49,6 +49,8 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
 
     if (response.status === 200) {
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+      queryClient.invalidateQueries({ queryKey: ["followedPost"] });
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:

@@ -63,6 +63,13 @@ export async function GET(req: Request) {
           },
         ],
       },
+      include: {
+        author: {
+          include: {
+            studentData: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({ users: users, posts: posts }, { status: 201 });

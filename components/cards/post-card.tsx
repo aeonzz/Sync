@@ -68,10 +68,12 @@ import {
 } from "../ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import ProfileHover from "../shared/profile-hover";
+import ImageView from "../ui/image-view";
 
 interface PostCardProps {
   post: PostProps;
   session: Session;
+  detailsView?: boolean | undefined;
 }
 
 const options = {
@@ -79,8 +81,9 @@ const options = {
   className: "text-blue-500 hover:underline",
 };
 
-const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
+  const [openImageViewer, setOpenImageViewer] = useState(false);
   const [likedBy, setLikedBy] = useState(post.postLike);
   const [open, setOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
@@ -90,6 +93,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
   const { setIsMutate } = useMutationSuccess();
   const [liked, setLiked] = useState(post.isLikedByCurrentUser);
   const router = useRouter();
+
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
 
@@ -268,6 +272,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
             </motion.div>
           )}
         </AnimatePresence>
+        <ImageView
+          openImageViewer={openImageViewer}
+          setOpenImageViewer={setOpenImageViewer}
+          imageUrls={post.imageUrls}
+        />
         <Link href={`/f/${post.postId}`}>
           <div className="relative flex w-full overflow-hidden rounded-md">
             <div
@@ -279,6 +288,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
               {post.imageUrls?.slice(0, 4).map((image, index) => (
                 <div
                   key={image.id}
+                  onClick={() => {
+                    detailsView && setOpenImageViewer(true);
+                  }}
                   className={cn(
                     post.imageUrls?.length === 3 && index === 0 && "col-span-2",
                     post.imageUrls?.length === 1 ? "h-[420px]" : "h-[220px]",
@@ -335,8 +347,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                     "whitespace-pre-wrap break-words",
                   )}
                 >
-                  {contentToDisplay}
-                  {post.content.length > 100 && (
+                  {post.imageUrls.length > 0 ? contentToDisplay : post.content}
+                  {post.imageUrls.length > 0 && post.content.length > 100 && (
                     <Button
                       variant="link"
                       onClick={toggleContentVisibility}
@@ -414,7 +426,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session }) => {
                   <span className="sr-only">Close</span>
                 </DialogClose>
                 <DialogHeader>
-                  <DialogTitle>Engagers</DialogTitle>
+                  <DialogTitle className="text-muted-foreground">Reactors</DialogTitle>
                 </DialogHeader>
                 <ScrollArea className="max-h-[316px]">
                   <Reactors

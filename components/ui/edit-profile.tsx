@@ -11,7 +11,6 @@ import {
 import { Button } from "./button";
 import EditProfileForm from "../forms/edit-profile-form";
 import { UserProps } from "@/types/user";
-import { ScrollArea } from "./scroll-area";
 import { Session } from "next-auth";
 import {
   checkIfCurrentUserFollowedUser,
@@ -85,19 +84,16 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
                 e.preventDefault();
               }
             }}
-            className="h-[90%] !max-w-[520px]"
           >
             <DialogHeader>
               <DialogTitle>Edit profile</DialogTitle>
             </DialogHeader>
-            <ScrollArea className="w-full" type="scroll">
-              <EditProfileForm
-                userData={userData}
-                setOpen={setOpen}
-                setIsLoading={setIsLoading}
-                isLoading={isLoading}
-              />
-            </ScrollArea>
+            <EditProfileForm
+              userData={userData}
+              setOpen={setOpen}
+              setIsLoading={setIsLoading}
+              isLoading={isLoading}
+            />
           </DialogContent>
         </Dialog>
       )}

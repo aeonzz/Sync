@@ -117,7 +117,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6 px-1">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
         <div className="relative">
           <SingleImageDropzone
             width={464}
@@ -186,7 +186,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
         <div className="mt-5 flex w-full space-x-3">
           <Button
             disabled={isLoading}
-            variant="secondary"
+            variant="ghost"
             className="flex-1"
             onClick={(e) => {
               e.preventDefault();
