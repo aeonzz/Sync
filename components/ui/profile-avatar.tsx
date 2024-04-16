@@ -39,7 +39,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = async ({ userData }) => {
           </DialogTrigger>
         </div>
         {profileImage && (
-          <DialogImage className="max-h-[80%] !w-fit">
+          <DialogImage className="max-h-[80%] !w-fit rounded-sm">
             <Image
               className="object-cover"
               src={profileImage}

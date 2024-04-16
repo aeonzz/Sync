@@ -159,6 +159,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
               hasUserInput={setIsDirty}
               hasUserImages={setIsImageDirty}
               onLoading={setIsLoading}
+              currentUser={currentUser}
             />
           </DialogContent>
         </Dialog>

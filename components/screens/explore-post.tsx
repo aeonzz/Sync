@@ -32,6 +32,7 @@ const ExplorePost = ({ session }: { session: Session }) => {
     status,
   } = useInfiniteQuery({
     queryKey: ["explore"],
+    gcTime: 1000,
     queryFn: fetchPosts,
     initialPageParam: 0,
     refetchOnWindowFocus: false,

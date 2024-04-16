@@ -32,6 +32,7 @@ const Feed = ({ session }: { session: Session }) => {
     status,
   } = useInfiniteQuery({
     queryKey: ["feed"],
+    gcTime: 1000,
     queryFn: fetchPosts,
     initialPageParam: 0,
     refetchOnWindowFocus: false,

@@ -15,7 +15,7 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <section className={cn(inter.className)}>
+    <section className={cn(inter.className, "bg-background")}>
       <ThemeProvider
         attribute="class"
         defaultTheme="system"

@@ -69,6 +69,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import ProfileHover from "../shared/profile-hover";
 import ImageView from "../ui/image-view";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface PostCardProps {
   post: PostProps;
@@ -93,11 +94,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
   const { setIsMutate } = useMutationSuccess();
   const [liked, setLiked] = useState(post.isLikedByCurrentUser);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
 
-  const contentToDisplay = showFullContent
+  const contentToDisplay = showFullContent  
     ? post.content
     : post.content.slice(0, 100);
 
@@ -119,7 +121,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
     }
   }
 
-  async function handleLike() {
+  async function handleLike(
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) {
+    e.stopPropagation();
+
     const data = {
       userId: session!.user.id,
       postId: post.postId,
@@ -144,7 +150,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
   //       session!.user.id,
   //       post.postId,
   //     );
-  //     setLiked(response.liked);
+  //     setLiked(response);
   //   };
   //   checkIfUserLiked();
   // }, [post, session]);
@@ -426,7 +432,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
                   <span className="sr-only">Close</span>
                 </DialogClose>
                 <DialogHeader>
-                  <DialogTitle className="text-muted-foreground">Reactors</DialogTitle>
+                  <DialogTitle className="text-muted-foreground">
+                    Reactors
+                  </DialogTitle>
                 </DialogHeader>
                 <ScrollArea className="max-h-[316px]">
                   <Reactors
@@ -445,7 +453,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
                     <Button
                       variant="ghost"
                       size="iconRound"
-                      onClick={handleLike}
+                      onClick={(e) => handleLike(e)}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

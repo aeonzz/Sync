@@ -2,18 +2,14 @@
 
 import { PostValidation } from "@/lib/validations/post";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "../ui/form";
 import { Button } from "../ui/button";
@@ -30,11 +26,15 @@ import { Accordion, AccordionContent, AccordionItem } from "../ui/accordion";
 import { createPost } from "@/lib/actions/post.actions";
 import { useSession } from "next-auth/react";
 import EmojiPicker from "../ui/emoji-picker";
+import { createNotification } from "@/lib/actions/notification.actions";
+import { UserProps } from "@/types/user";
+import { NotificationType } from "@prisma/client";
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
   hasUserInput: (state: boolean) => void;
   hasUserImages: (state: boolean) => void;
   onLoading: (state: boolean) => void;
+  currentUser: UserProps;
 }
 
 const PostForm: React.FC<PostFormProps> = ({
@@ -42,15 +42,14 @@ const PostForm: React.FC<PostFormProps> = ({
   hasUserInput,
   hasUserImages,
   onLoading,
+  currentUser,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openImageInput, setOpenImageInput] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
   const [accordionValue, setAccourdionValue] = useState("");
   const { edgestore } = useEdgeStore();
-  const session = useSession();
   const router = useRouter();
-  const { isDark } = useThemeStore();
   const { setIsMutate } = useMutationSuccess();
 
   const form = useForm<z.infer<typeof PostValidation>>({
@@ -62,13 +61,7 @@ const PostForm: React.FC<PostFormProps> = ({
   });
 
   const watchFormContent = form.watch("content");
-  // const handleEmojiClick = (emojiData: EmojiClickData) => {
-  //   const currentContent = form.getValues("content");
 
-  //   const newContent = currentContent + emojiData.emoji;
-
-  //   form.setValue("content", newContent);
-  // };
   const handleEmojiClick2 = (emojiData: string) => {
     const currentContent = form.getValues("content");
 
@@ -125,17 +118,26 @@ const PostForm: React.FC<PostFormProps> = ({
 
     const postData = {
       ...data,
-      userId: session.data!.user.id,
+      userId: currentUser.id,
       images: uploadImage,
     };
 
     const response = await createPost(postData);
 
-    if (response.status === 200) {
+    if (response.data && response.status === 200) {
       onMutationSuccess(false);
-      toast("Posted.");
+      toast.success("Posted.");
       router.refresh();
       setIsMutate(true);
+
+      const notificationData = {
+        type: NotificationType.POST,
+        from: currentUser.id,
+        resourceId: response.data.postId,
+      };
+
+      const res = await createNotification(notificationData);
+    
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
@@ -153,28 +155,6 @@ const PostForm: React.FC<PostFormProps> = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
-        {/* <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <div className="relative">
-                  <Label className="absolute -bottom-3 left-3 text-xs text-slate-200/40">
-                    (optional)
-                  </Label>
-                  <Input
-                    className="border-none text-lg placeholder:font-medium focus-visible:ring-transparent"
-                    placeholder="Title"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
         <FormField
           control={form.control}
           name="content"
@@ -276,19 +256,6 @@ const PostForm: React.FC<PostFormProps> = ({
               handleEmojiClick={handleEmojiClick2}
               side="top"
             />
-            {/* <div className="absolute -right-[70%] -top-[360px]">
-              <EmojiPicker
-                open={openEmojiPicker}
-                theme={isDark ? Theme.LIGHT : Theme.DARK}
-                className="z-[100] !h-[400px] !w-full !rounded-lg !border-none !bg-card p-3 pb-6 shadow-md"
-                lazyLoadEmojis={true}
-                searchDisabled={true}
-                onEmojiClick={handleEmojiClick}
-                previewConfig={{
-                  showPreview: false,
-                }}
-              />
-            </div> */}
           </div>
           <Button
             type="submit"

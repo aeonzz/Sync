@@ -26,7 +26,7 @@ const ProfileCover: React.FC<ProfileCoverProps> = async ({ userData }) => {
         <DialogTrigger asChild>
           <Image
             fill
-            className="cursor-pointer rounded-lg object-cover object-center"
+            className="cursor-pointer rounded-sm object-cover object-center"
             src={profileCover}
             alt="cover photo"
             quality={100}

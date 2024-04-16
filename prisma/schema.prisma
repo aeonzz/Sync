@@ -44,6 +44,17 @@ model Follows {
   @@unique([followerId, followingId])
 }
 
+model Notification {
+  id          Int              @id @default(autoincrement())
+  recipientId String
+  type        NotificationType
+  from        String
+  resourceId  String
+  isRead      Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @default(now())
+}
+
 model Post {
   postId     String     @id @default(uuid())
   sequenceId Int        @default(autoincrement())
@@ -122,4 +133,9 @@ model CommentLike {
   user      User    @relation(fields: [userId], references: [id])
 
   @@unique([userId, commentId])
+}
+
+enum NotificationType {
+  COMMENT
+  POST
 }

@@ -138,7 +138,7 @@ export async function getPostById(postId: string, currentUserId: string) {
     if (!response) {
       throw new Error();
     }
-    
+
     const likeRecord = await prisma.postLike.findUnique({
       where: {
         userId_postId: {
@@ -183,7 +183,7 @@ export async function createPost({
       }),
     );
 
-    await prisma.post.create({
+    const post = await prisma.post.create({
       data: {
         title: title,
         content: content,
@@ -199,10 +199,10 @@ export async function createPost({
       },
     });
 
-    return { error: null, status: 200 };
+    return { data: post, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { error: error.message, status: 500 };
+    return { data: null, error: error.message, status: 500 };
   }
 }
 

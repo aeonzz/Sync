@@ -40,7 +40,7 @@ const ImageView: React.FC<ImageViewProps> = ({
   return (
     <Dialog open={openImageViewer} onOpenChange={setOpenImageViewer}>
       <DialogImage className="max-h-[80%] !w-fit !overflow-visible border-none">
-        <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <DialogClose className="absolute z-50 right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
           <X className="h-5 w-5" />
           <span className="sr-only">Close</span>
         </DialogClose>
