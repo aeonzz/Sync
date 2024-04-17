@@ -10,21 +10,6 @@ export async function GET(req: Request) {
     const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
     const session = await getServerSession(authOptions);
 
-    const followingPosts = await prisma.follows.findMany({
-      where: { followerId: session?.user.id },
-      select: {
-        following: {
-          select: {
-            post: {
-              select: {
-                postId: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
     const posts = await prisma.post.findMany({
       include: {
         _count: {

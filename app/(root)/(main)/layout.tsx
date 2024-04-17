@@ -2,7 +2,7 @@ import React from "react";
 import LeftSideBar from "@/components/shared/left-sidebar";
 
 
-export default function MainLayout({
+export default async function MainLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

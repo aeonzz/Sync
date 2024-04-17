@@ -34,7 +34,7 @@ const UserNav = async () => {
         <Button
           variant="secondary"
           size="lg"
-          className="flex h-[52px] w-[200px] justify-start space-x-2 border bg-card px-3 shadow-sm"
+          className="flex h-[52px] w-full justify-start space-x-2 border bg-card px-3 shadow-sm"
         >
           <Avatar>
             <AvatarImage
@@ -61,7 +61,7 @@ const UserNav = async () => {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="z-50 w-[200px]" align="center" forceMount>
+      <DropdownMenuContent className="z-50 w-[230px]" align="center" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">

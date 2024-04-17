@@ -32,7 +32,7 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
 }) => {
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery<User>({
+  const { data, isLoading, isError } = useQuery<User>({
     queryFn: async () => {
       const response = await axios.get(`/api/user/${userId}`);
       return response.data;
@@ -42,7 +42,7 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
 
   if (isLoading) return <ProfileHoverSkeleton />;
 
-  if (!data) return null;
+  if (!data || isError) return null;
 
   async function handleFollow() {
     const response = await followUser(currentUserId, userId);

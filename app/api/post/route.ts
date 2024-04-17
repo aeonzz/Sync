@@ -5,11 +5,11 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const { title, content } = PostValidation.parse(body);
-    const session = await getServerSession(authOptions);
+  const body = await req.json();
+  const { title, content } = PostValidation.parse(body);
+  const session = await getServerSession(authOptions);
 
+  try {
     const result = await prisma.post.create({
       data: {
         title: title,
@@ -33,12 +33,12 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  try {
-    const url = new URL(req.url);
-    const cursorParam = url.searchParams.get("cursor");
-    const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
-    const session = await getServerSession(authOptions);
+  const url = new URL(req.url);
+  const cursorParam = url.searchParams.get("cursor");
+  const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
+  const session = await getServerSession(authOptions);
 
+  try {
     const followingPosts = await prisma.follows.findMany({
       where: { followerId: session?.user.id },
       select: {

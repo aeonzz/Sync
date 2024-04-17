@@ -15,6 +15,7 @@ export async function GET(
 ) {
   const session = await getServerSession(authOptions);
   const { userId } = params;
+
   try {
     const user = await prisma.user.findFirst({
       where: {
@@ -24,7 +25,7 @@ export async function GET(
         studentData: true,
       },
     });
-    
+
     const followRecord = await prisma.follows.findUnique({
       where: {
         followerId_followingId: {

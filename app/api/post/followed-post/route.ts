@@ -4,12 +4,12 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const cursorParam = url.searchParams.get("cursor");
+  const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
+  const session = await getServerSession(authOptions);
+  
   try {
-    const url = new URL(req.url);
-    const cursorParam = url.searchParams.get("cursor");
-    const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
-    const session = await getServerSession(authOptions);
-
     const followingPosts = await prisma.follows.findMany({
       where: { followerId: session?.user.id },
       select: {

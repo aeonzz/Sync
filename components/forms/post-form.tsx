@@ -29,6 +29,7 @@ import EmojiPicker from "../ui/emoji-picker";
 import { createNotification } from "@/lib/actions/notification.actions";
 import { UserProps } from "@/types/user";
 import { NotificationType } from "@prisma/client";
+import { useQueryClient } from "@tanstack/react-query";
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
   hasUserInput: (state: boolean) => void;
@@ -50,6 +51,7 @@ const PostForm: React.FC<PostFormProps> = ({
   const [accordionValue, setAccourdionValue] = useState("");
   const { edgestore } = useEdgeStore();
   const router = useRouter();
+  const queryClient = useQueryClient()
   const { setIsMutate } = useMutationSuccess();
 
   const form = useForm<z.infer<typeof PostValidation>>({
@@ -134,10 +136,12 @@ const PostForm: React.FC<PostFormProps> = ({
         type: NotificationType.POST,
         from: currentUser.id,
         resourceId: response.data.postId,
+        text: response.data.content,
       };
 
-      const res = await createNotification(notificationData);
-    
+      await createNotification(notificationData);
+
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {

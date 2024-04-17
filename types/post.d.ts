@@ -1,9 +1,3 @@
-// export type PostType = {
-//   title?: string | undefined;
-//   content: string;
-//   imageUrls?: string | undefined;
-// };
-
 export type PostProps = {
   sequenceId: number;
   postId: string;

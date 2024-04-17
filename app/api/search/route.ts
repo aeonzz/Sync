@@ -2,10 +2,10 @@ import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const searchTerm = searchParams.get("q");
+  const { searchParams } = new URL(req.url);
+  const searchTerm = searchParams.get("q");
 
+  try {
     if (!searchTerm)
       return NextResponse.json(
         { message: "An internal server error occurred" },
