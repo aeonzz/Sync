@@ -23,6 +23,7 @@ import { NotificationProps } from "@/types/notification";
 import { ScrollArea } from "../ui/scroll-area";
 import { updateAllReadStatus } from "@/lib/actions/notification.actions";
 import { toast } from "sonner";
+import Loader from "../loaders/loader";
 
 interface SideBarNavProps {
   currentUserId: string;
@@ -155,12 +156,12 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
             </div>
           </DrawerHeader>
           <ScrollArea className="flex h-screen flex-col">
-            {isLoadingNotifications && <div>Loading...</div>}
-            {isError && <div>Error</div>}
+            {isLoadingNotifications && <Loader />}
+            {isError && <p className="text-center text-sm">Error fetching notifications</p>}
             {!isLoadingNotifications && (
               <>
                 {notifications?.length === 0 && (
-                  <div>No notifications yet.</div>
+                  <p className="text-center text-sm">You have no notifications yet.</p>
                 )}
                 {notifications?.map((notification, index) => (
                   <NotificationCard

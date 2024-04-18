@@ -8,6 +8,7 @@ interface CreateNotificationParams {
   from: string;
   resourceId: string;
   text: string;
+  recipientId?: string | undefined;
 }
 
 export async function createNotification({
@@ -15,6 +16,7 @@ export async function createNotification({
   from,
   resourceId,
   text,
+  recipientId,
 }: CreateNotificationParams) {
   try {
     const followers = await prisma.follows.findMany({
@@ -26,16 +28,32 @@ export async function createNotification({
       },
     });
 
-    for (const follower of followers) {
+    console.log(type)
+
+    if (type === "POST") {
+      for (const follower of followers) {
+        await prisma.notification.create({
+          data: {
+            recipientId: follower.followerId,
+            type,
+            resourceId,
+            fromId: from,
+            text,
+          },
+        });
+      }
+    } else if (type === "COMMENT" && recipientId !== undefined) {
       await prisma.notification.create({
         data: {
-          recipientId: follower.followerId,
+          recipientId,
           type,
           resourceId,
           fromId: from,
           text,
         },
       });
+    } else {
+      null
     }
 
     return { error: null, status: 200 };
@@ -65,15 +83,14 @@ export async function updateReadStatus(notificationId: number) {
 
 export async function updateAllReadStatus(recipientId: string) {
   try {
-
     await prisma.notification.updateMany({
       where: {
         recipientId,
       },
       data: {
         isRead: true,
-      }
-    })
+      },
+    });
 
     return { error: null, status: 200 };
   } catch (error: any) {

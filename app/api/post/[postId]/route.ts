@@ -20,7 +20,7 @@ export async function GET(req: Request, params: Context) {
         deleted: false,
       },
       orderBy: {
-        id: "desc",
+        id: "asc",
       },
       include: {
         _count: {

@@ -74,11 +74,11 @@ model Post {
 }
 
 model Comment {
-  id          Int           @id @default(autoincrement())
+  id          String        @id @default(uuid())
   text        String
   postId      String
   post        Post          @relation(fields: [postId], references: [postId])
-  parentId    Int?
+  parentId    String?
   createdAt   DateTime      @default(now()) @db.Timestamp(6)
   updatedAt   DateTime      @updatedAt @db.Timestamp(6)
   replies     Comment[]     @relation("CommentReplies")
@@ -132,7 +132,7 @@ model CommentLike {
   id        Int     @id @default(autoincrement())
   userId    String
   comment   Comment @relation(fields: [commentId], references: [id])
-  commentId Int
+  commentId String
   user      User    @relation(fields: [userId], references: [id])
 
   @@unique([userId, commentId])

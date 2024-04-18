@@ -6,7 +6,7 @@ interface CreateCommentParams {
   postId: string;
   userId: string;
   text: string;
-  parentId?: number | undefined;
+  parentId?: string | undefined;
 }
 
 export async function createComment({
@@ -16,7 +16,7 @@ export async function createComment({
   parentId,
 }: CreateCommentParams) {
   try {
-    await prisma.comment.create({
+    const comment = await prisma.comment.create({
       data: {
         postId,
         userId,
@@ -25,16 +25,16 @@ export async function createComment({
       },
     });
 
-    return { error: null, status: 200 };
+    return { data: comment, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { error: error.message, status: 500 };
+    return { data: null, error: error.message, status: 500 };
   }
 }
 
 interface likeCommentProps {
   userId: string;
-  commentId: number;
+  commentId: string;
 }
 
 export async function likeComment({ userId, commentId }: likeCommentProps) {
@@ -83,13 +83,12 @@ export async function likeComment({ userId, commentId }: likeCommentProps) {
                 middleName: true,
                 lastName: true,
                 department: true,
-              }
-            }
+              },
+            },
           },
         },
       },
     });
-
 
     return { data: newLikes, error: null, status: 200 };
   } catch (error: any) {
@@ -100,7 +99,7 @@ export async function likeComment({ userId, commentId }: likeCommentProps) {
 
 export async function checkIfUserLikedComment(
   userId: string,
-  commentId: number,
+  commentId: string,
 ) {
   const likeRecord = await prisma.commentLike.findUnique({
     where: {
@@ -114,7 +113,7 @@ export async function checkIfUserLikedComment(
   return likeRecord !== null;
 }
 
-export async function deleteComment(commentId: number) {
+export async function deleteComment(commentId: string) {
   try {
     await prisma.comment.update({
       where: {
@@ -133,12 +132,12 @@ export async function deleteComment(commentId: number) {
 
 interface UpdateCommentParams {
   text: string;
-  commentId: number;
+  commentId: string;
 }
 
 export async function updateComment({ text, commentId }: UpdateCommentParams) {
   try {
-    await prisma.comment.update({
+    const comment = await prisma.comment.update({
       where: {
         id: commentId,
       },
@@ -146,9 +145,9 @@ export async function updateComment({ text, commentId }: UpdateCommentParams) {
         text: text,
       },
     });
-    return { error: null, status: 200 };
+    return { data: comment, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { error: error.message, status: 500 };
+    return { data: null, error: error.message, status: 500 };
   }
 }

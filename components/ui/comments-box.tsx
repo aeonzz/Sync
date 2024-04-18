@@ -1,6 +1,5 @@
 import { CommentProps } from "@/types/post";
 import CommentForm from "../forms/comment-form";
-import { Session } from "next-auth";
 import CommentCard from "../cards/comment-card";
 import { ScrollArea } from "./scroll-area";
 import { cn } from "@/lib/utils";
@@ -34,6 +33,7 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
         username={username}
         userId={userId}
         postId={postId}
+        postAuthor={postAuthor}
       />
       <ScrollArea className="relative h-[calc(100vh-180px)]">
         <div className="absolute z-20 h-5 w-full bg-gradient-to-b from-background to-transparent" />

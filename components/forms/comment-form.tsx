@@ -21,18 +21,21 @@ import { useMutationSuccess } from "@/context/store";
 import { commentValidation } from "@/lib/validations/post";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { NotificationType } from "@prisma/client";
+import { createNotification } from "@/lib/actions/notification.actions";
 
 interface CommentFormProps {
   avatarUrl: string | null;
   username: string | null;
   userId: string;
   postId: string;
-  parentId?: number | undefined;
+  postAuthor: string;
+  parentId?: string | undefined;
   setAccourdionValue?: (state: string) => void;
   className?: string | undefined;
   editData?: {
     text: string;
-    commentId: number;
+    commentId: string;
   };
   setDialogOpen?: (state: boolean) => void;
 }
@@ -42,6 +45,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
   username,
   userId,
   postId,
+  postAuthor,
   parentId,
   setAccourdionValue,
   className,
@@ -93,6 +97,18 @@ const CommentForm: React.FC<CommentFormProps> = ({
       setIsLoading(false);
       form.reset();
       setAccourdionValue && setAccourdionValue("");
+
+      if (!editData && response.data !== null) {
+        const notificationData = {
+          type: NotificationType.COMMENT,
+          from: userId,
+          resourceId: postId,
+          text: response.data.text,
+          recipientId: postAuthor
+        };
+
+        const g = await createNotification(notificationData);
+      }
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {

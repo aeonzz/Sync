@@ -6,7 +6,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Link from "next/link";
 import { updateReadStatus } from "@/lib/actions/notification.actions";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { SquarePen } from "lucide-react";
 
@@ -63,7 +62,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
           </Avatar>
           {notification.type === "POST" && (
             <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-blue-500">
-              <SquarePen className="h-4 w-4 ml-1 mt-1" />
+              <SquarePen className="ml-1 mt-1 h-4 w-4" />
             </div>
           )}
         </div>
@@ -75,19 +74,18 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
                 {notification.from.username}
               </h3>
               <p className="whitespace-pre-wrap break-words text-sm text-muted-foreground">
-                "{trimContent}..."
+                &quot;{trimContent}...&quot;
               </p>
             </>
           )}
           {notification.type === "COMMENT" && (
             <>
               <h3 className="text-sm font-semibold">
-                <span className="font-light">
-                  {notification.from.username} Commented on your post
-                </span>
+                {notification.from.username}{" "}
+                <span className="font-light">commented on your post</span>
               </h3>
               <p className="whitespace-pre-wrap break-words text-sm text-muted-foreground">
-                "{trimContent}..."
+                &quot;{trimContent}...&quot;
               </p>
             </>
           )}
