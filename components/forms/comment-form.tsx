@@ -29,7 +29,7 @@ interface CommentFormProps {
   username: string | null;
   userId: string;
   postId: string;
-  postAuthor: string;
+  postAuthor?: string | undefined;
   parentId?: string | undefined;
   setAccourdionValue?: (state: string) => void;
   className?: string | undefined;
@@ -104,10 +104,10 @@ const CommentForm: React.FC<CommentFormProps> = ({
           from: userId,
           resourceId: postId,
           text: response.data.text,
-          recipientId: postAuthor
+          recipientId: postAuthor,
         };
 
-        const g = await createNotification(notificationData);
+        await createNotification(notificationData);
       }
     } else {
       setIsLoading(false);

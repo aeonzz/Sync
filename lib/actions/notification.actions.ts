@@ -28,9 +28,7 @@ export async function createNotification({
       },
     });
 
-    console.log(type)
-
-    if (type === "POST") {
+    if (recipientId === undefined) {
       for (const follower of followers) {
         await prisma.notification.create({
           data: {
@@ -42,7 +40,7 @@ export async function createNotification({
           },
         });
       }
-    } else if (type === "COMMENT" && recipientId !== undefined) {
+    } else {
       await prisma.notification.create({
         data: {
           recipientId,
@@ -52,8 +50,6 @@ export async function createNotification({
           text,
         },
       });
-    } else {
-      null
     }
 
     return { error: null, status: 200 };

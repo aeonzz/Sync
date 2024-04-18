@@ -34,7 +34,7 @@ import CommentForm from "../forms/comment-form";
 import { useMutationSuccess } from "@/context/store";
 
 interface CommentMenuProps {
-  commentId: number;
+  commentId: string;
   avatarUrl: string | null;
   username: string | null;
   userId: string;

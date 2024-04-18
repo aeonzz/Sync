@@ -7,7 +7,7 @@ import Link from "next/link";
 import { updateReadStatus } from "@/lib/actions/notification.actions";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { SquarePen } from "lucide-react";
+import { Heart, MessageSquare, SquarePen } from "lucide-react";
 
 interface NotificationCardProps {
   notification: NotificationProps;
@@ -62,7 +62,17 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
           </Avatar>
           {notification.type === "POST" && (
             <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-blue-500">
-              <SquarePen className="ml-1 mt-1 h-4 w-4" />
+              <SquarePen className="ml-[5px] mt-1 h-4 w-4" />
+            </div>
+          )}
+          {notification.type === "COMMENT" && (
+            <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-green-500">
+              <MessageSquare className="ml-[5px] mt-[5px] h-4 w-4" />
+            </div>
+          )}
+          {notification.type === "LIKE" && (
+            <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-red-500">
+              <Heart className="ml-[5px] mt-[5px] h-4 w-4" />
             </div>
           )}
         </div>
@@ -87,6 +97,14 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               <p className="whitespace-pre-wrap break-words text-sm text-muted-foreground">
                 &quot;{trimContent}...&quot;
               </p>
+            </>
+          )}
+          {notification.type === "LIKE" && (
+            <>
+              <h3 className="text-sm font-semibold">
+                {notification.from.username}{" "}
+                <span className="font-light">liked your post</span>
+              </h3>
             </>
           )}
         </div>

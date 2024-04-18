@@ -128,7 +128,7 @@ export type PostProps = {
 };
 
 export type CommentProps = {
-  id: number;
+  id: string;
   text: string;
   createdAt: Date;
   _count: {

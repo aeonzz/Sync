@@ -70,6 +70,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import ProfileHover from "../shared/profile-hover";
 import ImageView from "../ui/image-view";
 import { useQueryClient } from "@tanstack/react-query";
+import { NotificationType } from "@prisma/client";
+import { createNotification } from "@/lib/actions/notification.actions";
 
 interface PostCardProps {
   post: PostProps;
@@ -136,6 +138,17 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
     if (response.status === 200) {
       setLiked((prev) => !prev);
       setLikedBy(response.data ?? []);
+
+      const notificationData = {
+        type: NotificationType.LIKE,
+        from: session.user.id,
+        resourceId: post.postId,
+        text: post.content,
+        recipientId: post.author.id,
+      };
+
+      await createNotification(notificationData);
+
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
