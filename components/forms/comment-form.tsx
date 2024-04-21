@@ -103,7 +103,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
           const notificationData = {
             type: NotificationType.COMMENT,
             from: userId,
-            resourceId: postId,
+            resourceId: `/f/${postId}`,
             text: response.data.text,
             recipientId: postAuthor,
           };

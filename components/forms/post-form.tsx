@@ -135,7 +135,7 @@ const PostForm: React.FC<PostFormProps> = ({
       const notificationData = {
         type: NotificationType.POST,
         from: currentUser.id,
-        resourceId: response.data.postId,
+        resourceId: `/f/${response.data.postId}`,
         text: response.data.content,
       };
 

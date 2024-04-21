@@ -14,6 +14,8 @@ import { CalendarDays } from "lucide-react";
 import { toast } from "sonner";
 import { followUser } from "@/lib/actions/user.actions";
 import ProfileHoverSkeleton from "../loaders/profile-hover-skeleton";
+import { NotificationType } from "@prisma/client";
+import { createNotification } from "@/lib/actions/notification.actions";
 
 interface ProfileHoverProps {
   userId: string;
@@ -51,6 +53,18 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       queryClient.invalidateQueries({ queryKey: ["feed"] });
       queryClient.invalidateQueries({ queryKey: ["followedPost"] });
+
+      if (!data?.data.isFollowedByCurrentUser) {
+        const notificationData = {
+          type: NotificationType.FOLLOW,
+          from: currentUserId,
+          resourceId: `/u/${currentUserId}`,
+          text: "",
+          recipientId: userId,
+        };
+
+        await createNotification(notificationData);
+      }
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:

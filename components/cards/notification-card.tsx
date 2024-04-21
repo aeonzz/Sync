@@ -7,7 +7,7 @@ import Link from "next/link";
 import { updateReadStatus } from "@/lib/actions/notification.actions";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { Heart, MessageSquare, SquarePen } from "lucide-react";
+import { Heart, MessageSquare, SquarePen, UserPlus } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface NotificationCardProps {
@@ -42,7 +42,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
 
   return (
     <Link
-      href={`/f/${notification.resourceId}`}
+      href={notification.resourceId}
       onClick={() => handleNotificationClick()}
       className="relative flex h-20 cursor-pointer items-center rounded-sm border-b px-6 py-2 hover:bg-accent/50 w-full"
     >
@@ -79,6 +79,11 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               <Heart className="ml-[5px] mt-[5px] h-4 w-4" />
             </div>
           )}
+          {notification.type === "FOLLOW" && (
+            <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-indigo-500">
+              <UserPlus className="ml-[5px] mt-[4px] h-4 w-4" />
+            </div>
+          )}
         </div>
         <div>
           {notification.type === "POST" && (
@@ -108,6 +113,14 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               <h3 className="text-sm font-semibold">
                 {notification.from.username}{" "}
                 <span className="font-light">liked your post</span>
+              </h3>
+            </>
+          )}
+          {notification.type === "FOLLOW" && (
+            <>
+              <h3 className="text-sm font-semibold">
+                {notification.from.username}{" "}
+                <span className="font-light">started following you</span>
               </h3>
             </>
           )}

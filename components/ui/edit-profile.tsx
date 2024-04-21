@@ -18,6 +18,8 @@ import {
 } from "@/lib/actions/user.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { NotificationType } from "@prisma/client";
+import { createNotification } from "@/lib/actions/notification.actions";
 
 interface ProfileActionsProps {
   userData: UserProps;
@@ -49,6 +51,18 @@ const ProfileActions: React.FC<ProfileActionsProps> = ({
       setIsLoading(false);
       setIsFollowed(response.data);
       router.refresh();
+
+      if (!isFollowed) {
+        const notificationData = {
+          type: NotificationType.FOLLOW,
+          from: currentUser.id,
+          resourceId: `/u/${currentUser.id}`,
+          text: "",
+          recipientId: paramsId,
+        };
+
+        await createNotification(notificationData);
+      }
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {

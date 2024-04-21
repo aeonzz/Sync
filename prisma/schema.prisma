@@ -142,4 +142,5 @@ enum NotificationType {
   COMMENT
   POST
   LIKE
+  FOLLOW
 }

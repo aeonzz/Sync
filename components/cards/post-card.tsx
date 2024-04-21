@@ -140,11 +140,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
       setLikedBy(response.data ?? []);
 
       if (session.user.id !== post.author.id) {
-        if (liked === false) {
+        if (!liked) {
           const notificationData = {
             type: NotificationType.LIKE,
             from: session.user.id,
-            resourceId: post.postId,
+            resourceId: `/f/${post.postId}`,
             text: post.content,
             recipientId: post.author.id,
           };
