@@ -101,7 +101,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
 
-  const contentToDisplay = showFullContent  
+  const contentToDisplay = showFullContent
     ? post.content
     : post.content.slice(0, 100);
 
@@ -139,16 +139,19 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
       setLiked((prev) => !prev);
       setLikedBy(response.data ?? []);
 
-      const notificationData = {
-        type: NotificationType.LIKE,
-        from: session.user.id,
-        resourceId: post.postId,
-        text: post.content,
-        recipientId: post.author.id,
-      };
+      if (session.user.id !== post.author.id) {
+        if (liked === false) {
+          const notificationData = {
+            type: NotificationType.LIKE,
+            from: session.user.id,
+            resourceId: post.postId,
+            text: post.content,
+            recipientId: post.author.id,
+          };
 
-      await createNotification(notificationData);
-
+          await createNotification(notificationData);
+        }
+      }
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:

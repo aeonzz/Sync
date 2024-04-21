@@ -2,6 +2,7 @@
 
 import prisma from "../db";
 import { NotificationType } from "@prisma/client";
+import { pusherServer } from "../pusher";
 
 interface CreateNotificationParams {
   type: NotificationType;
@@ -28,9 +29,20 @@ export async function createNotification({
       },
     });
 
+    let notificationsRecord;
+
+    if (type === "LIKE") {
+      notificationsRecord = await prisma.notification.findFirst({
+        where: {
+          fromId: from,
+          resourceId,
+        },
+      });
+    }
+
     if (recipientId === undefined) {
       for (const follower of followers) {
-        await prisma.notification.create({
+        const newNotification = await prisma.notification.create({
           data: {
             recipientId: follower.followerId,
             type,
@@ -38,19 +50,51 @@ export async function createNotification({
             fromId: from,
             text,
           },
+          include: {
+            from: {
+              select: {
+                id: true,
+                username: true,
+                avatarUrl: true,
+              },
+            },
+          },
         });
+        pusherServer.trigger(
+          "notify-post",
+          "incoming-notification",
+          newNotification,
+        );
       }
     } else {
-      await prisma.notification.create({
-        data: {
-          recipientId,
-          type,
-          resourceId,
-          fromId: from,
-          text,
-        },
-      });
+      if (!notificationsRecord) {
+        const newNotification = await prisma.notification.create({
+          data: {
+            recipientId,
+            type,
+            resourceId,
+            fromId: from,
+            text,
+          },
+          include: {
+            from: {
+              select: {
+                id: true,
+                username: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        });
+        pusherServer.trigger(
+          "notify-post",
+          "incoming-notification",
+          newNotification,
+        );
+      }
     }
+
+    pusherServer.trigger("new-notification", "incoming-notification", "yawa");
 
     return { error: null, status: 200 };
   } catch (error: any) {
@@ -93,4 +137,14 @@ export async function updateAllReadStatus(recipientId: string) {
     console.log(error);
     return { error: error.message, status: 500 };
   }
+}
+
+export async function getPostNotifications(resourceId: string) {
+  try {
+    const notification = await prisma.notification.findMany({
+      where: {
+        resourceId,
+      },
+    });
+  } catch (error: any) {}
 }

@@ -38,7 +38,7 @@ import ProfileHover from "../shared/profile-hover";
 
 interface LikeButtonProps {
   userId: string;
-  commentId: number;
+  commentId: string;
   likeCount: number;
   likedBy: {
     id: number;

@@ -99,15 +99,17 @@ const CommentForm: React.FC<CommentFormProps> = ({
       setAccourdionValue && setAccourdionValue("");
 
       if (!editData && response.data !== null) {
-        const notificationData = {
-          type: NotificationType.COMMENT,
-          from: userId,
-          resourceId: postId,
-          text: response.data.text,
-          recipientId: postAuthor,
-        };
+        if (userId !== postAuthor) {
+          const notificationData = {
+            type: NotificationType.COMMENT,
+            from: userId,
+            resourceId: postId,
+            text: response.data.text,
+            recipientId: postAuthor,
+          };
 
-        await createNotification(notificationData);
+          await createNotification(notificationData);
+        }
       }
     } else {
       setIsLoading(false);

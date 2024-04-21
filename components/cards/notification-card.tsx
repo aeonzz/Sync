@@ -8,6 +8,7 @@ import { updateReadStatus } from "@/lib/actions/notification.actions";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Heart, MessageSquare, SquarePen } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface NotificationCardProps {
   notification: NotificationProps;
@@ -20,6 +21,9 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
 }) => {
   const queryClient = useQueryClient();
   const trimContent = notification.text.slice(0, 50);
+  const notificationTimeAndDate = formatDistanceToNow(notification.createdAt, {
+    addSuffix: true,
+  });
 
   async function handleNotificationClick() {
     setOpen(false);
@@ -40,7 +44,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
     <Link
       href={`/f/${notification.resourceId}`}
       onClick={() => handleNotificationClick()}
-      className="relative flex h-20 cursor-pointer items-center rounded-sm border-b px-6 py-2 hover:bg-accent/50"
+      className="relative flex h-20 cursor-pointer items-center rounded-sm border-b px-6 py-2 hover:bg-accent/50 w-full"
     >
       {notification.isRead == false && (
         <div className="absolute left-1 top-1">
@@ -50,7 +54,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
           </span>
         </div>
       )}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-3">
         <div className="relative">
           <Avatar className="h-10 w-10 dark:border">
             <AvatarImage
@@ -107,6 +111,9 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               </h3>
             </>
           )}
+          <p className="text-xs font-light text-muted-foreground">
+            {notificationTimeAndDate}
+          </p>
         </div>
       </div>
     </Link>

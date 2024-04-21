@@ -10,11 +10,10 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -24,6 +23,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { updateAllReadStatus } from "@/lib/actions/notification.actions";
 import { toast } from "sonner";
 import Loader from "../loaders/loader";
+import { pusherClient } from "@/lib/pusher";
 
 interface SideBarNavProps {
   currentUserId: string;
@@ -66,6 +66,21 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
     }
   }
 
+  useEffect(() => {
+    pusherClient.subscribe("notify-post");
+
+    pusherClient.bind("incoming-notification", (data: NotificationProps) => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      if (data.recipientId === currentUserId) {
+        toast(<NotificationCard notification={data} setOpen={setOpen} />);
+      }
+    });
+
+    return () => {
+      pusherClient.unsubscribe("notify-post");
+    };
+  }, [currentUserId]);
+
   return (
     <div className="flex h-auto w-full flex-col items-start space-y-3">
       <Link
@@ -91,6 +106,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
               >
                 <Image
                   src={item.data.icon}
+                  priority
                   width={28}
                   height={28}
                   alt={item.data.alt}
@@ -157,11 +173,17 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
           </DrawerHeader>
           <ScrollArea className="flex h-screen flex-col">
             {isLoadingNotifications && <Loader />}
-            {isError && <p className="text-center text-sm">Error fetching notifications</p>}
+            {isError && (
+              <p className="text-center text-sm">
+                Error fetching notifications
+              </p>
+            )}
             {!isLoadingNotifications && (
               <>
                 {notifications?.length === 0 && (
-                  <p className="text-center text-sm">You have no notifications yet.</p>
+                  <p className="text-center text-sm">
+                    You have no notifications yet.
+                  </p>
                 )}
                 {notifications?.map((notification, index) => (
                   <NotificationCard

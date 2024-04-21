@@ -46,7 +46,7 @@ export type PostProps = {
     };
   }[];
   comment: {
-    id: number;
+    id: string;
     text: string;
     createdAt: Date;
     _count: {
@@ -54,7 +54,7 @@ export type PostProps = {
       replies: number;
     };
     replies: {
-      id: number;
+      id: string;
       text: string;
       createdAt: Date;
       _count: {
@@ -136,7 +136,7 @@ export type CommentProps = {
     replies: number;
   };
   replies: {
-    id: number;
+    id: string;
     text: string;
     createdAt: Date;
     _count: {
@@ -208,7 +208,7 @@ export type CommentProps = {
 };
 
 export type ReplyProps = {
-  id: number;
+  id: string;
   text: string;
   createdAt: Date;
   _count: {
