@@ -60,7 +60,6 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
             avatarUrl={currentUser.data.avatarUrl}
             username={currentUser.data.username}
             userId={currentUser.data.id}
-            comments={post.data.comment}
             postId={params.postId}
             postAuthor={post.data.author.id}
           />

@@ -6,6 +6,7 @@ import highlights from "@/public/icons/highlights.svg";
 import explore from "@/public/icons/explore.svg";
 import notification from "@/public/icons/notifcation.svg";
 import profile from "@/public/icons/profile.svg";
+import chatRoom from "@/public/icons/chat-room.svg";
 import { type } from "os";
 
 export const sidebarNav = [
@@ -43,6 +44,15 @@ export const sidebarNav = [
       icon: events,
       link: "/event",
       alt: "events",
+    },
+  },
+  {
+    type: "link",
+    data: {
+      title: "Chat-rooms",
+      icon: chatRoom,
+      link: "/chat-rooms",
+      alt: "chat rooms",
     },
   },
   {

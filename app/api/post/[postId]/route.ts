@@ -20,7 +20,7 @@ export async function GET(req: Request, params: Context) {
         deleted: false,
       },
       orderBy: {
-        id: "asc",
+        sequenceId: "desc",
       },
       include: {
         _count: {
@@ -49,7 +49,7 @@ export async function GET(req: Request, params: Context) {
             deleted: false,
           },
           orderBy: {
-            id: "asc",
+            sequenceId: "asc",
           },
           include: {
             _count: {

@@ -12,7 +12,6 @@ interface CommentBoxProps {
   userId: string;
   postId: string;
   postAuthor: string;
-  comments: CommentProps[] | null;
 }
 
 const CommentBox: React.FC<CommentBoxProps> = async ({
@@ -20,7 +19,6 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
   username,
   userId,
   postId,
-  comments,
   postAuthor,
 }) => {
   return (
@@ -38,24 +36,6 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
       <ScrollArea className="relative h-[calc(100vh-180px)]">
         <div className="absolute z-20 h-5 w-full bg-gradient-to-b from-background to-transparent" />
         <div className="absolute bottom-0 z-20 h-5 w-full bg-gradient-to-t from-background to-transparent" />
-        {/* {comments?.length !== 0 ? (
-          comments?.map((comment, index) => (
-            <CommentCard
-              key={comment.id}
-              comment={comment}
-              userId={userId}
-              postId={postId}
-              avatarUrl={avatarUrl}
-              username={username}
-              postAuthor={postAuthor}
-              className={cn(index === 0 && "mt-3")}
-            />
-          ))
-        ) : (
-          <div className="flex h-80 w-full items-center justify-center">
-            <h4 className="text-sm">No comments yet</h4>
-          </div>
-        )} */}
         <Comments
           userId={userId}
           avatarUrl={avatarUrl}

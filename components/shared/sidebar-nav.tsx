@@ -107,8 +107,8 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
                 <Image
                   src={item.data.icon}
                   priority
-                  width={28}
-                  height={28}
+                  width={24}
+                  height={24}
                   alt={item.data.alt}
                   className="mr-4 transition-all duration-300 group-hover:scale-105 group-active:scale-95"
                 />

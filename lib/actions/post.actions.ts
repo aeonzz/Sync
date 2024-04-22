@@ -76,7 +76,7 @@ export async function getPostById(postId: string, currentUserId: string) {
             deleted: false,
           },
           orderBy: {
-            id: "desc",
+            sequenceId: "desc"
           },
           include: {
             _count: {
@@ -105,7 +105,7 @@ export async function getPostById(postId: string, currentUserId: string) {
                 deleted: false,
               },
               orderBy: {
-                id: "asc",
+                sequenceId: "desc"
               },
               include: {
                 _count: {
