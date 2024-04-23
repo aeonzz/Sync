@@ -9,10 +9,21 @@ export type UserProps = {
   onboarded: boolean;
   createdAt: Date;
   updatedAt: Date;
+  _count: {
+    following: number;
+  };
   studentData: {
     firstName: string;
     middleName: string;
     lastName: string;
     department: string;
-  }
+  };
+  following: {
+    followerId: string;
+  }[];
+};
+
+export type UsersCardProps = {
+  user: UserProps;
+  isFollowedByCurrentUser: boolean;
 };

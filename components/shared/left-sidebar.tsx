@@ -11,7 +11,6 @@ const LeftSideBar = async () => {
   return (
     <aside className="sticky left-0 top-0 flex h-screen w-[270px] flex-col items-center justify-between space-y-7 p-5">
       <SideBarNav currentUserId={session.user.id} />
-      <UserNav />
     </aside>
   );
 };

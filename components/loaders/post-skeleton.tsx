@@ -12,15 +12,11 @@ const PostSkeleton = () => {
             <Skeleton className="mt-1 h-3 w-10" />
           </div>
         </div>
-        <div className="mt-[30px] flex flex-col gap-2">
-          <Skeleton className="h-5 w-full" />
-          <Skeleton className="h-5 w-[70%]" />
-          <Skeleton className="h-5 w-[50%]" />
-        </div>
         <div className="flex h-44 w-full gap-2">
           <Skeleton className="mt-[20px] flex-1" />
           <Skeleton className="mt-[20px] flex-1" />
         </div>
+        <Skeleton className="h-5 w-[50%] mt-3" />
       </div>
     </div>
   );

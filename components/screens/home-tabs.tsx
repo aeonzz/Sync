@@ -19,7 +19,7 @@ const HomeTabs: React.FC<HomeTabsProps> = ({ session, currentUserData }) => {
 
   return (
     <div className="relative">
-      <div className="sticky top-0 z-10 mb-4 flex h-14 w-full backdrop-blur-sm backdrop-filter dark:bg-background/50">
+      <div className="sticky top-0 z-10 mb-3 flex h-16 w-full backdrop-blur-sm backdrop-filter dark:bg-background/50">
         <Button
           variant="tab"
           value="feed"

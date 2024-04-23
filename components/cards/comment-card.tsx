@@ -113,7 +113,7 @@ const CommentCard: React.FC<CommentCardProps> = ({
             <HoverCardTrigger asChild>
               <Link href={`/u/${comment.user.id}`} className="group relative">
                 <div className="absolute z-10 rounded-full bg-card/30 opacity-0 transition group-hover:opacity-100" />
-                <Avatar>
+                <Avatar className="h-7 w-7">
                   <AvatarImage
                     src={comment.user.avatarUrl ?? undefined}
                     className="object-cover"

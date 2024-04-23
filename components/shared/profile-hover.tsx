@@ -53,6 +53,8 @@ const ProfileHover: React.FC<ProfileHoverProps> = ({
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       queryClient.invalidateQueries({ queryKey: ["feed"] });
       queryClient.invalidateQueries({ queryKey: ["followedPost"] });
+      queryClient.invalidateQueries({ queryKey: ["popular-users"] });
+      queryClient.invalidateQueries({ queryKey: ["reactors"] });
 
       if (!data?.data.isFollowedByCurrentUser) {
         const notificationData = {

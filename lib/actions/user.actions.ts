@@ -12,6 +12,12 @@ export async function getUserById(userId: string) {
       },
       include: {
         studentData: true,
+        following: true,
+        _count: {
+          select: {
+            following: true,
+          },
+        },
       },
     });
 
@@ -99,19 +105,21 @@ export async function resetPassword(
   }
 }
 
-export async function checkIfCurrentUserFollowedUser(followerId: string, followingId: string) {
+export async function checkIfCurrentUserFollowedUser(
+  followerId: string,
+  followingId: string,
+) {
   const likeRecord = await prisma.follows.findUnique({
     where: {
       followerId_followingId: {
         followerId,
         followingId,
-      }
+      },
     },
   });
 
   return likeRecord !== null;
 }
-
 
 export async function followUser(followerId: string, followingId: string) {
   try {

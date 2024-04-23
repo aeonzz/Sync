@@ -16,7 +16,16 @@ export async function GET(
         postId: postId,
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            following: true,
+            _count: {
+              select: {
+                following: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -30,7 +39,7 @@ export async function GET(
             },
           },
         });
-    
+
         return {
           ...reactor,
           isFollowedByCurrentUser: followRecord !== null,
