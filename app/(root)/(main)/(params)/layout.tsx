@@ -1,4 +1,3 @@
-import RightSideBar from "@/components/shared/right-sidebar";
 
 export default function ProfileLayout({
   children,

@@ -1,4 +1,3 @@
-import RightSideBar from "@/components/shared/right-sidebar";
 import CreatePost from "@/components/ui/create-post";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getUserById } from "@/lib/actions/user.actions";

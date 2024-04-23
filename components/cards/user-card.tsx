@@ -16,22 +16,38 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { NotificationType } from "@prisma/client";
 import { createNotification } from "@/lib/actions/notification.actions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface UserCardProps {
   user: UsersCardProps;
   currentUserId: string;
 }
 
-const UserCard: React.FC<UserCardProps> = ({
-  user,
-  currentUserId,
-}) => {
+const UserCard: React.FC<UserCardProps> = ({ user, currentUserId }) => {
   const queryClient = useQueryClient();
+  const [hoverText, setHoverText] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  async function handleFollow() {
+  async function handleFollow(
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) {
+    e.preventDefault();
+    setIsLoading(true);
     const response = await followUser(currentUserId, user.user.id);
 
     if (response.status === 200) {
+      setOpen(false);
+      setIsLoading(false);
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       queryClient.invalidateQueries({ queryKey: ["reactors"] });
       queryClient.invalidateQueries({ queryKey: ["popular-users"] });
@@ -48,6 +64,7 @@ const UserCard: React.FC<UserCardProps> = ({
         await createNotification(notificationData);
       }
     } else {
+      setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
         description:
           "An error occurred while making the request. Please try again later",
@@ -101,13 +118,42 @@ const UserCard: React.FC<UserCardProps> = ({
         {currentUserId !== user.user.id && (
           <Button
             size="sm"
-            variant={user.isFollowedByCurrentUser ? "secondary" : "default"}
+            variant={user.isFollowedByCurrentUser ? "outline" : "default"}
             className="!w-24"
-            onClick={() => handleFollow()}
+            onClick={(e) => {
+              user.isFollowedByCurrentUser ? setOpen(true) : handleFollow(e);
+            }}
+            onMouseEnter={() => setHoverText(user.isFollowedByCurrentUser ? true : false)}
+            onMouseLeave={() => setHoverText(false)}
           >
-            {user.isFollowedByCurrentUser ? <span>Unfollow</span> : <span>Follow</span>}
+            {hoverText ? (
+              <p className="text-red-500">Unfollow</p>
+            ) : (
+              <>{user.isFollowedByCurrentUser ? <p>Following</p> : <p>Follow</p>}</>
+            )}
           </Button>
         )}
+        <AlertDialog open={open} onOpenChange={setOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Unfollow user?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to unfollow this user? This action cannot
+                be undone and you will no longer see their posts or updates in
+                your feed.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={isLoading}
+                onClick={(e) => handleFollow(e)}
+              >
+                Unfollow
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

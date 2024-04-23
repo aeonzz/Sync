@@ -10,12 +10,12 @@ export default function FeedLayout({
   return (
     <section className="flex space-x-4">
       <div className="min-h-[400px] w-[550px]">{children}</div>
-      <div className="relative flex-1 border">
+      <div className="relative flex-1">
         <div className="sticky top-2 flex h-[calc(100vh-40px)] flex-col space-y-3 overflow-hidden rounded-md">
           <div className="w-full flex justify-end">
             <UserNav />
           </div>
-          <div className="flex w-full space-x-4">
+          <div className="flex w-full space-x-4 h-full">
             <RightSideBar />
             <div className="w-16 rounded-md bg-card"></div>
           </div>

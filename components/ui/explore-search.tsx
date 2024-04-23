@@ -30,7 +30,6 @@ const ExploreSearch = () => {
     PostProps[] | null
   >([]);
 
-  console.log(searchPostsResults);
 
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
