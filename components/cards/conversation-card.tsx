@@ -3,12 +3,45 @@
 import { UserProps } from "@/types/user";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
+import { createChannel } from "@/lib/actions/chat.actions";
+import { toast } from "sonner";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface ConversationCardProps {
   user: UserProps;
+  currentUserId: string;
+  setIsOpen: (state: boolean) => void;
 }
 
-const ConversationCard: React.FC<ConversationCardProps> = ({ user }) => {
+const ConversationCard: React.FC<ConversationCardProps> = ({
+  user,
+  currentUserId,
+  setIsOpen,
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleCreateChannel() {
+    setIsLoading(true);
+
+    const response = await createChannel(currentUserId, user.id);
+
+    if (!response.redirect && response.status === 200) {
+      setIsOpen(false);
+      setIsLoading(false);
+    } else if (response.redirect === true) {
+      setIsOpen(false);
+      router.push("/home");
+    } else {
+      setIsLoading(false);
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    }
+  }
+
   return (
     <div className="mb-2 flex items-center justify-between">
       <div className="flex items-center space-x-2">
@@ -27,7 +60,12 @@ const ConversationCard: React.FC<ConversationCardProps> = ({ user }) => {
           <p className="text-xs text-muted-foreground">{`${user.studentData.firstName} ${user.studentData.middleName.charAt(0).toUpperCase()} ${user.studentData.lastName}`}</p>
         </div>
       </div>
-      <Button variant="outline" size="sm">
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={isLoading}
+        onClick={handleCreateChannel}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"

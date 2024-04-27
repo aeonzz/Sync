@@ -13,16 +13,20 @@ import axios from "axios";
 import { UserProps } from "@/types/user";
 import { X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import ReactorSkeleton from "../loaders/reactor-skeleton";
 import FetchDataError from "./fetch-data-error";
 import { ScrollArea } from "./scroll-area";
-import { Button } from "./button";
 import ConversationCard from "../cards/conversation-card";
+import Loader from "../loaders/loader";
 
-const NewChat = () => {
+interface NewChatProps {
+  currentUserId: string;
+}
+
+const NewChat: React.FC<NewChatProps> = ({ currentUserId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const [searchUsersResults, setSearchUsersResults] = useState<
     UserProps[] | null
@@ -40,11 +44,9 @@ const NewChat = () => {
     queryKey: ["add-message-users"],
   });
 
-  console.log(data);
-
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
-      if (searchTerm.length) {
+      if (searchTerm.length && !searchTerm.startsWith(" ")) {
         setIsLoading(true);
         const response = await axios.get(`/api/search?q=${searchTerm}`);
         setSearchUsersResults(response.data.users);
@@ -58,7 +60,7 @@ const NewChat = () => {
   }, [searchTerm]);
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -97,6 +99,7 @@ const NewChat = () => {
             <Input
               placeholder="Search users..."
               autoComplete="off"
+              autoFocus
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-7 rounded-none border-none bg-transparent pl-0 ring-offset-transparent transition focus-visible:ring-0 focus-visible:ring-transparent"
@@ -104,11 +107,26 @@ const NewChat = () => {
           </div>
         </DialogHeader>
         <div className="space-y-2">
-          {searchUsersResults && searchUsersResults.length > 0 ? (
+          {searchTerm && searchTerm.length > 0 ? (
             <>
               <h4 className="text-left text-base font-semibold">Users</h4>
-              {searchUsersResults.map((user, index) => (
-                <ConversationCard key={index} user={user} />
+              {!isLoading && searchUsersResults?.length === 0 && (
+                <div className="w-full py-3 text-center">
+                  <h4 className="w-full text-sm">No results</h4>
+                </div>
+              )}
+              {isLoading && (
+                <div className="flex items-center justify-center py-5">
+                  <Loader className="!bg-primary" />
+                </div>
+              )}
+              {searchUsersResults?.map((user, index) => (
+                <ConversationCard
+                  key={index}
+                  user={user}
+                  currentUserId={currentUserId}
+                  setIsOpen={setIsOpen}
+                />
               ))}
             </>
           ) : (
@@ -127,7 +145,12 @@ const NewChat = () => {
               ) : (
                 <ScrollArea className="max-h-60">
                   {data?.map((user, index) => (
-                    <ConversationCard key={index} user={user} />
+                    <ConversationCard
+                      key={index}
+                      user={user}
+                      currentUserId={currentUserId}
+                      setIsOpen={setIsOpen}
+                    />
                   ))}
                 </ScrollArea>
               )}

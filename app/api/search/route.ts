@@ -6,6 +6,7 @@ export async function GET(req: Request) {
   const searchTerm = searchParams.get("q");
 
   try {
+    
     if (!searchTerm)
       return NextResponse.json(
         { message: "An internal server error occurred" },
