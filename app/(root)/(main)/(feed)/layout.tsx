@@ -7,10 +7,11 @@ export default function FeedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <section className="flex space-x-4">
-      <div className="min-h-[400px] w-[550px]">{children}</div>
-      <div className="relative flex-1">
+      <div className="min-h-[400px] w-auto">{children}</div>
+      <div className="relative flex-1 border border-white">
         <div className="sticky top-2 flex h-[calc(100vh-40px)] flex-col space-y-3 overflow-hidden rounded-md">
           <div className="w-full flex justify-end">
             <UserNav />

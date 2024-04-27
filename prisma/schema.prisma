@@ -11,27 +11,28 @@ datasource db {
 }
 
 model User {
-  id                       String         @id @default(uuid())
-  studentId                Int            @unique
-  email                    String         @unique
-  username                 String?        @unique
+  id                       String          @id @default(uuid())
+  studentId                Int             @unique
+  email                    String          @unique
+  username                 String?         @unique
   password                 String
   avatarUrl                String?
-  coverUrl                 String         @default("https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/26993850_369183360223308_167538467966553831_n.png")
-  bio                      String?        @db.Text
-  onboarded                Boolean        @default(false)
-  createdAt                DateTime       @default(now()) @db.Timestamp(6)
-  updatedAt                DateTime       @updatedAt @db.Timestamp(6)
-  resetPasswordToken       String?        @unique
+  coverUrl                 String          @default("https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/26993850_369183360223308_167538467966553831_n.png")
+  bio                      String?         @db.Text
+  onboarded                Boolean         @default(false)
+  createdAt                DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt                DateTime        @updatedAt @db.Timestamp(6)
+  resetPasswordToken       String?         @unique
   resetPasswordTokenExpiry DateTime?
   post                     Post[]
-  studentData              StudentData    @relation(fields: [studentId], references: [studentId])
+  studentData              StudentData     @relation(fields: [studentId], references: [studentId])
   comment                  Comment[]
   postLike                 PostLike[]
   commentLike              CommentLike[]
-  followers                Follows[]      @relation("followsMeList")
-  following                Follows[]      @relation("iFollowList")
+  followers                Follows[]       @relation("followsMeList")
+  following                Follows[]       @relation("iFollowList")
   Notification             Notification[]
+  ChannelMember            ChannelMember[]
 }
 
 model Follows {
@@ -137,6 +138,34 @@ model CommentLike {
   user      User    @relation(fields: [userId], references: [id])
 
   @@unique([userId, commentId])
+}
+
+model Channel {
+  id             String          @id @default(uuid())
+  senderId       String?
+  receiverId     String?
+  createdAt      DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime        @updatedAt @db.Timestamp(6)
+  messages       Message[]
+  ChannelMembers ChannelMember[]
+
+  @@unique([senderId, receiverId])
+}
+
+model ChannelMember {
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  channelId String
+  channel   Channel @relation(fields: [channelId], references: [id])
+
+  @@id([userId, channelId])
+}
+
+model Message {
+  id        String  @id @default(uuid())
+  channel   Channel @relation(fields: [channelId], references: [id])
+  channelId String
+  text      String
 }
 
 enum NotificationType {

@@ -34,6 +34,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
+  const isChatRoom = pathname === "/chat-rooms";
 
   const {
     data: notifications,
@@ -82,12 +83,17 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
   }, [currentUserId]);
 
   return (
-    <div className="flex h-auto w-full flex-col items-start space-y-3">
+    <div
+      className={cn(
+        isChatRoom ? "w-24" : "w-[270px]",
+        "flex h-auto flex-col items-start space-y-2 p-5 transition-all duration-300",
+      )}
+    >
       <Link
         href="/home"
         className="mb-2 w-full scroll-m-20 pl-5 text-3xl font-semibold tracking-tight first:mt-0"
       >
-        Sync
+        {isChatRoom ? "S" : "Sync"}
       </Link>
       <>
         {sidebarNav.map((item, index) => {
@@ -110,9 +116,13 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
                   width={24}
                   height={24}
                   alt={item.data.alt}
-                  className="mr-4 transition-all duration-300 group-hover:scale-105 group-active:scale-95"
+                  className="transition-all duration-300 group-hover:scale-105 group-active:scale-95"
                 />
-                {item.data.title}
+                <span
+                  className={cn(isChatRoom && "opacity-0 duration-300", "ml-4")}
+                >
+                  {item.data.title}
+                </span>
               </Link>
             );
           } else if (item.type === "button") {
@@ -125,27 +135,27 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
                     setOpen(true);
                   }
                 }}
-                className="group flex w-full justify-start py-6 text-base tracking-tight active:text-slate-400"
+                className={cn(
+                  "group flex w-full justify-start py-6 text-base tracking-tight active:text-slate-400",
+                )}
               >
-                <div className="relative w-auto">
-                  {hasActiveNotifications && (
-                    <div className="absolute left-0 top-0">
-                      <span className="relative flex h-3 w-3">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
-                      </span>
-                    </div>
-                  )}
-                  <Image
-                    src={item.data.icon}
-                    width={28}
-                    height={28}
-                    alt={item.data.alt}
-                    priority
-                    className="mr-4 transition-all duration-300 group-hover:scale-105 group-active:scale-95"
-                  />
-                </div>
-                {item.data.title}
+                {hasActiveNotifications && (
+                  <div className="absolute left-0 top-0">
+                    <span className="relative flex h-3 w-3">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+                    </span>
+                  </div>
+                )}
+                <Image
+                  src={item.data.icon}
+                  width={24}
+                  height={24}
+                  alt={item.data.alt}
+                  priority
+                  className="transition-all duration-300 group-hover:scale-105 group-active:scale-95"
+                />
+                {!isChatRoom && <span className="ml-4">{item.data.title}</span>}
               </Button>
             );
           } else {

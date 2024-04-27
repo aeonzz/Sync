@@ -18,7 +18,7 @@ const HomeTabs: React.FC<HomeTabsProps> = ({ session, currentUserData }) => {
   const [isActive, setIsActive] = useState("feed");
 
   return (
-    <div className="relative">
+    <div className="relative w-[550px]">
       <div className="sticky top-0 z-10 mb-3 flex h-16 w-full backdrop-blur-sm backdrop-filter dark:bg-background/50">
         <Button
           variant="tab"

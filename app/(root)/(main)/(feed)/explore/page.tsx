@@ -24,9 +24,9 @@ export default async function Home() {
   }
 
   return (
-    <>
+    <div className="w-[550px]">
       <ExploreSearch />
       <ExplorePage session={session} />
-    </>
+    </div>
   );
 }
