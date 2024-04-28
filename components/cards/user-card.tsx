@@ -51,6 +51,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, currentUserId }) => {
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       queryClient.invalidateQueries({ queryKey: ["reactors"] });
       queryClient.invalidateQueries({ queryKey: ["popular-users"] });
+      queryClient.invalidateQueries({ queryKey: ["add-message-users"] });
 
       if (!user.isFollowedByCurrentUser) {
         const notificationData = {

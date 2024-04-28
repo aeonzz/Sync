@@ -34,7 +34,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
-  const isChatRoom = pathname === "/chat-rooms";
+  const isChatRoom = pathname.startsWith("/chat-rooms");
 
   const {
     data: notifications,
@@ -104,7 +104,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
                 href={item.data.link}
                 className={cn(
                   buttonVariants({ variant: "ghost" }),
-                  pathname === item.data.link
+                  pathname.startsWith(item.data.link)
                     ? "bg-primary hover:bg-primary"
                     : undefined,
                   "group flex w-full justify-start py-6 text-base tracking-tight active:text-slate-400",

@@ -14,24 +14,31 @@ export async function GET(req: Request) {
   }
 
   try {
-    const chats = await prisma.channel.findMany({
+    const channels = await prisma.channelMember.findMany({
       where: {
-        OR: [
-          {
-            senderId: session.user.id,
+        userId: session.user.id,
+      },
+      select: {
+        channel: {
+          include: {
+            members: {
+              select: {
+                user: true,
+              },
+            },
           },
-          {
-            receiverId: session.user.id,
-          },
-        ],
+        },
       },
     });
 
-    return NextResponse.json({ chats }, { status: 200 });
+    return NextResponse.json(
+      { channels: channels.map((channel) => channel.channel) },
+      { status: 200 },
+    );
   } catch (error: any) {
     console.log(error);
     return NextResponse.json(
-      { message: "Could not get post" },
+      { message: "Could not get chat" },
       { status: 500 },
     );
   }

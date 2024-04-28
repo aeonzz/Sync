@@ -1,28 +1,49 @@
 "use server";
 
-import { error } from "console";
 import prisma from "../db";
-import { redirect } from "next/navigation";
+import { ChannelType } from "@prisma/client";
 
-export async function createChannel(senderId: string, receiverId: string) {
+export async function createChannel(to: string, from: string) {
   try {
-    const hasChannelRecord = await prisma.channel.findUnique({
+    const existingChannel = await prisma.channel.findFirst({
       where: {
-        senderId_receiverId: {
-          senderId,
-          receiverId,
+        members: {
+          every: {
+            userId: {
+              in: [to, from],
+            },
+          },
         },
       },
-    });
-
-    if (hasChannelRecord) return { redirect: true, error: null, status: 200 };
-
-    await prisma.channel.create({
-      data: {
-        senderId,
-        receiverId,
+      include: {
+        members: true,
       },
     });
+
+    const doesChannelExist = Boolean(existingChannel);
+    if (doesChannelExist) return { redirect: true, error: null, status: 200 };
+
+    const channel = await prisma.channel.create({
+      data: {
+        isAccepted: true,
+        type: ChannelType.PRIVATE,
+      },
+    });
+
+    await prisma.channelMember.create({
+      data: {
+        userId: to,
+        channelId: channel.id,
+      },
+    });
+
+    await prisma.channelMember.create({
+      data: {
+        userId: from,
+        channelId: channel.id,
+      },
+    });
+
     return { redirect: false, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);

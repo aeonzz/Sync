@@ -32,6 +32,7 @@ model User {
   followers                Follows[]       @relation("followsMeList")
   following                Follows[]       @relation("iFollowList")
   Notification             Notification[]
+  Message                  Message[]
   ChannelMember            ChannelMember[]
 }
 
@@ -141,15 +142,13 @@ model CommentLike {
 }
 
 model Channel {
-  id             String          @id @default(uuid())
-  senderId       String?
-  receiverId     String?
-  createdAt      DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt      DateTime        @updatedAt @db.Timestamp(6)
-  messages       Message[]
-  ChannelMembers ChannelMember[]
-
-  @@unique([senderId, receiverId])
+  id            String          @id @default(uuid())
+  type          ChannelType
+  isAccepted    Boolean         @default(false)
+  createdAt     DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime        @updatedAt @db.Timestamp(6)
+  messages      Message[]
+  members ChannelMember[]
 }
 
 model ChannelMember {
@@ -164,6 +163,8 @@ model ChannelMember {
 model Message {
   id        String  @id @default(uuid())
   channel   Channel @relation(fields: [channelId], references: [id])
+  sender    User    @relation(fields: [senderId], references: [id])
+  senderId  String
   channelId String
   text      String
 }
@@ -173,4 +174,9 @@ enum NotificationType {
   POST
   LIKE
   FOLLOW
+}
+
+enum ChannelType {
+  PRIVATE
+  GROUP
 }

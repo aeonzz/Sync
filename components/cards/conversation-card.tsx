@@ -7,6 +7,7 @@ import { createChannel } from "@/lib/actions/chat.actions";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ConversationCardProps {
   user: UserProps;
@@ -21,13 +22,15 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   async function handleCreateChannel() {
     setIsLoading(true);
 
-    const response = await createChannel(currentUserId, user.id);
+    const response = await createChannel(user.id, currentUserId);
 
     if (!response.redirect && response.status === 200) {
+      queryClient.invalidateQueries({ queryKey: ["chat-cards"] });
       setIsOpen(false);
       setIsLoading(false);
     } else if (response.redirect === true) {
@@ -96,7 +99,7 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
             strokeLinejoin="round"
           />
         </svg>
-        Start conversation
+        Message
       </Button>
     </div>
   );
