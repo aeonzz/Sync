@@ -13,35 +13,29 @@ interface ChatCardProps {
 
 const ChatCard: React.FC<ChatCardProps> = ({ channel, currentUserId }) => {
   const pathname = usePathname();
+  const chatPartner = channel.members[0];
 
   return (
-    <>
-      {channel.members.map(
-        (member) =>
-          member.user.id !== currentUserId && (
-            <Link
-              href={`/chat-rooms/c/${channel.id}`}
-              className={cn(
-                buttonVariants({ variant: "ghost" }),
-                pathname === `/chat-rooms/c/${channel.id}` && "bg-accent/50",
-                "flex justify-start gap-2 py-7",
-              )}
-            >
-              <Avatar>
-                <AvatarImage
-                  src={member.user.avatarUrl ?? undefined}
-                  className="object-cover"
-                  alt={member.user.avatarUrl ?? undefined}
-                />
-                <AvatarFallback>
-                  {member.user.username?.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <p className="text-xs">{member.user.username}</p>
-            </Link>
-          ),
+    <Link
+      href={`/chat-rooms/${channel.id}`}
+      className={cn(
+        buttonVariants({ variant: "ghost" }),
+        pathname === `/chat-rooms/${channel.id}` && "bg-accent/20",
+        "flex justify-start gap-2 py-7",
       )}
-    </>
+    >
+      <Avatar>
+        <AvatarImage
+          src={chatPartner.user.avatarUrl ?? undefined}
+          className="object-cover"
+          alt={chatPartner.user.avatarUrl ?? undefined}
+        />
+        <AvatarFallback>
+          {chatPartner.user.username?.charAt(0).toUpperCase()}
+        </AvatarFallback>
+      </Avatar>
+      <p className="text-xs">{chatPartner.user.username}</p>
+    </Link>
   );
 };
 

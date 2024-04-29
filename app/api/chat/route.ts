@@ -3,6 +3,7 @@ import prisma from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
 
@@ -22,7 +23,12 @@ export async function GET(req: Request) {
         channel: {
           include: {
             members: {
-              select: {
+              where: {
+                userId: {
+                  not: session.user.id,
+                },
+              },
+              include: {
                 user: true,
               },
             },

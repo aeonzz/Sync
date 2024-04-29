@@ -50,3 +50,49 @@ export async function createChannel(to: string, from: string) {
     return { redirect: false, error: error.message, status: 500 };
   }
 }
+
+export async function getChannelById(channelId: string, currentUserId: string) {
+  try {
+    const channel = await prisma.channel.findFirst({
+      where: {
+        id: channelId,
+      },
+      include: {
+        members: {
+          where: {
+            userId: {
+              not: currentUserId,
+            },
+          },
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    return { data: channel, error: null, status: 200 };
+  } catch (error: any) {
+    return { data: null, error: error.message, status: 500 };
+  }
+}
+
+export async function createMessage(
+  text: string,
+  channelId: string,
+  senderId: string,
+) {
+  const message = await prisma.message.create({
+    data: {
+      channelId: channelId,
+      senderId: senderId,
+      text: text,
+    },
+  });
+
+  try {
+    return { data: message, error: null, status: 200 };
+  } catch (error: any) {
+    return { data: null, error: error.message, status: 500 };
+  }
+}

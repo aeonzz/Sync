@@ -142,13 +142,13 @@ model CommentLike {
 }
 
 model Channel {
-  id            String          @id @default(uuid())
-  type          ChannelType
-  isAccepted    Boolean         @default(false)
-  createdAt     DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt     DateTime        @updatedAt @db.Timestamp(6)
-  messages      Message[]
-  members ChannelMember[]
+  id         String          @id @default(uuid())
+  type       ChannelType
+  isAccepted Boolean         @default(false)
+  createdAt  DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime        @updatedAt @db.Timestamp(6)
+  messages   Message[]
+  members    ChannelMember[]
 }
 
 model ChannelMember {
@@ -161,12 +161,13 @@ model ChannelMember {
 }
 
 model Message {
-  id        String  @id @default(uuid())
-  channel   Channel @relation(fields: [channelId], references: [id])
-  sender    User    @relation(fields: [senderId], references: [id])
-  senderId  String
-  channelId String
-  text      String
+  id         String  @id @default(uuid())
+  sequenceId Int     @default(autoincrement())
+  channel    Channel @relation(fields: [channelId], references: [id])
+  sender     User    @relation(fields: [senderId], references: [id])
+  senderId   String
+  channelId  String
+  text       String
 }
 
 enum NotificationType {
