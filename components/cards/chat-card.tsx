@@ -21,10 +21,10 @@ const ChatCard: React.FC<ChatCardProps> = ({ channel, currentUserId }) => {
       className={cn(
         buttonVariants({ variant: "ghost" }),
         pathname === `/chat-rooms/${channel.id}` && "bg-accent/20",
-        "flex justify-start gap-2 py-7",
+        "flex justify-start gap-2 py-6",
       )}
     >
-      <Avatar>
+      <Avatar className="h-7 w-7">
         <AvatarImage
           src={chatPartner.user.avatarUrl ?? undefined}
           className="object-cover"
@@ -34,7 +34,7 @@ const ChatCard: React.FC<ChatCardProps> = ({ channel, currentUserId }) => {
           {chatPartner.user.username?.charAt(0).toUpperCase()}
         </AvatarFallback>
       </Avatar>
-      <p className="text-xs">{chatPartner.user.username}</p>
+      <p className="text-sm">{chatPartner.user.username}</p>
     </Link>
   );
 };

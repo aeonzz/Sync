@@ -1,20 +1,21 @@
 "use client";
 
-import { MessageProps } from "@/types/message";
-import { useQuery } from "@tanstack/react-query";
+import { MessageProps, MessageVariable } from "@/types/message";
+import { useMutationState, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useEffect, useRef } from "react";
 import MessageCard from "../cards/message-card";
 import { ScrollArea } from "./scroll-area";
+import { UserProps } from "@/types/user";
 
 interface ChatMessagesProps {
   channelId: string;
-  currentUserId: string;
+  currentUser: UserProps;
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   channelId,
-  currentUserId,
+  currentUser,
 }) => {
   const messageEndRef = useRef<HTMLInputElement>(null);
 
@@ -26,26 +27,42 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     queryKey: ["messages"],
   });
 
+  const variables = useMutationState<MessageVariable>({
+    filters: { mutationKey: ["add-message"], status: "pending" },
+    // @ts-ignore
+    select: (mutation) => mutation.state.variables,
+  });
+
   const scrollTobottom = () => {
-    messageEndRef.current?.scrollIntoView({ behavior: "instant" });
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
     scrollTobottom();
-  }, [data]);
+  }, [data, variables]);
 
   return (
     <ScrollArea className="h-full">
       {data?.map((message, index) => (
         <MessageCard
-          key={message.id}
+          key={index}
           messages={data}
           index={index}
           message={message}
-          currentUserId={currentUserId}
+          currentUser={currentUser}
         />
       ))}
-      <div ref={messageEndRef}></div>
+      <div ref={messageEndRef}>
+        {/* {variables.map((variable, index) => (
+          <MessageCard
+            key={index}
+            messages={data}
+            index={index}
+            message={variable}
+            currentUserId={currentUserId}
+          />
+        ))} */}
+      </div>
     </ScrollArea>
   );
 };

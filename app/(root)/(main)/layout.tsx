@@ -10,7 +10,7 @@ export default async function MainLayout({
   return (
     <main className="container relative flex h-auto justify-between px-0">
       <LeftSideBar />
-      <div className="flex-1 pr-4">{children}</div>
+      <div className="flex-1">{children}</div>
     </main>
   );
 }

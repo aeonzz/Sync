@@ -22,6 +22,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ channelId, currentUserId }) => {
   const [input, setInput] = useState<string>("");
 
   const { isPending, variables, mutate } = useMutation({
+    mutationKey: ["add-message"],
     mutationFn: (newMessage: NewMessage) => {
       return axios.post(`/api/chat/${channelId}`, newMessage);
     },
@@ -47,7 +48,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ channelId, currentUserId }) => {
   }
 
   return (
-    <div>
+    <div className="px-4">
       <TextareaAutosize
         ref={textareaRef}
         autoFocus
@@ -60,6 +61,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ channelId, currentUserId }) => {
           }
         }}
         rows={1}
+        maxRows={10}
         placeholder="Write a message..."
         className="flex h-auto w-full resize-none rounded-md border-input bg-input px-5 py-4 text-sm shadow-sm ring-offset-background transition duration-300 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
       />

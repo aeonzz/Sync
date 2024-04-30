@@ -161,10 +161,12 @@ model ChannelMember {
 }
 
 model Message {
-  id         String  @id @default(uuid())
-  sequenceId Int     @default(autoincrement())
-  channel    Channel @relation(fields: [channelId], references: [id])
-  sender     User    @relation(fields: [senderId], references: [id])
+  id         String   @id @default(uuid())
+  sequenceId Int      @default(autoincrement())
+  channel    Channel  @relation(fields: [channelId], references: [id])
+  sender     User     @relation(fields: [senderId], references: [id])
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime @updatedAt @db.Timestamp(6)
   senderId   String
   channelId  String
   text       String

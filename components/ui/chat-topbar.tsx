@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader } from "./card";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { ChannelProps } from "@/types/channel";
 
@@ -10,8 +9,8 @@ const ChatTopBar: React.FC<ChatTopBarProps> = ({ channel }) => {
   const chatPartner = channel.members[0];
 
   return (
-    <Card className="flex h-16 mb-2 w-full items-center px-4">
-      <div className="flex space-x-2 items-center">
+    <div className="flex h-16 w-full items-center p-4 border-b">
+      <div className="flex items-center space-x-2">
         <Avatar className="h-8 w-8">
           <AvatarImage
             src={chatPartner.user.avatarUrl ?? undefined}
@@ -22,9 +21,9 @@ const ChatTopBar: React.FC<ChatTopBarProps> = ({ channel }) => {
             {chatPartner.user.username?.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
-        <p className="text-xs">{chatPartner.user.username}</p>
+        <p className="text-base">{chatPartner.user.username}</p>
       </div>
-    </Card>
+    </div>
   );
 };
 

@@ -7,4 +7,10 @@ export type MessageProps = {
   channelId: string;
   text: string;
   sender: UserProps;
+  createdAt: Date;
+};
+
+export type MessageVariable = {
+  userId: string;
+  text: string;
 };

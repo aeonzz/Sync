@@ -29,7 +29,7 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ currentUserId }) => {
   });
 
   return (
-    <div className="mt-5 h-auto w-[250px]">
+    <div className="pt-5 h-auto w-[262px] border-x px-3">
       <div className="mb-6 flex justify-between pt-1">
         <h3 className="ml-3 scroll-m-20 text-xl font-semibold tracking-tight">
           Chat rooms

@@ -15,9 +15,9 @@ export default async function ChatLayout({
   }
 
   return (
-    <section className="sticky top-0 flex space-x-4 h-auto w-[900px]">
+    <section className="sticky top-0 flex h-auto w-full">
       <ChatMenu currentUserId={session.user.id} />
-      <div className="h-screen flex-1">{children}</div>
+      <div className="h-screen flex-1 ">{children}</div>
     </section>
   );
 }
