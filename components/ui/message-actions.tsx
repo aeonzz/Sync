@@ -46,12 +46,12 @@ const MessageActions: React.FC<MessageActionsProps> = ({
                 <EmojiPicker
                   isLoading={isLoading}
                   handleEmojiClick={handleEmojiClick2}
-                  side="top"
+                  side="left"
                 />  
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Edit</p>
+              <p>Add Reaction</p>
             </TooltipContent>
           </Tooltip>
           {isSender ? (

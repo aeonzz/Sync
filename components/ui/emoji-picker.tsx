@@ -36,7 +36,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
         <Button
           className={cn(
             openEmojiPicker && "bg-yellow-500/15",
-            "group rounded-full transition-all hover:bg-yellow-500/15 active:scale-95",
+            "group transition-all hover:bg-yellow-500/15",
           )}
           size="icon"
           variant="ghost"
@@ -48,8 +48,8 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
         >
           <SmilePlus
             className={cn(
-              openEmojiPicker ? "text-yellow-500/70" : "text-slate-500",
-              "group-hover:text-yellow-500/70",
+              openEmojiPicker && "text-yellow-500/70",
+              "h-4 w-4 group-hover:text-yellow-500/70",
             )}
           />
         </Button>

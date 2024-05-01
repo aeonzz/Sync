@@ -1,7 +1,5 @@
-import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { ChatValidation } from "@/lib/validations/chat";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 interface Context {
@@ -12,19 +10,28 @@ interface Context {
 
 export async function GET(req: Request, params: Context) {
   const { channelId } = params.params;
+  const url = new URL(req.url);
+  const cursorParam = url.searchParams.get("cursor");
+  const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
+
   try {
     const messages = await prisma.message.findMany({
       where: {
         channelId: channelId,
+        sequenceId: cursor ? { lt: cursor } : undefined,
       },
       orderBy: {
-        sequenceId: "asc",
+        sequenceId: "desc",
       },
       include: {
         sender: true,
       },
+      take: 20,
     });
-    return NextResponse.json({ messages }, { status: 200 });
+    const lastMessage = messages[messages.length - 1];
+    const nextCursor = lastMessage?.sequenceId || undefined;
+
+    return NextResponse.json({ messages, nextCursor }, { status: 200 });
   } catch (error: any) {
     console.log(error);
     return NextResponse.json(
