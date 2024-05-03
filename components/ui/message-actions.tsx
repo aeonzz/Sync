@@ -22,11 +22,13 @@ import EmojiPicker from "./emoji-picker";
 interface MessageActionsProps {
   currentUser: UserProps;
   senderId: string;
+  setIsEditing: (state: boolean) => void;
 }
 
 const MessageActions: React.FC<MessageActionsProps> = ({
   currentUser,
   senderId,
+  setIsEditing,
 }) => {
   const isSender = currentUser.id === senderId;
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +49,7 @@ const MessageActions: React.FC<MessageActionsProps> = ({
                   isLoading={isLoading}
                   handleEmojiClick={handleEmojiClick2}
                   side="left"
-                />  
+                />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -57,7 +59,11 @@ const MessageActions: React.FC<MessageActionsProps> = ({
           {isSender ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsEditing(true)}
+                >
                   <Pencil className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>

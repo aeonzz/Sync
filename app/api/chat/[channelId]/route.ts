@@ -1,4 +1,5 @@
 import prisma from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
 import { ChatValidation } from "@/lib/validations/chat";
 import { NextResponse } from "next/server";
 
@@ -26,7 +27,7 @@ export async function GET(req: Request, params: Context) {
       include: {
         sender: true,
       },
-      take: 20,
+      take: 40,
     });
     const lastMessage = messages[messages.length - 1];
     const nextCursor = lastMessage?.sequenceId || undefined;
@@ -54,7 +55,12 @@ export async function POST(req: Request, params: Context) {
         senderId: senderId,
         text: text,
       },
+      include: {
+        sender: true,
+      },
     });
+
+    pusherServer.trigger("messages", "incoming-message", newMessage);
 
     return NextResponse.json({ newMessage }, { status: 200 });
   } catch (error: any) {

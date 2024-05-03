@@ -72,6 +72,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
 
     pusherClient.bind("incoming-notification", (data: NotificationProps) => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      console.log(data)
       if (data.recipientId === currentUserId) {
         toast(<NotificationCard notification={data} setOpen={setOpen} />);
       }

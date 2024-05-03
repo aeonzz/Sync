@@ -1,8 +1,7 @@
-import ChatInput from "@/components/ui/chat-input";
+import ChatInput from "@/components/forms/chat-input";
 import ChatMessages from "@/components/ui/chat-messages";
 import ChatTopBar from "@/components/ui/chat-topbar";
 import FetchDataError from "@/components/ui/fetch-data-error";
-import Hh from "@/components/ui/hh";
 import { getChannelById } from "@/lib/actions/chat.actions";
 import { getUserById } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";
@@ -42,10 +41,12 @@ const Chat: React.FC<ChatProps> = async ({ params }) => {
   return (
     <div className="flex h-screen flex-col pb-3">
       <ChatTopBar channel={channel.data} />
-      {/* <ChatMessages channelId={channelId} currentUser={currentUser.data} /> */}
-
-      <Hh channel={channel.data} currentUser={currentUser.data} />
-      <ChatInput channelId={channelId} currentUserId={session.user.id} />
+      <ChatMessages channel={channel.data} currentUser={currentUser.data} />
+      <ChatInput
+        channelId={channelId}
+        currentUserId={session.user.id}
+        className="px-4"
+      />
     </div>
   );
 };
