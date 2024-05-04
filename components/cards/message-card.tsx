@@ -14,7 +14,7 @@ interface MessageCardProps {
   index: number;
   channelId: string;
   isEditing: boolean;
-  onStartEditing: (state: boolean) => void
+  setIsEditing: (messageId: string | null) => void;
 }
 
 const MessageCard: React.FC<MessageCardProps> = ({
@@ -24,7 +24,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
   currentUser,
   channelId,
   isEditing,
-  onStartEditing,
+  setIsEditing,
 }) => {
   const sentAt = new Date(message.createdAt);
   const formatSentAt = format(sentAt, "Pp");
@@ -51,8 +51,9 @@ const MessageCard: React.FC<MessageCardProps> = ({
       className={cn(
         hasNextMessageFromSameUserAndIsSameTime ? "mb-0" : "mb-0 mt-4",
         messageAction && "bg-card/50",
+        isEditing && "bg-card/50",
         message.text.length > 200 && "pb-1",
-        "relative flex items-center pl-1 transition-colors",
+        "relative flex pl-1 transition-colors",
       )}
       onMouseEnter={() => setMessageAction(true)}
       onMouseLeave={() => setMessageAction(false)}
@@ -61,10 +62,11 @@ const MessageCard: React.FC<MessageCardProps> = ({
         <MessageActions
           currentUser={currentUser}
           senderId={message.senderId}
-          setIsEditing={onStartEditing}
+          setIsEditing={setIsEditing}
+          messageId={message.id}
         />
       )}
-      <div className="flex w-14 justify-end">
+      <div className="flex w-14 items-center justify-end">
         {hasNextMessageFromSameUserAndIsSameTime && messageAction ? (
           <span className="inline-flex h-8 items-center text-xs font-light text-muted-foreground">
             {format(sentAt, "p")}
@@ -73,7 +75,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
           <Avatar
             className={cn(
               hasNextMessageFromSameUserAndIsSameTime && "invisible",
-              "h-8 w-8",
+              "h-8 w-8 self-start",
             )}
           >
             <AvatarImage
@@ -90,7 +92,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
       <div
         className={cn(
           !hasNextMessageFromSameUserAndIsSameTime && "mb-1",
-          "h-auto w-[calc(100%-100px)] overflow-hidden rounded-md px-4",
+          "flex h-auto w-[calc(100%-100px)] flex-col items-start justify-center overflow-hidden px-4",
         )}
       >
         {!hasNextMessageFromSameUserAndIsSameTime && (
@@ -107,6 +109,8 @@ const MessageCard: React.FC<MessageCardProps> = ({
             currentUserId={currentUser.id}
             isEditing={isEditing}
             isEditingData={message}
+            setIsEditing={setIsEditing}
+            className="w-full"
           />
         ) : (
           <p className="whitespace-pre-wrap break-words break-all text-sm font-light">

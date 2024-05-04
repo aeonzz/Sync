@@ -22,12 +22,14 @@ import EmojiPicker from "./emoji-picker";
 interface MessageActionsProps {
   currentUser: UserProps;
   senderId: string;
-  setIsEditing: (state: boolean) => void;
+  messageId: string;
+  setIsEditing: (messageId: string | null) => void
 }
 
 const MessageActions: React.FC<MessageActionsProps> = ({
   currentUser,
   senderId,
+  messageId,
   setIsEditing,
 }) => {
   const isSender = currentUser.id === senderId;
@@ -62,7 +64,7 @@ const MessageActions: React.FC<MessageActionsProps> = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setIsEditing(true)}
+                  onClick={() => setIsEditing(messageId)}
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>

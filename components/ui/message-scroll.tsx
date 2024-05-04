@@ -18,7 +18,10 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
 }) => {
   const [newMessages, setNewMessages] = useState<MessageProps[]>([]);
   const messageEndRef = useRef<HTMLDivElement>(null);
-  const [editingMessageIndex, setEditingMessageIndex] = useState<number | null>(null);
+  const [editingMessageIndex, setEditingMessageIndex] = useState<number | null>(
+    null,
+  );
+  const [isEditing, setIsEditing] = useState<string | null>(null);
 
   const handleStartEditing = (index: number) => {
     setEditingMessageIndex(index);
@@ -42,7 +45,7 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
     pusherClient.subscribe("messages");
 
     pusherClient.bind("incoming-message", (data: MessageProps) => {
-      console.log(data)
+      console.log(data);
       setNewMessages((prev) => [...prev, data]);
     });
 
@@ -61,8 +64,8 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
           message={message}
           currentUser={currentUser}
           channelId={channelId}
-          isEditing={editingMessageIndex === index}
-          onStartEditing={() => handleStartEditing(index)}
+          isEditing={isEditing === message.id}
+          setIsEditing={setIsEditing}
         />
       ))}
       {newMessages.map((message, index) => (
@@ -73,8 +76,8 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
           message={message}
           currentUser={currentUser}
           channelId={channelId}
-          isEditing={editingMessageIndex === index}
-          onStartEditing={() => handleStartEditing(index)}
+          isEditing={isEditing === message.id}
+          setIsEditing={setIsEditing}
         />
       ))}
       <div ref={messageEndRef}></div>
