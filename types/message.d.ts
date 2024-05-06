@@ -10,6 +10,10 @@ export type MessageProps = {
   deleted: boolean;
   createdAt: Date;
   updatedAt: Date;
+  messageReaction: {
+    reaction: string;
+    user: UserProps;
+  };
 };
 
 export type MessageVariable = {

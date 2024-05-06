@@ -26,6 +26,11 @@ export async function GET(req: Request, params: Context) {
       },
       include: {
         sender: true,
+        messageReaction: {
+          include: {
+            user: true,
+          },
+        },
       },
       take: 40,
     });

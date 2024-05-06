@@ -1,26 +1,15 @@
 "use client";
 
-import { useMutationSuccess } from "@/context/store";
 import { UserProps } from "@/types/user";
 import {
   useInfiniteQuery,
-  useMutationState,
-  useQueryClient,
 } from "@tanstack/react-query";
 import axios from "axios";
-import { useInView } from "react-intersection-observer";
-import NoPostMessage from "./no-post-message";
-import { MessageProps, MessageVariable } from "@/types/message";
 import { ScrollArea } from "./scroll-area";
-import MessageCard from "../cards/message-card";
-import { useEffect, useRef, useState } from "react";
-import Loader from "../loaders/loader";
 import { Button } from "./button";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { ChannelProps } from "@/types/channel";
 import MessageSkeleton from "../loaders/message-skeleton";
-import { pusherClient } from "@/lib/pusher";
-import { cn } from "@/lib/utils";
 import MessageScroll from "./message-scroll";
 
 interface ChatMessagesProps {
@@ -63,6 +52,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       fetchNextPage();
     }
   }
+
+  console.log(data)
 
   return (
     <ScrollArea className="h-full pb-5">

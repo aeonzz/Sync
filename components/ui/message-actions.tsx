@@ -60,15 +60,15 @@ const MessageActions: React.FC<MessageActionsProps> = ({
   const { mutate } = useMutation({
     mutationKey: ["message-reaction"],
     mutationFn: (reaction: Reaction) => {
-      return axios.patch(`/api/chat`, reaction);
+      return axios.post("/api/chat/message", reaction);
     },
     onError: () => {
       toast.error("Uh oh! Something went wrong.", {
         description: "Could not send message, Try again later.",
       });
     },
-    onSuccess: () => {
-      
+    onSuccess: (data) => {
+      console.log(data)
     },
     // onSettled: async () => {
     //   return await queryClient.invalidateQueries({ queryKey: ["messages"] });
@@ -79,6 +79,7 @@ const MessageActions: React.FC<MessageActionsProps> = ({
     const data = {
       messageId,
       reaction: emojiData,
+      userId: currentUser.id,
     };
     mutate(data);
   }

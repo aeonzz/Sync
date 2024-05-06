@@ -49,31 +49,3 @@ export async function GET(req: Request) {
     );
   }
 }
-
-export async function PATCH(req: Request) {
-  const body = await req.json();
-
-  const { messageId, reaction } = ReactionValidation.parse(body);
-
-  try {
-    const newReaction = await prisma.message.update({
-      where: {
-        id: messageId,
-      },
-      data: {
-        reaction,
-      },
-      include: {
-        sender: true,
-      },
-    });
-
-    return NextResponse.json({ newReaction }, { status: 200 });
-  } catch (error: any) {
-    console.log(error);
-    return NextResponse.json(
-      { message: "Could not update message" },
-      { status: 500 },
-    );
-  }
-}
