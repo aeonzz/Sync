@@ -167,6 +167,8 @@ model Message {
   sender     User     @relation(fields: [senderId], references: [id])
   createdAt  DateTime @default(now()) @db.Timestamp(6)
   updatedAt  DateTime @updatedAt @db.Timestamp(6)
+  deleted    Boolean  @default(false)
+  reaction   String?
   senderId   String
   channelId  String
   text       String

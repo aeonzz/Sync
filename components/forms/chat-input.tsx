@@ -9,6 +9,8 @@ import TextareaAutosize from "react-textarea-autosize";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import { updateMessage } from "@/lib/actions/chat.actions";
+import { useRouter } from "next/navigation";
 
 interface ChatInputProps {
   channelId: string;
@@ -17,6 +19,7 @@ interface ChatInputProps {
   setIsEditing?: (messageId: string | null) => void;
   className?: string | undefined;
   isEditingData?: MessageProps | undefined;
+  setMessageAction?: (state: boolean) => void;
 }
 
 interface NewMessage {
@@ -31,9 +34,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
   setIsEditing,
   className,
   isEditingData,
+  setMessageAction,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const [input, setInput] = useState<string>(
     isEditingData?.text ? isEditingData.text : "",
   );
@@ -44,25 +50,48 @@ const ChatInput: React.FC<ChatInputProps> = ({
       return axios.post(`/api/chat/${channelId}`, newMessage);
     },
     onError: () => {
+      setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
         description: "Could not send message, Try again later.",
       });
     },
     onSuccess: () => {
       setInput("");
+      setIsLoading(false);
     },
     // onSettled: async () => {
     //   return await queryClient.invalidateQueries({ queryKey: ["messages"] });
     // },
   });
 
-  function handleMessageSubmit() {
+  async function handleMessageSubmit() {
     if (input) {
-      const data = {
-        text: input,
-        senderId: currentUserId,
-      };
-      mutate(data);
+      setIsLoading(true);
+      if (isEditing && isEditingData) {
+        const data = {
+          text: input,
+          messageId: isEditingData.id,
+        };
+        const response = await updateMessage(data);
+
+        if (response.status === 200) {
+          setIsLoading(false);
+          setIsEditing?.(null);
+          setMessageAction?.(false);
+        } else {
+          setIsLoading(false);
+          toast.error("Uh oh! Something went wrong.", {
+            description:
+              "An error occurred while making the request. Please try again later",
+          });
+        }
+      } else {
+        const data = {
+          text: input,
+          senderId: currentUserId,
+        };
+        mutate(data);
+      }
     }
   }
 
@@ -105,13 +134,22 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <Button
             variant="link"
             className="ml-[5px] h-fit p-0 text-xs"
-            onClick={() => setIsEditing?.(null)}
+            onClick={() => {
+              setIsEditing?.(null);
+              setMessageAction?.(false);
+            }}
+            disabled={isLoading}
           >
             cancel
           </Button>
           <Separator orientation="vertical" className="mx-2 h-4" />
           <p className="text-xs text-muted-foreground">Enter to</p>
-          <Button variant="link" className="ml-[5px] h-fit p-0 text-xs">
+          <Button
+            variant="link"
+            className="ml-[5px] h-fit p-0 text-xs"
+            onClick={handleMessageSubmit}
+            disabled={isLoading}
+          >
             save
           </Button>
         </div>

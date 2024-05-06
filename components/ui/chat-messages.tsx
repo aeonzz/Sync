@@ -28,23 +28,32 @@ interface ChatMessagesProps {
   currentUser: UserProps;
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ channel, currentUser }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({
+  channel,
+  currentUser,
+}) => {
   const chatPartner = channel.members[0];
-  const messageEndRef = useRef<HTMLDivElement>(null);
 
   const fetchMessages = async ({ pageParam = 0 }) => {
     const res = await axios.get(`/api/chat/${channel.id}?cursor=${pageParam}`);
     return res.data;
   };
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery({
-      queryKey: ["messages"],
-      queryFn: fetchMessages,
-      initialPageParam: 0,
-      refetchOnWindowFocus: false,
-      getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
-    });
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isSuccess,
+    hasPreviousPage,
+  } = useInfiniteQuery({
+    queryKey: ["messages"],
+    queryFn: fetchMessages,
+    initialPageParam: 0,
+    refetchOnWindowFocus: false,
+    getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
+  });
 
   const messages = data?.pages.flatMap((page) => page.messages) || [];
   const reversedMessages = messages.reverse();
@@ -55,23 +64,13 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ channel, currentUser }) => 
     }
   }
 
-  const scrollTobottom = () => {
-    messageEndRef.current?.scrollIntoView({ behavior: "instant" });
-  };
-
-  useEffect(() => {
-    if (!isLoading) {
-      scrollTobottom();
-    }
-  }, [isLoading]);
-
   return (
     <ScrollArea className="h-full pb-5">
       {isLoading ? (
         <MessageSkeleton />
       ) : (
         <>
-          {hasNextPage ? (
+          {hasNextPage && hasPreviousPage ? (
             <div className="flex w-full justify-center p-2">
               <Button
                 onClick={getMoreMessage}
@@ -111,8 +110,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ channel, currentUser }) => 
         initialMessages={reversedMessages}
         currentUser={currentUser}
         channelId={channel.id}
+        isFetchingNextPage={isFetchingNextPage}
       />
-      <div ref={messageEndRef}></div>
+      {/* <div ref={messageEndRef} className="border border-transparent"></div> */}
     </ScrollArea>
   );
 };

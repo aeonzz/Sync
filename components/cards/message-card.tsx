@@ -1,5 +1,5 @@
 import { MessageProps } from "@/types/message";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { cn } from "@/lib/utils";
 import { UserProps } from "@/types/user";
@@ -15,6 +15,7 @@ interface MessageCardProps {
   channelId: string;
   isEditing: boolean;
   setIsEditing: (messageId: string | null) => void;
+  isFetchingNextPage: boolean;
 }
 
 const MessageCard: React.FC<MessageCardProps> = ({
@@ -25,7 +26,9 @@ const MessageCard: React.FC<MessageCardProps> = ({
   channelId,
   isEditing,
   setIsEditing,
+  isFetchingNextPage,
 }) => {
+  const messageEndRef = useRef<HTMLDivElement>(null);
   const sentAt = new Date(message.createdAt);
   const formatSentAt = format(sentAt, "Pp");
   const indexSentAt = new Date(messages[index - 1]?.createdAt);
@@ -46,8 +49,19 @@ const MessageCard: React.FC<MessageCardProps> = ({
     hasNextMessageFromSameUser && isWithin5Minutes;
   const [messageAction, setMessageAction] = useState(false);
 
+  function scrollTobottom() {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  useEffect(() => {
+    if (!isFetchingNextPage) {
+      scrollTobottom();
+    }
+  }, [isFetchingNextPage]);
+
   return (
     <div
+      ref={index === messages.length - 1 ? messageEndRef : null}
       className={cn(
         hasNextMessageFromSameUserAndIsSameTime ? "mb-0" : "mb-0 mt-4",
         messageAction && "bg-card/50",
@@ -58,13 +72,18 @@ const MessageCard: React.FC<MessageCardProps> = ({
       onMouseEnter={() => setMessageAction(true)}
       onMouseLeave={() => setMessageAction(false)}
     >
-      {messageAction && !isEditing && (
-        <MessageActions
-          currentUser={currentUser}
-          senderId={message.senderId}
-          setIsEditing={setIsEditing}
-          messageId={message.id}
-        />
+      {!message.deleted && (
+        <>
+          {messageAction && !isEditing && (
+            <MessageActions
+              currentUser={currentUser}
+              senderId={message.senderId}
+              setIsEditing={setIsEditing}
+              messageId={message.id}
+              setMessageAction={setMessageAction}
+            />
+          )}
+        </>
       )}
       <div className="flex w-14 items-center justify-end">
         {hasNextMessageFromSameUserAndIsSameTime && messageAction ? (
@@ -103,19 +122,34 @@ const MessageCard: React.FC<MessageCardProps> = ({
             </span>
           </p>
         )}
-        {isEditing ? (
-          <ChatInput
-            channelId={channelId}
-            currentUserId={currentUser.id}
-            isEditing={isEditing}
-            isEditingData={message}
-            setIsEditing={setIsEditing}
-            className="w-full"
-          />
+        {message.deleted ? (
+          <div>
+            <p className="text-xs text-red-800">Message Removed</p>
+          </div>
         ) : (
-          <p className="whitespace-pre-wrap break-words break-all text-sm font-light">
-            {message.text}
-          </p>
+          <>
+            {isEditing ? (
+              <ChatInput
+                channelId={channelId}
+                currentUserId={currentUser.id}
+                isEditing={isEditing}
+                isEditingData={message}
+                setIsEditing={setIsEditing}
+                setMessageAction={setMessageAction}
+                className="w-full"
+              />
+            ) : (
+              <p className="whitespace-pre-wrap break-words break-all text-sm font-light">
+                {message.text}
+                {message.createdAt !== message.updatedAt &&
+                  message.text.length - 1 && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      (edited)
+                    </span>
+                  )}
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>

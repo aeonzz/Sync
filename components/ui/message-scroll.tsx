@@ -2,30 +2,25 @@ import { MessageProps, MessageVariable } from "@/types/message";
 import React, { useEffect, useRef, useState } from "react";
 import MessageCard from "../cards/message-card";
 import { UserProps } from "@/types/user";
-import { useMutationState } from "@tanstack/react-query";
+import { useMutationState, useQueryClient } from "@tanstack/react-query";
 import { pusherClient } from "@/lib/pusher";
 
 interface MessageScrollProps {
   initialMessages: MessageProps[];
   currentUser: UserProps;
   channelId: string;
+  isFetchingNextPage: boolean;
 }
 
 const MessageScroll: React.FC<MessageScrollProps> = ({
   initialMessages,
   currentUser,
   channelId,
+  isFetchingNextPage,
 }) => {
   const [newMessages, setNewMessages] = useState<MessageProps[]>([]);
-  const messageEndRef = useRef<HTMLDivElement>(null);
-  const [editingMessageIndex, setEditingMessageIndex] = useState<number | null>(
-    null,
-  );
+  const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState<string | null>(null);
-
-  const handleStartEditing = (index: number) => {
-    setEditingMessageIndex(index);
-  };
 
   const variables = useMutationState<MessageVariable>({
     filters: { mutationKey: ["send-message"], status: "pending" },
@@ -33,20 +28,12 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
     select: (mutation) => mutation.state.variables,
   });
 
-  const scrollTobottom = () => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollTobottom();
-  }, [newMessages]);
-
   useEffect(() => {
     pusherClient.subscribe("messages");
 
     pusherClient.bind("incoming-message", (data: MessageProps) => {
-      console.log(data);
       setNewMessages((prev) => [...prev, data]);
+      queryClient.invalidateQueries({ queryKey: ["messages"] });
     });
 
     return () => {
@@ -54,33 +41,52 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    pusherClient.subscribe("messages");
+
+    pusherClient.bind("updated-message", (data: MessageProps) => {
+      setNewMessages((prevMessages) => {
+        const updatedMessages = prevMessages.map((message) => {
+          if (message.id === data.id) {
+            return data;
+          }
+          return message;
+        });
+        return updatedMessages;
+      });
+    });
+
+    return () => {
+      pusherClient.unsubscribe("messages");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (newMessages.length === 0 || isFetchingNextPage) {
+      setNewMessages(initialMessages);
+    }
+  }, [newMessages, initialMessages, isFetchingNextPage]);
+
+
   return (
     <div>
-      {initialMessages.map((message, index) => (
-        <MessageCard
-          key={index}
-          messages={initialMessages}
-          index={index}
-          message={message}
-          currentUser={currentUser}
-          channelId={channelId}
-          isEditing={isEditing === message.id}
-          setIsEditing={setIsEditing}
-        />
-      ))}
-      {newMessages.map((message, index) => (
-        <MessageCard
-          key={index}
-          messages={newMessages}
-          index={index}
-          message={message}
-          currentUser={currentUser}
-          channelId={channelId}
-          isEditing={isEditing === message.id}
-          setIsEditing={setIsEditing}
-        />
-      ))}
-      <div ref={messageEndRef}></div>
+      {newMessages.length > 0 && (
+        <>
+          {newMessages.map((message, index) => (
+            <MessageCard
+              key={index}
+              messages={newMessages}
+              index={index}
+              message={message}
+              currentUser={currentUser}
+              channelId={channelId}
+              isEditing={isEditing === message.id}
+              setIsEditing={setIsEditing}
+              isFetchingNextPage={isFetchingNextPage}
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 };

@@ -2,6 +2,7 @@
 
 import prisma from "../db";
 import { ChannelType } from "@prisma/client";
+import { pusherServer } from "../pusher";
 
 export async function createChannel(to: string, from: string) {
   try {
@@ -77,22 +78,69 @@ export async function getChannelById(channelId: string, currentUserId: string) {
   }
 }
 
-export async function createMessage(
-  text: string,
-  channelId: string,
-  senderId: string,
-) {
-  const message = await prisma.message.create({
-    data: {
-      channelId: channelId,
-      senderId: senderId,
-      text: text,
-    },
-  });
+// export async function createMessage(
+//   text: string,
+//   channelId: string,
+//   senderId: string,
+// ) {
+//   try {
+//     const message = await prisma.message.create({
+//       data: {
+//         channelId: channelId,
+//         senderId: senderId,
+//         text: text,
+//       },
+//     });
 
+//     return { data: message, error: null, status: 200 };
+//   } catch (error: any) {
+//     return { data: null, error: error.message, status: 500 };
+//   }
+// }
+
+interface UpdateMessageParams {
+  messageId: string;
+  text: string;
+}
+
+export async function updateMessage({ messageId, text }: UpdateMessageParams) {
   try {
-    return { data: message, error: null, status: 200 };
+    const updatedMessage = await prisma.message.update({
+      where: {
+        id: messageId,
+      },
+      data: {
+        text,
+      },
+      include: {
+        sender: true,
+      },
+    });
+
+    pusherServer.trigger("messages", "updated-message", updatedMessage);
+    return { error: null, status: 200 };
   } catch (error: any) {
-    return { data: null, error: error.message, status: 500 };
+    return { error: error.message, status: 500 };
+  }
+}
+
+export async function deleteMessage(messageId: string) {
+  try {
+    const deletedMessage = await prisma.message.update({
+      where: {
+        id: messageId,
+      },
+      data: {
+        deleted: true,
+      },
+      include: {
+        sender: true,
+      },
+    });
+
+    pusherServer.trigger("messages", "updated-message", deletedMessage);
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    return { error: error.message, status: 500 };
   }
 }
