@@ -29,20 +29,20 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
   });
 
   useEffect(() => {
-    pusherClient.subscribe("messages");
+    pusherClient.subscribe(channelId);
 
     pusherClient.bind("incoming-message", (data: MessageProps) => {
       setNewMessages((prev) => [...prev, data]);
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
+      // queryClient.invalidateQueries({ queryKey: ["messages", [channelId]] });
     });
 
     return () => {
-      pusherClient.unsubscribe("messages");
+      pusherClient.unsubscribe(channelId);
     };
   }, []);
 
   useEffect(() => {
-    pusherClient.subscribe("messages");
+    pusherClient.subscribe(channelId);
 
     pusherClient.bind("updated-message", (data: MessageProps) => {
       setNewMessages((prevMessages) => {
@@ -57,7 +57,7 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
     });
 
     return () => {
-      pusherClient.unsubscribe("messages");
+      pusherClient.unsubscribe(channelId);
     };
   }, []);
 
@@ -66,6 +66,11 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
       setNewMessages(initialMessages);
     }
   }, [newMessages, initialMessages, isFetchingNextPage]);
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["messages", [channelId]] });
+    setNewMessages(initialMessages);
+  }, [initialMessages]);
 
 
   return (

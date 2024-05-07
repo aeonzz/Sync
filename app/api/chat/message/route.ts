@@ -1,12 +1,13 @@
 import prisma from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
 import { ReactionValidation } from "@/lib/validations/chat";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const body = await req.json();
 
-  const { messageId, reaction, userId } = ReactionValidation.parse(body);
-
+  const { reaction, userId } = ReactionValidation.parse(body);
+  const messageId = "asda";
   try {
     const newReaction = await prisma.messageReaction.create({
       data: {
@@ -15,6 +16,8 @@ export async function POST(req: Request) {
         userId,
       },
     });
+
+    pusherServer.trigger("message-reaction", "incoming-reaction", newReaction);
 
     return NextResponse.json({ newReaction }, { status: 200 });
   } catch (error: any) {

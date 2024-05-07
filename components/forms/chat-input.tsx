@@ -39,7 +39,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const [input, setInput] = useState<string>(
     isEditingData?.text ? isEditingData.text : "",
   );
@@ -56,7 +55,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
       });
     },
     onSuccess: () => {
-      setInput("");
       setIsLoading(false);
     },
     // onSettled: async () => {
@@ -66,24 +64,31 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   async function handleMessageSubmit() {
     if (input) {
+      setInput("");
       setIsLoading(true);
       if (isEditing && isEditingData) {
-        const data = {
-          text: input,
-          messageId: isEditingData.id,
-        };
-        const response = await updateMessage(data);
-
-        if (response.status === 200) {
-          setIsLoading(false);
+        if (input === isEditingData.text) {
           setIsEditing?.(null);
           setMessageAction?.(false);
         } else {
-          setIsLoading(false);
-          toast.error("Uh oh! Something went wrong.", {
-            description:
-              "An error occurred while making the request. Please try again later",
-          });
+          const data = {
+            text: input,
+            messageId: isEditingData.id,
+            channelId,
+          };
+          const response = await updateMessage(data);
+
+          if (response.status === 200) {
+            setIsLoading(false);
+            setIsEditing?.(null);
+            setMessageAction?.(false);
+          } else {
+            setIsLoading(false);
+            toast.error("Uh oh! Something went wrong.", {
+              description:
+                "An error occurred while making the request. Please try again later",
+            });
+          }
         }
       } else {
         const data = {

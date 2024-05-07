@@ -1,4 +1,4 @@
-import { MessageProps } from "@/types/message";
+import { MessageProps, MessageReactionProps } from "@/types/message";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { cn } from "@/lib/utils";
@@ -6,6 +6,8 @@ import { UserProps } from "@/types/user";
 import { differenceInMinutes, format, formatDistanceToNow } from "date-fns";
 import MessageActions from "../ui/message-actions";
 import ChatInput from "../forms/chat-input";
+import { pusherClient } from "@/lib/pusher";
+import MessageReaction from "../ui/message-reaction";
 
 interface MessageCardProps {
   message: MessageProps;
@@ -50,7 +52,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
   const [messageAction, setMessageAction] = useState(false);
 
   function scrollTobottom() {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messageEndRef.current?.scrollIntoView({ behavior: "instant" });
   }
 
   useEffect(() => {
@@ -81,6 +83,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
               setIsEditing={setIsEditing}
               messageId={message.id}
               setMessageAction={setMessageAction}
+              channelId={channelId}
             />
           )}
         </>
@@ -139,7 +142,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
                 className="w-full"
               />
             ) : (
-              <p className="whitespace-pre-wrap break-words break-all text-sm font-light">
+              <p className="whitespace-pre-wrap break-words break-all text-[15px] font-light">
                 {message.text}
                 {message.createdAt !== message.updatedAt &&
                   message.text.length - 1 && (
@@ -151,6 +154,11 @@ const MessageCard: React.FC<MessageCardProps> = ({
             )}
           </>
         )}
+        <MessageReaction
+          reactions={message.messageReaction}
+          messageId={message.id}
+          currentUserId={currentUser.id}
+        />
       </div>
     </div>
   );

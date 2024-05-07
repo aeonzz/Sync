@@ -101,9 +101,14 @@ export async function getChannelById(channelId: string, currentUserId: string) {
 interface UpdateMessageParams {
   messageId: string;
   text: string;
+  channelId: string;
 }
 
-export async function updateMessage({ messageId, text }: UpdateMessageParams) {
+export async function updateMessage({
+  messageId,
+  text,
+  channelId,
+}: UpdateMessageParams) {
   try {
     const updatedMessage = await prisma.message.update({
       where: {
@@ -114,17 +119,22 @@ export async function updateMessage({ messageId, text }: UpdateMessageParams) {
       },
       include: {
         sender: true,
+        messageReaction: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 
-    pusherServer.trigger("messages", "updated-message", updatedMessage);
+    pusherServer.trigger(channelId, "updated-message", updatedMessage);
     return { error: null, status: 200 };
   } catch (error: any) {
     return { error: error.message, status: 500 };
   }
 }
 
-export async function deleteMessage(messageId: string) {
+export async function deleteMessage(messageId: string, channelId: string) {
   try {
     const deletedMessage = await prisma.message.update({
       where: {
@@ -135,10 +145,58 @@ export async function deleteMessage(messageId: string) {
       },
       include: {
         sender: true,
+        messageReaction: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 
-    pusherServer.trigger("messages", "updated-message", deletedMessage);
+    pusherServer.trigger(channelId, "updated-message", deletedMessage);
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    return { error: error.message, status: 500 };
+  }
+}
+
+interface CreateReactionParams {
+  messageId: string;
+  reaction: string;
+  userId: string;
+}
+
+export async function CreateReaction({
+  messageId,
+  reaction,
+  userId,
+}: CreateReactionParams) {
+  try {
+    const newReaction = await prisma.messageReaction.create({
+      data: {
+        messageId,
+        reaction,
+        userId,
+      },
+    });
+
+    pusherServer.trigger(messageId, "incoming-reaction", newReaction);
+
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    return { error: error.message, status: 500 };
+  }
+}
+
+export async function RemoveReaction(reactionId: string, messageId: string) {
+  try {
+    const removedReaction = await prisma.messageReaction.delete({
+      where: {
+        id: reactionId,
+      },
+    });
+
+
     return { error: null, status: 200 };
   } catch (error: any) {
     return { error: error.message, status: 500 };

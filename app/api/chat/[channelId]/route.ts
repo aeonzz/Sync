@@ -62,10 +62,15 @@ export async function POST(req: Request, params: Context) {
       },
       include: {
         sender: true,
+        messageReaction: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 
-    pusherServer.trigger("messages", "incoming-message", newMessage);
+    pusherServer.trigger(channelId, "incoming-message", newMessage);
 
     return NextResponse.json({ newMessage }, { status: 200 });
   } catch (error: any) {

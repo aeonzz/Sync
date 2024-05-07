@@ -18,6 +18,8 @@ interface EmojiPickerProps {
   side?: "top" | "right" | "bottom" | "left" | undefined;
   align?: "start" | "center" | "end" | undefined;
   sideOffset?: number | undefined;
+  onOpenEmojiPicker: (state: boolean) => void;
+  openEmojiPicker: boolean;
 }
 
 const EmojiPicker: React.FC<EmojiPickerProps> = ({
@@ -27,11 +29,11 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
   sideOffset,
   align,
   className,
+  onOpenEmojiPicker,
+  openEmojiPicker,
 }) => {
-  const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
-
   return (
-    <Popover open={openEmojiPicker} onOpenChange={setOpenEmojiPicker}>
+    <Popover open={openEmojiPicker} onOpenChange={onOpenEmojiPicker}>
       <PopoverTrigger asChild>
         <Button
           className={cn(
@@ -42,7 +44,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
           variant="ghost"
           onClick={(e) => {
             e.preventDefault();
-            setOpenEmojiPicker(!openEmojiPicker);
+            onOpenEmojiPicker(!openEmojiPicker);
           }}
           disabled={isLoading}
         >

@@ -54,6 +54,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
 }) => {
   const avatar = avatarUrl ? avatarUrl : undefined;
   const initialLetter = username?.charAt(0).toUpperCase();
+  const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { setIsMutate } = useMutationSuccess();
   const form = useForm<z.infer<typeof commentValidation>>({
@@ -149,6 +150,8 @@ const CommentForm: React.FC<CommentFormProps> = ({
                 </FormControl>
                 <div className="absolute bottom-0 right-0 flex items-center">
                   <EmojiPicker
+                    onOpenEmojiPicker={setOpen}
+                    openEmojiPicker={open}
                     isLoading={isLoading}
                     handleEmojiClick={handleEmojiClick2}
                     sideOffset={10}

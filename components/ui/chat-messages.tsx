@@ -1,9 +1,7 @@
 "use client";
 
 import { UserProps } from "@/types/user";
-import {
-  useInfiniteQuery,
-} from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { ScrollArea } from "./scroll-area";
 import { Button } from "./button";
@@ -11,17 +9,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { ChannelProps } from "@/types/channel";
 import MessageSkeleton from "../loaders/message-skeleton";
 import MessageScroll from "./message-scroll";
+import { useEffect } from "react";
+import { pusherClient } from "@/lib/pusher";
+import { useMutationSuccess } from "@/context/store";
 
 interface ChatMessagesProps {
   channel: ChannelProps;
   currentUser: UserProps;
+  params: string
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   channel,
   currentUser,
+  params
 }) => {
   const chatPartner = channel.members[0];
+  const queryClient = useQueryClient();
+  const { isMutate, setIsMutate } = useMutationSuccess();
 
   const fetchMessages = async ({ pageParam = 0 }) => {
     const res = await axios.get(`/api/chat/${channel.id}?cursor=${pageParam}`);
@@ -37,15 +42,16 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     isSuccess,
     hasPreviousPage,
   } = useInfiniteQuery({
-    queryKey: ["messages"],
+    queryKey: ["messages", [params]],
     queryFn: fetchMessages,
     initialPageParam: 0,
-    refetchOnWindowFocus: false,
     getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
   });
 
+
   const messages = data?.pages.flatMap((page) => page.messages) || [];
   const reversedMessages = messages.reverse();
+
 
   function getMoreMessage() {
     if (hasNextPage) {
@@ -53,15 +59,13 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
   }
 
-  console.log(data)
-
   return (
     <ScrollArea className="h-full pb-5">
       {isLoading ? (
         <MessageSkeleton />
       ) : (
         <>
-          {hasNextPage && hasPreviousPage ? (
+          {hasNextPage ? (
             <div className="flex w-full justify-center p-2">
               <Button
                 onClick={getMoreMessage}

@@ -7,6 +7,5 @@ export const ChatValidation = z.object({
 
 export const ReactionValidation = z.object({
   userId: z.string().min(1),
-  messageId: z.string().min(1),
   reaction: z.string().min(1),
 });

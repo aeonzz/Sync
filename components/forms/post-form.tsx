@@ -47,11 +47,12 @@ const PostForm: React.FC<PostFormProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openImageInput, setOpenImageInput] = useState(false);
+  const [open, setOpen] = useState(false);
   const [fileStates, setFileStates] = useState<FileState[]>([]);
   const [accordionValue, setAccourdionValue] = useState("");
   const { edgestore } = useEdgeStore();
   const router = useRouter();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const { setIsMutate } = useMutationSuccess();
 
   const form = useForm<z.infer<typeof PostValidation>>({
@@ -256,6 +257,8 @@ const PostForm: React.FC<PostFormProps> = ({
               />
             </Button>
             <EmojiPicker
+              onOpenEmojiPicker={setOpen}
+              openEmojiPicker={open}
               isLoading={isLoading}
               handleEmojiClick={handleEmojiClick2}
               side="top"

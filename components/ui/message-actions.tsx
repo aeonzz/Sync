@@ -30,8 +30,8 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { toast } from "sonner";
-import { deleteMessage } from "@/lib/actions/chat.actions";
-import { useMutation } from "@tanstack/react-query";
+import { CreateReaction, deleteMessage } from "@/lib/actions/chat.actions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 interface MessageActionsProps {
@@ -40,11 +40,12 @@ interface MessageActionsProps {
   messageId: string;
   setIsEditing: (messageId: string | null) => void;
   setMessageAction: (state: boolean) => void;
+  channelId: string;
 }
 
 interface Reaction {
-  messageId: string;
   reaction: string;
+  userId: string;
 }
 
 const MessageActions: React.FC<MessageActionsProps> = ({
@@ -53,39 +54,52 @@ const MessageActions: React.FC<MessageActionsProps> = ({
   messageId,
   setIsEditing,
   setMessageAction,
+  channelId,
 }) => {
   const isSender = currentUser.id === senderId;
   const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const { mutate } = useMutation({
     mutationKey: ["message-reaction"],
     mutationFn: (reaction: Reaction) => {
-      return axios.post("/api/chat/message", reaction);
+      return axios.post(`/api/chat/message/${messageId}`, reaction);
     },
     onError: () => {
       toast.error("Uh oh! Something went wrong.", {
         description: "Could not send message, Try again later.",
       });
     },
-    onSuccess: (data) => {
-      console.log(data)
+    onSuccess: () => {
+      setMessageAction(false);
     },
     // onSettled: async () => {
     //   return await queryClient.invalidateQueries({ queryKey: ["messages"] });
     // },
   });
 
-  function handleReaction(emojiData: string) {
+  async function handleReaction(emojiData: string) {
     const data = {
-      messageId,
       reaction: emojiData,
       userId: currentUser.id,
+      messageId,
     };
-    mutate(data);
+
+    // mutate(data);
+    const response = await CreateReaction(data);
+
+    if (response.status === 200) {
+      setOpen(false);
+    } else {
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    }
   }
 
   async function handleDelete() {
-    const response = await deleteMessage(messageId);
+    const response = await deleteMessage(messageId, channelId);
 
     if (response.status === 200) {
       setMessageAction(false);
@@ -103,13 +117,13 @@ const MessageActions: React.FC<MessageActionsProps> = ({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <EmojiPicker
-                  isLoading={isLoading}
-                  handleEmojiClick={handleReaction}
-                  side="left"
-                />
-              </Button>
+              <EmojiPicker
+                onOpenEmojiPicker={setOpen}
+                openEmojiPicker={open}
+                isLoading={isLoading}
+                handleEmojiClick={handleReaction}
+                side="left"
+              />
             </TooltipTrigger>
             <TooltipContent>
               <p>Add Reaction</p>
