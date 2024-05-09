@@ -65,11 +65,11 @@ const MessageCard: React.FC<MessageCardProps> = ({
     <div
       ref={index === messages.length - 1 ? messageEndRef : null}
       className={cn(
-        hasNextMessageFromSameUserAndIsSameTime ? "mb-0" : "mb-0 mt-4",
+        !hasNextMessageFromSameUserAndIsSameTime && "mt-4",
         messageAction && "bg-card/50",
         isEditing && "bg-card/50",
         message.text.length > 200 && "pb-1",
-        "relative flex pl-1 transition-colors",
+        "relative flex py-1 pl-1 transition-colors",
       )}
       onMouseEnter={() => setMessageAction(true)}
       onMouseLeave={() => setMessageAction(false)}
@@ -89,31 +89,32 @@ const MessageCard: React.FC<MessageCardProps> = ({
         </>
       )}
       <div className="flex w-14 items-center justify-end">
-        {hasNextMessageFromSameUserAndIsSameTime && messageAction ? (
-          <span className="inline-flex h-8 items-center text-xs font-light text-muted-foreground">
-            {format(sentAt, "p")}
-          </span>
-        ) : (
-          <Avatar
-            className={cn(
-              hasNextMessageFromSameUserAndIsSameTime && "invisible",
-              "h-8 w-8 self-start",
-            )}
-          >
-            <AvatarImage
-              src={message.sender.avatarUrl ?? undefined}
-              className="object-cover"
-              alt={message.sender.avatarUrl ?? undefined}
-            />
-            <AvatarFallback>
-              {message.sender.username?.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        )}
+        <div className="mt-1 flex h-full flex-col justify-start self-start">
+          {hasNextMessageFromSameUserAndIsSameTime && messageAction ? (
+            <span className="inline-flex items-center text-xs font-light text-muted-foreground">
+              {format(sentAt, "p")}
+            </span>
+          ) : (
+            <Avatar
+              className={cn(
+                hasNextMessageFromSameUserAndIsSameTime && "hidden",
+                "h-8 w-8",
+              )}
+            >
+              <AvatarImage
+                src={message.sender.avatarUrl ?? undefined}
+                className="object-cover"
+                alt={message.sender.avatarUrl ?? undefined}
+              />
+              <AvatarFallback>
+                {message.sender.username?.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          )}
+        </div>
       </div>
       <div
         className={cn(
-          !hasNextMessageFromSameUserAndIsSameTime && "mb-1",
           "flex h-auto w-[calc(100%-100px)] flex-col items-start justify-center overflow-hidden px-4",
         )}
       >

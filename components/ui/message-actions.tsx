@@ -79,6 +79,7 @@ const MessageActions: React.FC<MessageActionsProps> = ({
   });
 
   async function handleReaction(emojiData: string) {
+    setOpen(false);
     const data = {
       reaction: emojiData,
       userId: currentUser.id,
@@ -89,7 +90,6 @@ const MessageActions: React.FC<MessageActionsProps> = ({
     const response = await CreateReaction(data);
 
     if (response.status === 200) {
-      setOpen(false);
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:

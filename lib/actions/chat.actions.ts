@@ -178,6 +178,9 @@ export async function CreateReaction({
         reaction,
         userId,
       },
+      include: {
+        user: true,
+      },
     });
 
     pusherServer.trigger(messageId, "incoming-reaction", newReaction);
@@ -196,6 +199,7 @@ export async function RemoveReaction(reactionId: string, messageId: string) {
       },
     });
 
+    pusherServer.trigger(messageId, "deleted-reaction", removedReaction);
 
     return { error: null, status: 200 };
   } catch (error: any) {
