@@ -18,6 +18,7 @@ interface EmojiPickerProps {
   side?: "top" | "right" | "bottom" | "left" | undefined;
   align?: "start" | "center" | "end" | undefined;
   sideOffset?: number | undefined;
+  alignOffset?: number | undefined;
   onOpenEmojiPicker: (state: boolean) => void;
   openEmojiPicker: boolean;
 }
@@ -31,6 +32,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
   className,
   onOpenEmojiPicker,
   openEmojiPicker,
+  alignOffset,
 }) => {
   return (
     <Popover open={openEmojiPicker} onOpenChange={onOpenEmojiPicker}>
@@ -59,6 +61,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
       <PopoverContent
         side={side}
         align={align}
+        alignOffset={alignOffset}
         sideOffset={sideOffset}
         className="w-fit p-1"
       >

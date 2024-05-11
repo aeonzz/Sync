@@ -1,4 +1,3 @@
-import ChatInput from "@/components/forms/chat-input";
 import ChatMessages from "@/components/ui/chat-messages";
 import ChatTopBar from "@/components/ui/chat-topbar";
 import FetchDataError from "@/components/ui/fetch-data-error";
@@ -41,12 +40,7 @@ const Chat: React.FC<ChatProps> = async ({ params }) => {
   return (
     <div className="flex h-screen flex-col pb-3">
       <ChatTopBar channel={channel.data} />
-      <ChatMessages channel={channel.data} currentUser={currentUser.data} params={channelId} />
-      <ChatInput
-        channelId={channelId}
-        currentUserId={session.user.id}
-        className="px-4"
-      />
+      <ChatMessages channel={channel.data} currentUser={currentUser.data}/>
     </div>
   );
 };

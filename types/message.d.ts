@@ -11,6 +11,7 @@ export type MessageProps = {
   createdAt: Date;
   updatedAt: Date;
   messageReaction: MessageReactionProps[];
+  parent?: MessageProps | null;
 };
 
 export type MessageVariable = {

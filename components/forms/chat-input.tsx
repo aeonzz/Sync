@@ -11,6 +11,8 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { updateMessage } from "@/lib/actions/chat.actions";
 import { useRouter } from "next/navigation";
+import { useReplyMessage } from "@/context/store";
+import EmojiPicker from "../ui/emoji-picker";
 
 interface ChatInputProps {
   channelId: string;
@@ -38,10 +40,16 @@ const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { messageId, setMessageId } = useReplyMessage();
   const [input, setInput] = useState<string>(
     isEditingData?.text ? isEditingData.text : "",
   );
+
+  const handleEmojiClick = (emojiData: string) => {
+    setInput((prev) => prev + emojiData);
+  };
 
   const { mutate } = useMutation({
     mutationKey: ["send-message"],
@@ -56,6 +64,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     },
     onSuccess: () => {
       setIsLoading(false);
+      setMessageId(null);
     },
     // onSettled: async () => {
     //   return await queryClient.invalidateQueries({ queryKey: ["messages"] });
@@ -94,6 +103,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         const data = {
           text: input,
           senderId: currentUserId,
+          parentId: messageId,
         };
         mutate(data);
       }
@@ -106,33 +116,48 @@ const ChatInput: React.FC<ChatInputProps> = ({
         setIsEditing?.(null);
       }
     };
-
     document.addEventListener("keydown", handleKeyDown);
 
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [messageId]);
+
   return (
     <div className={cn(isEditing && "pb-2 pt-3", "space-y-2", className)}>
-      <TextareaAutosize
-        ref={textareaRef}
-        autoFocus
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleMessageSubmit();
-          }
-        }}
-        rows={1}
-        maxRows={8}
-        placeholder="Write a message..."
-        className={cn(
-          isEditing ? "px-4 py-3" : "px-5 py-4",
-          "flex h-auto w-full resize-none rounded-md border-input bg-input text-sm shadow-sm ring-offset-background transition duration-300 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
-        )}
-      />
+      <div className="flex items-center overflow-hidden rounded-md border-input bg-input pr-3">
+        <TextareaAutosize
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleMessageSubmit();
+            }
+          }}
+          rows={1}
+          maxRows={8}
+          placeholder="Write a message..."
+          className={cn(
+            isEditing ? "px-4 py-3" : "px-5 py-4",
+            "flex h-auto w-full resize-none bg-input text-sm shadow-sm ring-offset-background transition duration-300 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
+          )}
+        />
+        <EmojiPicker
+          onOpenEmojiPicker={setOpen}
+          openEmojiPicker={open}
+          isLoading={isLoading}
+          handleEmojiClick={handleEmojiClick}
+          side="top"
+          align="end"
+          sideOffset={12}
+        />
+      </div>
       {isEditing && (
         <div className="flex items-center">
           <p className="text-xs text-muted-foreground">Escape to</p>

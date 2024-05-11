@@ -26,6 +26,11 @@ export async function GET(req: Request, params: Context) {
       },
       include: {
         sender: true,
+        parent: {
+          include: {
+            sender: true,
+          },
+        },
         messageReaction: {
           include: {
             user: true,
@@ -51,17 +56,23 @@ export async function POST(req: Request, params: Context) {
   const { channelId } = params.params;
   const body = await req.json();
 
-  const { senderId, text } = ChatValidation.parse(body);
-
+  const { senderId, text, parentId } = ChatValidation.parse(body);
   try {
+    
     const newMessage = await prisma.message.create({
       data: {
         channelId: channelId,
         senderId: senderId,
         text: text,
+        parentId: parentId,
       },
       include: {
         sender: true,
+        parent: {
+          include: {
+            sender: true,
+          },
+        },
         messageReaction: {
           include: {
             user: true,

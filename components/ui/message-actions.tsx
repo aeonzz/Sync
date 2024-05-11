@@ -30,9 +30,10 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { toast } from "sonner";
-import { CreateReaction, deleteMessage } from "@/lib/actions/chat.actions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { createReaction, deleteMessage } from "@/lib/actions/chat.actions";
+import { useReplyMessage } from "@/context/store";
 
 interface MessageActionsProps {
   currentUser: UserProps;
@@ -59,24 +60,25 @@ const MessageActions: React.FC<MessageActionsProps> = ({
   const isSender = currentUser.id === senderId;
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const { setMessageId } = useReplyMessage();
 
-  const { mutate } = useMutation({
-    mutationKey: ["message-reaction"],
-    mutationFn: (reaction: Reaction) => {
-      return axios.post(`/api/chat/message/${messageId}`, reaction);
-    },
-    onError: () => {
-      toast.error("Uh oh! Something went wrong.", {
-        description: "Could not send message, Try again later.",
-      });
-    },
-    onSuccess: () => {
-      setMessageAction(false);
-    },
-    // onSettled: async () => {
-    //   return await queryClient.invalidateQueries({ queryKey: ["messages"] });
-    // },
-  });
+  // const { mutate } = useMutation({
+  //   mutationKey: ["message-reaction"],
+  //   mutationFn: (reaction: Reaction) => {
+  //     return axios.post(`/api/chat/message/${messageId}`, reaction);
+  //   },
+  //   onError: () => {
+  //     toast.error("Uh oh! Something went wrong.", {
+  //       description: "Could not send message, Try again later.",
+  //     });
+  //   },
+  //   onSuccess: () => {
+  //     setMessageAction(false);
+  //   },
+  //   onSettled: async () => {
+  //     return await queryClient.invalidateQueries({ queryKey: ["messages"] });
+  //   },
+  // });
 
   async function handleReaction(emojiData: string) {
     setOpen(false);
@@ -87,9 +89,10 @@ const MessageActions: React.FC<MessageActionsProps> = ({
     };
 
     // mutate(data);
-    const response = await CreateReaction(data);
+    const response = await createReaction(data);
 
     if (response.status === 200) {
+
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -147,7 +150,11 @@ const MessageActions: React.FC<MessageActionsProps> = ({
           ) : (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMessageId(messageId)}
+                >
                   <Reply className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
@@ -170,11 +177,15 @@ const MessageActions: React.FC<MessageActionsProps> = ({
               </TooltipContent>
             </Tooltip>
             <DropdownMenuContent side="left" className="p-1.5">
+              <DropdownMenuItem onClick={() => setMessageId(messageId)}>
+                <Reply className="mr-2 h-4 w-4" />
+                Reply
+              </DropdownMenuItem>
               <AlertDialog>
                 {isSender && (
                   <AlertDialogTrigger asChild>
                     <DropdownMenuItem
-                      className="text-xs text-red-600"
+                      className="text-red-600"
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash className="mr-2 h-4 w-4" />

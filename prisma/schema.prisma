@@ -173,6 +173,9 @@ model Message {
   channelId       String
   text            String
   messageReaction MessageReaction[]
+  parentId        String?
+  replies         Message[]         @relation("MessageReplies")
+  parent          Message?          @relation("MessageReplies", fields: [parentId], references: [id])
 }
 
 model MessageReaction {

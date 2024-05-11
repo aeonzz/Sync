@@ -65,11 +65,12 @@ const MessageCard: React.FC<MessageCardProps> = ({
     <div
       ref={index === messages.length - 1 ? messageEndRef : null}
       className={cn(
-        !hasNextMessageFromSameUserAndIsSameTime && "mt-4",
+        !hasNextMessageFromSameUserAndIsSameTime ||
+          (message.parent !== null && "mt-4"),
         messageAction && "bg-card/50",
         isEditing && "bg-card/50",
         message.text.length > 200 && "pb-1",
-        "relative flex py-1 pl-1 transition-colors",
+        "relative flex gap-1 py-1 pl-1 transition-colors",
       )}
       onMouseEnter={() => setMessageAction(true)}
       onMouseLeave={() => setMessageAction(false)}
@@ -88,16 +89,26 @@ const MessageCard: React.FC<MessageCardProps> = ({
           )}
         </>
       )}
-      <div className="flex w-14 items-center justify-end">
-        <div className="mt-1 flex h-full flex-col justify-start self-start">
-          {hasNextMessageFromSameUserAndIsSameTime && messageAction ? (
+      <div className="flex w-16 flex-col items-center justify-center">
+        {message.parent !== null && (
+          <>
+            <div className="mr-[1px] mt-1.5 w-[50%] self-end border border-muted-foreground/50" />
+            <div className="h-5 border border-muted-foreground/50" />
+          </>
+        )}
+        <div className="mt-1 flex h-full flex-col justify-start">
+          {hasNextMessageFromSameUserAndIsSameTime &&
+          messageAction &&
+          message.parent === null ? (
             <span className="inline-flex items-center text-xs font-light text-muted-foreground">
               {format(sentAt, "p")}
             </span>
           ) : (
             <Avatar
               className={cn(
-                hasNextMessageFromSameUserAndIsSameTime && "hidden",
+                hasNextMessageFromSameUserAndIsSameTime &&
+                  message.parent === null &&
+                  "hidden",
                 "h-8 w-8",
               )}
             >
@@ -113,11 +124,37 @@ const MessageCard: React.FC<MessageCardProps> = ({
           )}
         </div>
       </div>
-      <div
-        className={cn(
-          "flex h-auto w-[calc(100%-100px)] flex-col items-start justify-center overflow-hidden px-4",
+      <div className="flex h-auto w-[calc(100%-100px)] flex-col items-start justify-center overflow-hidden pr-4">
+        {message.parent && (
+          <div>
+            <div className="flex items-center space-x-2 pb-2">
+              <Avatar className="h-4 w-4">
+                <AvatarImage
+                  src={message.parent.sender.avatarUrl ?? undefined}
+                  className="object-cover"
+                  alt={message.parent.sender.avatarUrl ?? undefined}
+                />
+                <AvatarFallback>
+                  {message.parent.sender.username?.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <p className="text-xs text-muted-foreground">
+                <span className="mr-1 font-semibold">
+                  {message.parent.sender.username}
+                </span>{" "}
+                {message.parent.text}
+              </p>
+            </div>
+            {hasNextMessageFromSameUserAndIsSameTime && (
+              <p className="mb-1 text-base font-semibold">
+                {message.sender.username}{" "}
+                <span className="ml-2 text-xs font-light text-muted-foreground">
+                  {format(sentAt, "PPp")}
+                </span>
+              </p>
+            )}
+          </div>
         )}
-      >
         {!hasNextMessageFromSameUserAndIsSameTime && (
           <p className="mb-1 text-base font-semibold">
             {message.sender.username}{" "}
@@ -128,7 +165,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
         )}
         {message.deleted ? (
           <div>
-            <p className="text-xs text-red-800">Message Removed</p>
+            <p className="text-sm text-red-800">Message Removed</p>
           </div>
         ) : (
           <>
@@ -153,13 +190,14 @@ const MessageCard: React.FC<MessageCardProps> = ({
                   )}
               </p>
             )}
+            <MessageReaction
+              reactions={message.messageReaction}
+              messageId={message.id}
+              currentUserId={currentUser.id}
+              channelId={channelId}
+            />
           </>
         )}
-        <MessageReaction
-          reactions={message.messageReaction}
-          messageId={message.id}
-          currentUserId={currentUser.id}
-        />
       </div>
     </div>
   );

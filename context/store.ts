@@ -25,3 +25,13 @@ export const useMutationSuccess = create<MutateState>((set) => ({
   isMutate: false,
   setIsMutate: (isMutate: boolean) => set(() => ({ isMutate })),
 }));
+
+interface ReplyMessage {
+  messageId: string | null;
+  setMessageId: (messageId: string | null) => void;
+}
+
+export const useReplyMessage = create<ReplyMessage>((set) => ({
+  messageId: null,
+  setMessageId: (messageId: string | null) => set(() => ({ messageId })),
+}));

@@ -119,6 +119,11 @@ export async function updateMessage({
       },
       include: {
         sender: true,
+        parent: {
+          include: {
+            sender: true,
+          },
+        },
         messageReaction: {
           include: {
             user: true,
@@ -145,6 +150,11 @@ export async function deleteMessage(messageId: string, channelId: string) {
       },
       include: {
         sender: true,
+        parent: {
+          include: {
+            sender: true,
+          },
+        },
         messageReaction: {
           include: {
             user: true,
@@ -166,7 +176,7 @@ interface CreateReactionParams {
   userId: string;
 }
 
-export async function CreateReaction({
+export async function createReaction({
   messageId,
   reaction,
   userId,
@@ -191,7 +201,7 @@ export async function CreateReaction({
   }
 }
 
-export async function RemoveReaction(reactionId: string, messageId: string) {
+export async function removeReaction(reactionId: string, messageId: string) {
   try {
     const removedReaction = await prisma.messageReaction.delete({
       where: {

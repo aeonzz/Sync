@@ -4,6 +4,9 @@ import MessageCard from "../cards/message-card";
 import { UserProps } from "@/types/user";
 import { useMutationState, useQueryClient } from "@tanstack/react-query";
 import { pusherClient } from "@/lib/pusher";
+import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
+import { useReplyMessage } from "@/context/store";
 
 interface MessageScrollProps {
   initialMessages: MessageProps[];
@@ -21,6 +24,7 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
   const [newMessages, setNewMessages] = useState<MessageProps[]>([]);
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState<string | null>(null);
+  const { messageId, setMessageId } = useReplyMessage();
 
   const variables = useMutationState<MessageVariable>({
     filters: { mutationKey: ["send-message"], status: "pending" },
@@ -33,7 +37,7 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
 
     pusherClient.bind("incoming-message", (data: MessageProps) => {
       setNewMessages((prev) => [...prev, data]);
-      // queryClient.invalidateQueries({ queryKey: ["messages", [channelId]] });
+      // queryClient.invalidateQueries({ queryKey: [channelId] });
     });
 
     return () => {
@@ -68,31 +72,46 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
   }, [newMessages, initialMessages, isFetchingNextPage]);
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ["messages", [channelId]] });
     setNewMessages(initialMessages);
   }, [initialMessages]);
 
-
   return (
-    <div>
+    <>
       {newMessages.length > 0 && (
         <>
           {newMessages.map((message, index) => (
-            <MessageCard
-              key={index}
-              messages={newMessages}
-              index={index}
-              message={message}
-              currentUser={currentUser}
-              channelId={channelId}
-              isEditing={isEditing === message.id}
-              setIsEditing={setIsEditing}
-              isFetchingNextPage={isFetchingNextPage}
-            />
+            <div key={index}>
+              <MessageCard
+                messages={newMessages}
+                index={index}
+                message={message}
+                currentUser={currentUser}
+                channelId={channelId}
+                isEditing={isEditing === message.id}
+                setIsEditing={setIsEditing}
+                isFetchingNextPage={isFetchingNextPage}
+              />
+              {messageId === message.id && (
+                <div className="absolute bottom-0 w-full px-4">
+                  <div className="flex w-full items-center justify-between rounded-sm bg-card px-4 py-1">
+                    <h4 className="text-xs text-muted-foreground">
+                      Replying to{" "}
+                      <span className="font-semibold">
+                        {message.sender.username}
+                      </span>
+                    </h4>
+                    <X
+                      className="h-4 w-4 cursor-pointer"
+                      onClick={() => setMessageId(null)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           ))}
         </>
       )}
-    </div>
+    </>
   );
 };
 
