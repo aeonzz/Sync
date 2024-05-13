@@ -3,6 +3,7 @@
 import { hash } from "bcrypt";
 import prisma from "../db";
 import { revalidatePath } from "next/cache";
+import { pusherServer } from "../pusher";
 
 export async function getUserById(userId: string) {
   try {
@@ -164,4 +165,11 @@ export async function followUser(followerId: string, followingId: string) {
     console.log(error);
     return { error: error.message, status: 500 };
   }
+}
+
+export async function handleUserPresence(userId: string, isOnline: boolean) {
+  pusherServer.trigger("presence-channel", "user-status", {
+    userId,
+    isOnline,
+  });
 }

@@ -36,7 +36,7 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ currentUserId }) => {
         </h3>
         <NewChat currentUserId={currentUserId} />
       </div>
-      <div className="space-y-2">
+      <div className="space-y-1">
         <div className="relative">
           <svg
             xmlns="http://www.w3.org/2000/svg"

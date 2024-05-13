@@ -92,8 +92,8 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
                 isFetchingNextPage={isFetchingNextPage}
               />
               {messageId === message.id && (
-                <div className="absolute bottom-0 w-full px-4">
-                  <div className="flex w-full items-center justify-between rounded-sm bg-card px-4 py-1">
+                <div className="absolute bottom-0 w-full px-4 z-50">
+                  <div className="flex w-full items-center justify-between rounded-sm bg-primary/20 px-4 py-1">
                     <h4 className="text-xs text-muted-foreground">
                       Replying to{" "}
                       <span className="font-semibold">
