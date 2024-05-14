@@ -25,10 +25,10 @@ const ChatCard: React.FC<ChatCardProps> = ({ channel, currentUserId }) => {
 
   return (
     <Link
-      href={`/chat-rooms/${channel.id}`}
+      href={`/chat-rooms/dm/${channel.id}`}
       className={cn(
         buttonVariants({ variant: "ghost" }),
-        pathname === `/chat-rooms/${channel.id}` && "bg-accent/20",
+        pathname === `/chat-rooms/dm/${channel.id}` && "bg-accent/20",
         "mb-1 flex justify-start gap-2 py-6",
       )}
     >
