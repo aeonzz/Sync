@@ -143,13 +143,13 @@ model CommentLike {
 }
 
 model Channel {
-  id         String          @id @default(uuid())
-  type       ChannelType
-  isAccepted Boolean         @default(false)
-  createdAt  DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime        @updatedAt @db.Timestamp(6)
-  messages   Message[]
-  members    ChannelMember[]
+  id        String          @id @default(uuid())
+  type      ChannelType
+  status    ChannelStatus   @default(PENDING)
+  createdAt DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt DateTime        @updatedAt @db.Timestamp(6)
+  messages  Message[]
+  members   ChannelMember[]
 }
 
 model ChannelMember {
@@ -199,4 +199,10 @@ enum NotificationType {
 enum ChannelType {
   PRIVATE
   GROUP
+}
+
+enum ChannelStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }

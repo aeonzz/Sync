@@ -1,9 +1,9 @@
-import { ChannelType, User } from "@prisma/client";
+import { ChannelStatus, ChannelType, User } from "@prisma/client";
 
 export type ChannelProps = {
   id: string;
   type: ChannelType;
-  isAccepted: boolean;
+  status: ChannelStatus;
   createdAt: Date;
   members: {
     user: User;

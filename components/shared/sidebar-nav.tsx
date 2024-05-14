@@ -85,8 +85,8 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
   return (
     <div
       className={cn(
-        isChatRoom ? "w-24" : "w-[270px]",
-        "flex h-auto flex-col items-start space-y-2 p-5 transition-all duration-300",
+        isChatRoom ? "w-24 bg-card/50" : "w-[270px]",
+        "flex h-full flex-col items-start space-y-2 p-5 transition-all duration-300",
       )}
     >
       <Link
@@ -116,7 +116,6 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
                   width={24}
                   height={24}
                   alt={item.data.alt}
-                  className="transition-all duration-300 group-hover:scale-105 group-active:scale-95"
                 />
                 <span
                   className={cn(isChatRoom && "opacity-0 duration-300", "ml-4")}
@@ -136,7 +135,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
                   }
                 }}
                 className={cn(
-                  "group flex w-full justify-start py-6 text-base tracking-tight active:text-slate-400 relative",
+                  "group relative flex w-full justify-start py-6 text-base tracking-tight active:text-slate-400",
                 )}
               >
                 {hasActiveNotifications && (
@@ -153,7 +152,6 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
                   height={24}
                   alt={item.data.alt}
                   priority
-                  className="transition-all duration-300 group-hover:scale-105 group-active:scale-95"
                 />
                 {!isChatRoom && <span className="ml-4">{item.data.title}</span>}
               </Button>

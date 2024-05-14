@@ -28,8 +28,8 @@ const ChatCard: React.FC<ChatCardProps> = ({ channel, currentUserId }) => {
       href={`/chat-rooms/dm/${channel.id}`}
       className={cn(
         buttonVariants({ variant: "ghost" }),
-        pathname === `/chat-rooms/dm/${channel.id}` && "bg-accent/20",
-        "mb-1 flex justify-start gap-2 py-6",
+        pathname === `/chat-rooms/dm/${channel.id}` && "bg-accent/50",
+        "mb-1 flex justify-start gap-2 py-[22px] !rounded-[4px]",
       )}
     >
       <div className="relative">

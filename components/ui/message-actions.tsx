@@ -92,7 +92,6 @@ const MessageActions: React.FC<MessageActionsProps> = ({
     const response = await createReaction(data);
 
     if (response.status === 200) {
-
     } else {
       toast.error("Uh oh! Something went wrong.", {
         description:
@@ -115,7 +114,7 @@ const MessageActions: React.FC<MessageActionsProps> = ({
   }
 
   return (
-    <Card className="absolute -top-5 right-[10%] h-auto w-auto rounded-sm">
+    <Card className="absolute -top-5 right-[10%] h-auto w-auto rounded-sm bg-input">
       <div className="p-1">
         <TooltipProvider>
           <Tooltip>
@@ -177,7 +176,10 @@ const MessageActions: React.FC<MessageActionsProps> = ({
               </TooltipContent>
             </Tooltip>
             <DropdownMenuContent side="left" className="p-1.5">
-              <DropdownMenuItem onClick={() => setMessageId(messageId)}>
+              <DropdownMenuItem
+                onClick={() => setMessageId(messageId)}
+                className="text-xs"
+              >
                 <Reply className="mr-2 h-4 w-4" />
                 Reply
               </DropdownMenuItem>
@@ -185,7 +187,7 @@ const MessageActions: React.FC<MessageActionsProps> = ({
                 {isSender && (
                   <AlertDialogTrigger asChild>
                     <DropdownMenuItem
-                      className="text-red-600"
+                      className="text-xs text-red-600"
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash className="mr-2 h-4 w-4" />
