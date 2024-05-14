@@ -20,6 +20,8 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
   currentUserId,
   setIsOpen,
 }) => {
+  if (currentUserId === user.id) return null;
+
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -35,7 +37,7 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
       setIsLoading(false);
     } else if (response.redirect === true) {
       setIsOpen(false);
-      router.push("/home");
+      router.push(`/chat-rooms/${response.channel}`);
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {

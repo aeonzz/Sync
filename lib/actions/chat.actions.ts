@@ -22,7 +22,13 @@ export async function createChannel(to: string, from: string) {
     });
 
     const doesChannelExist = Boolean(existingChannel);
-    if (doesChannelExist) return { redirect: true, error: null, status: 200 };
+    if (doesChannelExist)
+      return {
+        channel: existingChannel?.id,
+        redirect: true,
+        error: null,
+        status: 200,
+      };
 
     const channel = await prisma.channel.create({
       data: {
@@ -45,10 +51,15 @@ export async function createChannel(to: string, from: string) {
       },
     });
 
-    return { redirect: false, error: null, status: 200 };
+    return { channel, redirect: false, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { redirect: false, error: error.message, status: 500 };
+    return {
+      channel: null,
+      redirect: false,
+      error: error.message,
+      status: 500,
+    };
   }
 }
 
@@ -215,4 +226,8 @@ export async function removeReaction(reactionId: string, messageId: string) {
   } catch (error: any) {
     return { error: error.message, status: 500 };
   }
+}
+
+export async function gg(userId: string, isOnline: boolean) {
+  pusherServer.trigger("prescence", "user-status", { userId, isOnline });
 }

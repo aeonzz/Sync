@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, buttonVariants } from "../ui/button";
 import { ChannelProps } from "@/types/channel";
 import Link from "next/link";
@@ -8,6 +8,10 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { usePathname } from "next/navigation";
 import { useIsOnline } from "react-use-is-online";
+import { pusherClient } from "@/lib/pusher";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { gg } from "@/lib/actions/chat.actions";
 
 interface ChatCardProps {
   channel: ChannelProps;
@@ -18,10 +22,6 @@ const ChatCard: React.FC<ChatCardProps> = ({ channel, currentUserId }) => {
   const { isOnline } = useIsOnline();
   const pathname = usePathname();
   const chatPartner = channel.members[0];
-
-  useEffect(() => {
-    
-  }, [])
 
   return (
     <Link
@@ -43,10 +43,6 @@ const ChatCard: React.FC<ChatCardProps> = ({ channel, currentUserId }) => {
             {chatPartner.user.username?.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
-
-        {isOnline && (
-          <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500" />
-        )}
       </div>
       <p className="text-sm">{chatPartner.user.username}</p>
     </Link>

@@ -48,7 +48,9 @@ const NewChat: React.FC<NewChatProps> = ({ currentUserId }) => {
     const timeoutId = setTimeout(async () => {
       if (searchTerm.length && !searchTerm.startsWith(" ")) {
         setIsLoading(true);
-        const response = await axios.get(`/api/search?q=${searchTerm}`);
+        const response = await axios.get(
+          `/api/chat/search/users?q=${searchTerm}`,
+        );
         setSearchUsersResults(response.data.users);
         setIsLoading(false);
       } else {

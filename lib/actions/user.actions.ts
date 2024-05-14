@@ -167,9 +167,12 @@ export async function followUser(followerId: string, followingId: string) {
   }
 }
 
-export async function handleUserPresence(userId: string, isOnline: boolean) {
-  pusherServer.trigger("presence-channel", "user-status", {
-    userId,
-    isOnline,
-  });
-}
+// export async function handleUserPresence(userId: string) {
+//   pusherServer.trigger("presence-channel", "user-status", "tangina");
+//   try {
+//     return { error: null, status: 200 };
+//   } catch (error: any) {
+//     console.log(error);
+//     return { error: error.message, status: 500 };
+//   }
+// }

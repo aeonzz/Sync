@@ -37,10 +37,11 @@ const Chat: React.FC<ChatProps> = async ({ params }) => {
     redirect("/onboarding");
   }
 
+
   return (
     <div className="flex h-screen flex-col pb-3">
       <ChatTopBar channel={channel.data} />
-      <ChatMessages channel={channel.data} currentUser={currentUser.data}/>
+      <ChatMessages channel={channel.data} currentUser={currentUser.data} />
     </div>
   );
 };

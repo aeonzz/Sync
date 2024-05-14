@@ -72,6 +72,9 @@ import ImageView from "../ui/image-view";
 import { useQueryClient } from "@tanstack/react-query";
 import { NotificationType } from "@prisma/client";
 import { createNotification } from "@/lib/actions/notification.actions";
+import { useIsOnline } from "react-use-is-online";
+import { pusherClient } from "@/lib/pusher";
+import { gg } from "@/lib/actions/chat.actions";
 
 interface PostCardProps {
   post: PostProps;
@@ -160,6 +163,34 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
     }
   }
 
+  const [isUserOnline, setIsUserOnline] = useState(false);
+  const { isOnline } = useIsOnline();
+
+  useEffect(() => {
+    const f = async () => {
+      await gg(session.user.id, isOnline);
+    };
+    f();
+  }, []);
+
+  useEffect(() => {
+    pusherClient.subscribe("prescence");
+
+    pusherClient.bind(
+      "user-status",
+      (data: { userId: string; isOnline: boolean }) => {
+        console.log(data);
+        if (data.userId === post.author.id) {
+          setIsUserOnline(data.isOnline);
+        }
+      },
+    );
+
+    return () => {
+      pusherClient.unsubscribe("prescence");
+    };
+  }, []);
+
   // useEffect(() => {
   //   const checkIfUserLiked = async () => {
   //     const response = await checkIfUserLikedPost(
@@ -189,6 +220,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
                     {post.author.username?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
+                {isUserOnline && (
+                  <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500" />
+                )}
               </Link>
             </HoverCardTrigger>
             <HoverCardContent

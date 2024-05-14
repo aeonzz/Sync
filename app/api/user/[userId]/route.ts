@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -48,4 +49,14 @@ export async function GET(
       { status: 500 },
     );
   }
+}
+
+export async function POST(req: Request) {
+  const { userId } = await req.json();
+  
+  await pusherServer.trigger('presence-channel', 'user-online', {
+    userId: userId,
+  });
+
+  return NextResponse.json({ status: 'User status updated' });
 }
