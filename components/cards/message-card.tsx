@@ -67,7 +67,7 @@ const MessageCard: React.FC<MessageCardProps> = ({
       className={cn(
         !hasNextMessageFromSameUserAndIsSameTime ||
           (message.parent !== null && "mt-4"),
-        messageAction && "bg-card/50",
+        messageAction && "bg-accent/30",
         isEditing && "bg-card/50",
         message.text.length > 200 && "pb-1",
         "relative flex gap-1 py-1 pl-1 transition-colors",

@@ -13,10 +13,20 @@ import { useEffect, useState } from "react";
 import Loader from "../loaders/loader";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "./button";
+import { Button, buttonVariants } from "./button";
 import { usePathname } from "next/navigation";
-import { ChannelStatus } from "@prisma/client";
 import { useMessageRequestsStore } from "@/context/store";
+import { Separator } from "./separator";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { X } from "lucide-react";
 
 interface ChatMenuProps {
   currentUserId: string;
@@ -125,11 +135,46 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ currentUserId }) => {
             />
           </svg>
         </Link>
+        <Separator className="my-2 w-full" />
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="secondary" size="sm" className="aspect-square p-0">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width={20}
+                height={20}
+                color={"#ededed"}
+                fill={"none"}
+              >
+                <path
+                  d="M12 4V20M20 12H4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogClose className="absolute right-4 top-5 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+            <DialogHeader>
+              <DialogTitle>Create Room</DialogTitle>
+              <DialogDescription>
+                Create a room and hangout with your friends
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
       </div>
       <div className="h-auto w-[262px] border-x bg-card/50 px-3 pt-5">
         <div className="mb-6 flex justify-between pt-1">
           <h3 className="ml-3 scroll-m-20 text-xl font-semibold tracking-tight">
-            Direct Messages
+            Chat Rooms
           </h3>
           <NewChat currentUserId={currentUserId} />
         </div>
