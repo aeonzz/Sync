@@ -33,7 +33,7 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { createReaction, deleteMessage } from "@/lib/actions/chat.actions";
-import { useReplyMessage } from "@/context/store";
+import { useReplyMessageStore } from "@/context/store";
 
 interface MessageActionsProps {
   currentUser: UserProps;
@@ -60,7 +60,7 @@ const MessageActions: React.FC<MessageActionsProps> = ({
   const isSender = currentUser.id === senderId;
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const { setMessageId } = useReplyMessage();
+  const { setMessageId } = useReplyMessageStore();
 
   // const { mutate } = useMutation({
   //   mutationKey: ["message-reaction"],

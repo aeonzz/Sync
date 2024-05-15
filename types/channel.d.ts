@@ -1,4 +1,5 @@
 import { ChannelStatus, ChannelType, User } from "@prisma/client";
+import { MessageProps } from "./message";
 
 export type ChannelProps = {
   id: string;
@@ -8,4 +9,8 @@ export type ChannelProps = {
   members: {
     user: User;
   }[];
+};
+
+export type ExtendedChannelProps = ChannelProps & {
+  messages: MessageProps[];
 };

@@ -5,7 +5,7 @@ import NewChat from "./new-chat";
 import axios from "axios";
 import FetchDataError from "./fetch-data-error";
 import { ScrollArea } from "./scroll-area";
-import { ChannelProps } from "@/types/channel";
+import { ChannelProps, ExtendedChannelProps } from "@/types/channel";
 import ChatCard from "../cards/chat-card";
 import { Input } from "./input";
 import ChatSkeleton from "../loaders/chat-skeleton";
@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "./button";
 import { usePathname } from "next/navigation";
 import { ChannelStatus } from "@prisma/client";
+import { useMessageRequestsStore } from "@/context/store";
 
 interface ChatMenuProps {
   currentUserId: string;
@@ -25,23 +26,39 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ currentUserId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const pathname = usePathname();
+  const {
+    setChannel,
+    setIsError,
+    setIsLoading: setQueryLoading,
+  } = useMessageRequestsStore();
 
   const [searchChatsResults, setSearchChatsResults] = useState<
     ChannelProps[] | null
   >([]);
 
-  const {
-    data,
-    isLoading: queryLoading,
-    isError,
-    isSuccess,
-  } = useQuery<ChannelProps[]>({
+  const chatsQuery = useQuery<ChannelProps[]>({
     queryFn: async () => {
       const response = await axios.get(`/api/chat/chats/${currentUserId}`);
       return response.data.channels;
     },
     queryKey: ["chat-cards"],
   });
+
+  const messageRequestsQuery = useQuery<ExtendedChannelProps[]>({
+    queryFn: async () => {
+      const response = await axios.get(
+        `/api/chat/message/message-request/${currentUserId}`,
+      );
+      return response.data.channels;
+    },
+    queryKey: ["message-request"],
+  });
+
+  useEffect(() => {
+    setChannel(messageRequestsQuery.data);
+    setIsError(messageRequestsQuery.isError);
+    setQueryLoading(messageRequestsQuery.isLoading);
+  }, [messageRequestsQuery.isFetching]);
 
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
@@ -145,7 +162,7 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ currentUserId }) => {
             className={cn(
               buttonVariants({ variant: "ghost" }),
               pathname === "/chat-rooms/dm/message-request" && "bg-accent/60",
-              "mb-1 flex justify-start gap-2 !rounded-[4px] py-[22px]",
+              "relative mb-1 flex justify-start gap-2 !rounded-[4px] py-[22px]",
             )}
           >
             <svg
@@ -171,6 +188,14 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ currentUserId }) => {
               />
             </svg>
             Message Requests
+            {messageRequestsQuery.data &&
+              messageRequestsQuery.data.length > 0 && (
+                <span className="absolute right-4 rounded-full bg-red-500 px-1.5 py-[1px] text-xs">
+                  <p className="-ml-[1px]">
+                    {messageRequestsQuery.data.length}
+                  </p>
+                </span>
+              )}
           </Link>
           <p className="text-sm text-muted-foreground">Direct Messages</p>
           {searchTerm && searchTerm.length > 0 ? (
@@ -195,18 +220,18 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ currentUserId }) => {
             </>
           ) : (
             <>
-              {queryLoading ? (
+              {chatsQuery.isLoading ? (
                 <ChatSkeleton />
-              ) : isError ? (
+              ) : chatsQuery.isError ? (
                 <FetchDataError />
-              ) : data?.length === 0 ? (
+              ) : chatsQuery.data?.length === 0 ? (
                 <p className="py-5 text-center text-sm text-muted-foreground">
                   No direct messages yet
                 </p>
               ) : (
                 <ScrollArea className="max-h-60">
                   <>
-                    {data?.map((channel, index) => (
+                    {chatsQuery.data?.map((channel, index) => (
                       <ChatCard
                         key={index}
                         channel={channel}

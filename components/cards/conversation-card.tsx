@@ -20,7 +20,6 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
   currentUserId,
   setIsOpen,
 }) => {
-  if (currentUserId === user.id) return null;
 
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();

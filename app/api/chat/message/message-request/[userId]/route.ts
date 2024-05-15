@@ -29,6 +29,7 @@ export async function GET(req: Request, context: Context) {
             user: true,
           },
         },
+        messages: true,
       },
     });
 

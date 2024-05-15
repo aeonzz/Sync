@@ -6,7 +6,7 @@ import { useMutationState, useQueryClient } from "@tanstack/react-query";
 import { pusherClient } from "@/lib/pusher";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
-import { useReplyMessage } from "@/context/store";
+import { useReplyMessageStore } from "@/context/store";
 
 interface MessageScrollProps {
   initialMessages: MessageProps[];
@@ -24,7 +24,7 @@ const MessageScroll: React.FC<MessageScrollProps> = ({
   const [newMessages, setNewMessages] = useState<MessageProps[]>([]);
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState<string | null>(null);
-  const { messageId, setMessageId } = useReplyMessage();
+  const { messageId, setMessageId } = useReplyMessageStore();
 
   const variables = useMutationState<MessageVariable>({
     filters: { mutationKey: ["send-message"], status: "pending" },

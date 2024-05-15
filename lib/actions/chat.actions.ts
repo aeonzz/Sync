@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "../db";
-import { ChannelType } from "@prisma/client";
+import { ChannelStatus, ChannelType } from "@prisma/client";
 import { pusherServer } from "../pusher";
 
 export async function createChannel(to: string, from: string) {
@@ -32,7 +32,6 @@ export async function createChannel(to: string, from: string) {
 
     const channel = await prisma.channel.create({
       data: {
-        isAccepted: true,
         type: ChannelType.PRIVATE,
       },
     });
@@ -230,4 +229,24 @@ export async function removeReaction(reactionId: string, messageId: string) {
 
 export async function gg(userId: string, isOnline: boolean) {
   pusherServer.trigger("prescence", "user-status", { userId, isOnline });
+}
+
+export async function updateMessageRequest(
+  channelId: string,
+  status: ChannelStatus,
+) {
+  try {
+    await prisma.channel.update({
+      where: {
+        id: channelId,
+      },
+      data: {
+        status,
+      },
+    });
+
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    return { error: error.message, status: 500 };
+  }
 }

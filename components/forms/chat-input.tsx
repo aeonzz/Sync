@@ -11,7 +11,7 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { updateMessage } from "@/lib/actions/chat.actions";
 import { useRouter } from "next/navigation";
-import { useReplyMessage } from "@/context/store";
+import { useReplyMessageStore } from "@/context/store";
 import EmojiPicker from "../ui/emoji-picker";
 
 interface ChatInputProps {
@@ -42,7 +42,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { messageId, setMessageId } = useReplyMessage();
+  const { messageId, setMessageId } = useReplyMessageStore();
   const [input, setInput] = useState<string>(
     isEditingData?.text ? isEditingData.text : "",
   );
