@@ -10,22 +10,16 @@ import React from "react";
 
 interface ChatProps {
   params: {
-    channelId: string;
+    roomId: string;
   };
 }
 
 const Chat: React.FC<ChatProps> = async ({ params }) => {
-  const { channelId } = params;
+  const { roomId } = params;
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/login");
-  }
-
-  const channel = await getChannelById(channelId, session.user.id);
-
-  if (!channel.data || channel.error) {
-    return <FetchDataError />;
   }
 
   const currentUser = await getUserById(session.user.id);
@@ -37,11 +31,10 @@ const Chat: React.FC<ChatProps> = async ({ params }) => {
     redirect("/onboarding");
   }
 
-
   return (
-    <div className="flex h-screen flex-col pb-3">
-      <ChatTopBar channel={channel.data} />
-      <ChatMessages channel={channel.data} currentUser={currentUser.data} />
+    <div className="flex flex-col pb-3">
+      {/* <ChatTopBar channel={channel.data} room /> */}
+      fuck this shit
     </div>
   );
 };

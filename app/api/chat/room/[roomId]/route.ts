@@ -4,34 +4,32 @@ import { NextResponse } from "next/server";
 
 interface Context {
   params: {
-    userId: string;
+    roomId: string;
   };
 }
 
 export async function GET(req: Request, context: Context) {
-  const { userId } = context.params;
+  const { roomId } = context.params;
 
   try {
-    const channels = await prisma.channel.findMany({
+    const room = await prisma.room.findFirst({
       where: {
-        members: {
-          some: {
-            userId,
-          },
-        },
-        status: ChannelStatus.ACCEPTED,
-        type: ChannelType.PRIVATE,
+        id: roomId,
       },
       include: {
-        members: {
+        channels: {
           include: {
-            user: true,
+            members: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
       },
     });
 
-    return NextResponse.json({ channels }, { status: 200 });
+    return NextResponse.json({ room }, { status: 200 });
   } catch (error: any) {
     console.log(error);
     return NextResponse.json(

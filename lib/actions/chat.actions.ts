@@ -62,6 +62,47 @@ export async function createChannel(to: string, from: string) {
   }
 }
 
+export async function createRoom(name: string, currentUserId: string) {
+  try {
+    const room = await prisma.room.create({
+      data: {
+        roomName: name,
+      },
+    });
+    const channel = await prisma.channel.create({
+      data: {
+        type: ChannelType.GROUP,
+        status: ChannelStatus.ACCEPTED,
+        roomId: room.id,
+      },
+    });
+    await prisma.channelMember.create({
+      data: {
+        userId: currentUserId,
+        channelId: channel.id,
+      },
+    });
+    return { room, error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { room: null, error: error.message, status: 500 };
+  }
+}
+
+export async function checkRoomId(roomId: string) {
+  try {
+    const existingRoom = await prisma.room.findFirst({
+      where: {
+        id: roomId,
+      },
+    });
+    return { data: existingRoom !== null, error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { existingRoom: null, error: error.message, status: 500 };
+  }
+}
+
 export async function getChannelById(channelId: string, currentUserId: string) {
   try {
     const channel = await prisma.channel.findFirst({

@@ -49,9 +49,9 @@ export const sidebarNav = [
   {
     type: "link",
     data: {
-      title: "Chat-rooms",
+      title: "Chat rooms",
       icon: chatRoom,
-      link: "/chat-rooms/dm",
+      link: "/chat-rooms/me",
       alt: "chat rooms",
     },
   },

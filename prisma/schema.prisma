@@ -142,14 +142,24 @@ model CommentLike {
   @@unique([userId, commentId])
 }
 
+model Room {
+  id        String    @id @default(uuid())
+  roomName  String
+  createdAt DateTime  @default(now())
+  channels  Channel[]
+}
+
 model Channel {
-  id        String          @id @default(uuid())
-  type      ChannelType
-  status    ChannelStatus   @default(PENDING)
-  createdAt DateTime        @default(now()) @db.Timestamp(6)
-  updatedAt DateTime        @updatedAt @db.Timestamp(6)
-  messages  Message[]
-  members   ChannelMember[]
+  id          String          @id @default(uuid())
+  type        ChannelType
+  channelName String?
+  status      ChannelStatus   @default(PENDING)
+  createdAt   DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime        @updatedAt @db.Timestamp(6)
+  messages    Message[]
+  members     ChannelMember[]
+  room        Room?           @relation(fields: [roomId], references: [id])
+  roomId      String?
 }
 
 model ChannelMember {

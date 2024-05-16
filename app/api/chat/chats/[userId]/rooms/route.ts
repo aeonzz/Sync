@@ -10,28 +10,29 @@ interface Context {
 
 export async function GET(req: Request, context: Context) {
   const { userId } = context.params;
-
   try {
-    const channels = await prisma.channel.findMany({
+    const userRooms = await prisma.room.findMany({
       where: {
-        members: {
+        channels: {
           some: {
-            userId,
+            members: {
+              some: {
+                userId: userId,
+              },
+            },
           },
         },
-        status: ChannelStatus.ACCEPTED,
-        type: ChannelType.PRIVATE,
       },
       include: {
-        members: {
-          include: {
-            user: true,
+        channels: {
+          select: {
+            id: true,
           },
         },
       },
     });
 
-    return NextResponse.json({ channels }, { status: 200 });
+    return NextResponse.json({ userRooms }, { status: 200 });
   } catch (error: any) {
     console.log(error);
     return NextResponse.json(

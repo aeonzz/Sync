@@ -10,3 +10,10 @@ export const ReactionValidation = z.object({
   userId: z.string().min(1),
   reaction: z.string().min(1),
 });
+
+export const RoomValidation = z.object({
+  name: z
+    .string()
+    .min(5, "Room name should be atleast 5 characters")
+    .max(20, "Room name should not exceed 20 characters"),
+});
