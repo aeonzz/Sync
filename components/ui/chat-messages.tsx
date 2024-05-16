@@ -13,15 +13,18 @@ import { useEffect, useRef, useState } from "react";
 import { pusherClient } from "@/lib/pusher";
 import { useMutationSuccess } from "@/context/store";
 import ChatInput from "../forms/chat-input";
+import { Hash } from "lucide-react";
 
 interface ChatMessagesProps {
   channel: ChannelProps;
   currentUser: UserProps;
+  room: boolean;
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   channel,
   currentUser,
+  room,
 }) => {
   const chatPartner = channel.members[0];
   const { isMutate, setIsMutate } = useMutationSuccess();
@@ -62,7 +65,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           <MessageSkeleton />
         ) : (
           <>
-            {hasNextPage ? (
+            {hasNextPage && reversedMessages.length >= 40 ? (
               <div className="flex w-full justify-center p-2">
                 <Button
                   onClick={getMoreMessage}
@@ -75,25 +78,41 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
               </div>
             ) : (
               <div className="w-full space-y-3 p-4">
-                <Avatar className="h-28 w-28">
-                  <AvatarImage
-                    src={chatPartner.user.avatarUrl ?? undefined}
-                    className="object-cover"
-                    alt={chatPartner.user.avatarUrl ?? undefined}
-                  />
-                  <AvatarFallback>
-                    {chatPartner.user.username?.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <h3 className="text-3xl font-semibold">
-                  {chatPartner.user.username}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  This is the beginning fo your direct message history with{" "}
-                  <span className="text-base font-semibold">
-                    {chatPartner.user.username}
-                  </span>
-                </p>
+                {room ? (
+                  <>
+                    <div className="flex h-28 w-28 items-center justify-center rounded-full bg-input">
+                      <Hash className="h-10 w-10" />
+                    </div>
+                    <h3 className="inline-flex text-3xl font-semibold text-muted-foreground">
+                      👋Welcome to
+                      <span className="ml-2 text-foreground">
+                        #{channel.channelName}
+                      </span>
+                    </h3>
+                  </>
+                ) : (
+                  <>
+                    <Avatar className="h-28 w-28">
+                      <AvatarImage
+                        src={chatPartner.user.avatarUrl ?? undefined}
+                        className="object-cover"
+                        alt={chatPartner.user.avatarUrl ?? undefined}
+                      />
+                      <AvatarFallback>
+                        {chatPartner.user.username?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <h3 className="text-3xl font-semibold">
+                      {chatPartner.user.username}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      This is the beginning fo your direct message history with{" "}
+                      <span className="text-base font-semibold">
+                        {chatPartner.user.username}
+                      </span>
+                    </p>
+                  </>
+                )}
               </div>
             )}
           </>

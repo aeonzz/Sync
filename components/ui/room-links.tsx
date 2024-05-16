@@ -17,7 +17,7 @@ const RoomLinks: React.FC<RoomLinksProps> = ({ room }) => {
 
   return (
     <Link
-      href={`/chat-rooms/${room.id}`}
+      href={`/chat-rooms/${room.id}/${room.channels[0].id}`}
       className={cn(
         buttonVariants({ variant: "secondary" }),
         pathname.startsWith(`/chat-rooms/${room.id}`) &&

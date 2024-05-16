@@ -72,6 +72,7 @@ const RoomForm: React.FC<RoomFormProps> = ({ setOpen, currentUserId }) => {
                 <Input
                   placeholder="Room Name"
                   autoComplete="off"
+                  autoFocus
                   disabled={isLoading}
                   {...field}
                 />

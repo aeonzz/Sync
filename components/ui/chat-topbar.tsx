@@ -1,3 +1,4 @@
+import { Hash } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { ChannelProps } from "@/types/channel";
 
@@ -25,7 +26,12 @@ const ChatTopBar: React.FC<ChatTopBarProps> = ({ channel, room }) => {
           </Avatar>
           <p className="text-base">{chatPartner.user.username}</p>
         </div>
-      ) : null}
+      ) : (
+        <p className="inline-flex gap-1 font-semibold items-center">
+          <Hash className="h-5 w-5" />
+          {channel.channelName}
+        </p>
+      )}
     </div>
   );
 };

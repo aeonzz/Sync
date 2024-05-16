@@ -8,18 +8,24 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
 
-interface ChatProps {
+const Page = async ({
+  params,
+}: {
   params: {
-    roomId: string;
+    channelId: string;
   };
-}
-
-const Chat: React.FC<ChatProps> = async ({ params }) => {
-  const { roomId } = params;
+}) => {
+  const { channelId } = params;
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/login");
+  }
+
+  const channel = await getChannelById(channelId, session.user.id);
+
+  if (!channel.data || channel.error) {
+    return <FetchDataError />;
   }
 
   const currentUser = await getUserById(session.user.id);
@@ -32,11 +38,11 @@ const Chat: React.FC<ChatProps> = async ({ params }) => {
   }
 
   return (
-    <div className="flex flex-col pb-3">
-      {/* <ChatTopBar channel={channel.data} room /> */}
-      fuck this shit
+    <div className="flex h-screen flex-col pb-3">
+      <ChatTopBar channel={channel.data} room />
+      <ChatMessages channel={channel.data} currentUser={currentUser.data} room />
     </div>
   );
 };
 
-export default Chat;
+export default Page;

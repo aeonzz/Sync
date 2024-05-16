@@ -74,6 +74,7 @@ export async function createRoom(name: string, currentUserId: string) {
         type: ChannelType.GROUP,
         status: ChannelStatus.ACCEPTED,
         roomId: room.id,
+        channelName: "General",
       },
     });
     await prisma.channelMember.create({
@@ -100,6 +101,51 @@ export async function checkRoomId(roomId: string) {
   } catch (error: any) {
     console.log(error);
     return { existingRoom: null, error: error.message, status: 500 };
+  }
+}
+
+export async function inviteUser(roomId: string, userId: string) {
+  try {
+    const room = await prisma.room.findUnique({
+      where: { id: roomId },
+      include: { channels: true },
+    });
+
+    if (!room) {
+      return { error: "Room not found", status: 404 };
+    }
+
+    const existingMemberships = await prisma.channelMember.findMany({
+      where: {
+        userId,
+        channelId: {
+          in: room.channels.map((channel) => channel.id),
+        },
+      },
+    });
+
+    await prisma.$transaction(async () => {
+      for (const channel of room.channels) {
+        const isMember = existingMemberships.some(
+          (m) => m.channelId === channel.id,
+        );
+        if (!isMember) {
+          await prisma.channelMember.create({
+            data: {
+              userId,
+              channelId: channel.id,
+            },
+          });
+        }
+      }
+    });
+    return {
+      error: null,
+      status: existingMemberships.length > 0 ? 208 : 200,
+    };
+  } catch (error: any) {
+    console.log(error.message);
+    return { error: error.message, status: 500 };
   }
 }
 

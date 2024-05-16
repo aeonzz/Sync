@@ -41,7 +41,7 @@ const Chat: React.FC<ChatProps> = async ({ params }) => {
   return (
     <div className="flex h-screen flex-col pb-3">
       <ChatTopBar channel={channel.data} room={false} />
-      <ChatMessages channel={channel.data} currentUser={currentUser.data} />
+      <ChatMessages channel={channel.data} currentUser={currentUser.data} room={false} />
     </div>
   );
 };
