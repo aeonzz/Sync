@@ -21,7 +21,7 @@ const ChannelCard: React.FC<ChannelCardProps> = ({ roomId, channel }) => {
       className={cn(
         buttonVariants({ variant: "ghost" }),
         pathname === `/chat-rooms/${roomId}/${channel.id}` && "bg-accent/50",
-        "mb-1 flex justify-start gap-2 !rounded-[4px]",
+        "mb-1 flex justify-start gap-2 rounded-[4px]",
       )}
     >
       <p className="text-sm inline-flex gap-1">

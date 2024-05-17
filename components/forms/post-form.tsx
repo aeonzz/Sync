@@ -228,11 +228,11 @@ const PostForm: React.FC<PostFormProps> = ({
           )}
         </AnimatePresence> */}
         <div className="relative space-y-2">
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end space-x-[1px]">
             <Button
               className={cn(
                 openImageInput && "bg-green-500/15",
-                "group rounded-full transition-all hover:bg-green-500/15 active:scale-95",
+                "group transition-all hover:bg-green-500/15 active:scale-95",
               )}
               size="icon"
               variant="ghost"
@@ -251,8 +251,8 @@ const PostForm: React.FC<PostFormProps> = ({
             >
               <ImagePlus
                 className={cn(
-                  openImageInput ? "text-green-500/70" : "text-slate-500",
-                  "group-hover:text-green-500/70",
+                  openImageInput ? "text-green-500/70" : "text-foreground",
+                  "h-5 w-5 group-hover:text-green-500/70",
                 )}
               />
             </Button>
@@ -262,6 +262,7 @@ const PostForm: React.FC<PostFormProps> = ({
               isLoading={isLoading}
               handleEmojiClick={handleEmojiClick2}
               side="top"
+              iconSize="w-5 h-5"
             />
           </div>
           <Button

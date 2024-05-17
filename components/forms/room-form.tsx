@@ -46,7 +46,9 @@ const RoomForm: React.FC<RoomFormProps> = ({ setOpen, currentUserId }) => {
       setIsLoading(false);
       setOpen(false);
       queryClient.invalidateQueries({ queryKey: ["rooms"] });
-      router.push(`/chat-rooms/${response.room?.id}`);
+      router.push(
+        `/chat-rooms/${response.data?.room.id}/${response.data?.channel.id}`,
+      );
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {

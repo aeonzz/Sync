@@ -4,7 +4,13 @@ import prisma from "../db";
 import { ChannelStatus, ChannelType } from "@prisma/client";
 import { pusherServer } from "../pusher";
 
-export async function createChannel(to: string, from: string) {
+export async function createChannel({
+  to,
+  from,
+}: {
+  to: string;
+  from: string;
+}) {
   try {
     const existingChannel = await prisma.channel.findFirst({
       where: {
@@ -83,10 +89,10 @@ export async function createRoom(name: string, currentUserId: string) {
         channelId: channel.id,
       },
     });
-    return { room, error: null, status: 200 };
+    return { data: { room, channel }, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
-    return { room: null, error: error.message, status: 500 };
+    return { data: null, error: error.message, status: 500 };
   }
 }
 
@@ -149,6 +155,22 @@ export async function inviteUser(roomId: string, userId: string) {
   }
 }
 
+export async function getRoomByID({roomId} : {roomId: string}) {
+  try {
+
+    const room = await prisma.room.findFirst({
+      where: {
+        id: roomId,
+      }
+    })
+
+    return { data: room, error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { data: null, error: error.message, status: 500 };
+  }
+}
+
 export async function getChannelById(channelId: string, currentUserId: string) {
   try {
     const channel = await prisma.channel.findFirst({
@@ -174,26 +196,6 @@ export async function getChannelById(channelId: string, currentUserId: string) {
     return { data: null, error: error.message, status: 500 };
   }
 }
-
-// export async function createMessage(
-//   text: string,
-//   channelId: string,
-//   senderId: string,
-// ) {
-//   try {
-//     const message = await prisma.message.create({
-//       data: {
-//         channelId: channelId,
-//         senderId: senderId,
-//         text: text,
-//       },
-//     });
-
-//     return { data: message, error: null, status: 200 };
-//   } catch (error: any) {
-//     return { data: null, error: error.message, status: 500 };
-//   }
-// }
 
 interface UpdateMessageParams {
   messageId: string;
@@ -312,10 +314,6 @@ export async function removeReaction(reactionId: string, messageId: string) {
   } catch (error: any) {
     return { error: error.message, status: 500 };
   }
-}
-
-export async function gg(userId: string, isOnline: boolean) {
-  pusherServer.trigger("prescence", "user-status", { userId, isOnline });
 }
 
 export async function updateMessageRequest(

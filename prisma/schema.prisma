@@ -35,6 +35,8 @@ model User {
   Message                  Message[]
   ChannelMember            ChannelMember[]
   MessageReaction          MessageReaction[]
+  organizedEvents          Event[]           @relation("OrganizedEvents")
+  attendedEvents           Event[]           @relation("EventAttendees")
 }
 
 model Follows {
@@ -59,6 +61,17 @@ model Notification {
   isRead      Boolean          @default(false)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @default(now())
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  date        DateTime
+  location    String
+  organizer   User     @relation(fields: [organizerId], references: [id], name: "OrganizedEvents")
+  organizerId String
+  attendees   User[]   @relation("EventAttendees")
 }
 
 model Post {

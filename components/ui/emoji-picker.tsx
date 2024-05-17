@@ -21,6 +21,7 @@ interface EmojiPickerProps {
   alignOffset?: number | undefined;
   onOpenEmojiPicker: (state: boolean) => void;
   openEmojiPicker: boolean;
+  iconSize: string;
 }
 
 const EmojiPicker: React.FC<EmojiPickerProps> = ({
@@ -33,6 +34,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
   onOpenEmojiPicker,
   openEmojiPicker,
   alignOffset,
+  iconSize,
 }) => {
   return (
     <Popover open={openEmojiPicker} onOpenChange={onOpenEmojiPicker}>
@@ -41,6 +43,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
           className={cn(
             openEmojiPicker && "bg-yellow-500/15",
             "group transition-all hover:bg-yellow-500/15",
+            className,
           )}
           size="icon"
           variant="ghost"
@@ -52,8 +55,9 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
         >
           <SmilePlus
             className={cn(
-              openEmojiPicker && "text-yellow-500/70",
-              "h-4 w-4 group-hover:text-yellow-500/70",
+              openEmojiPicker ? "text-yellow-500/70" : "text-foreground",
+              "group-hover:text-yellow-500/70",
+              iconSize,
             )}
           />
         </Button>

@@ -28,6 +28,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import ChannelCard from "../cards/channel-card";
+import RoomMenuSkeleton from "../loaders/room-menu-skeleton";
 
 interface RoomMenuProps {
   roomId: string;
@@ -69,13 +70,13 @@ const RoomMenu: React.FC<RoomMenuProps> = ({ roomId, currentUserId }) => {
   if (!roomQuery.isLoading && !roomQuery.data) return <NotFound />;
 
   return (
-    <div className="h-auto w-[262px] border-x bg-card/50 px-3 pt-5">
+    <div className="h-auto w-[262px] border-x bg-card/50">
       {roomQuery.isLoading ? (
-        <h1>Loading...</h1>
+        <RoomMenuSkeleton />
       ) : roomQuery.isError ? (
         <FetchDataError />
       ) : (
-        <div className="flex flex-col">
+        <div className="flex flex-col px-3 pt-5">
           <div className="mb-6 flex justify-between pt-1">
             <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
               {roomQuery.data?.roomName}

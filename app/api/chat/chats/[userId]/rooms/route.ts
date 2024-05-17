@@ -25,10 +25,17 @@ export async function GET(req: Request, context: Context) {
       },
       include: {
         channels: {
-          select: {
-            id: true,
+          include: {
+            members: {
+              include: {
+                user: true,
+              },
+            },
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 

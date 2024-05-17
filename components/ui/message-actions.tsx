@@ -125,6 +125,7 @@ const MessageActions: React.FC<MessageActionsProps> = ({
                 isLoading={isLoading}
                 handleEmojiClick={handleReaction}
                 side="left"
+                iconSize="w-4 h-4"
               />
             </TooltipTrigger>
             <TooltipContent>

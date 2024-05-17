@@ -156,7 +156,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                     handleEmojiClick={handleEmojiClick2}
                     sideOffset={10}
                     align="end"
-                    className="h-5 w-5"
+                    iconSize="w-4 h-4"
                   />
                   <Button
                     type="submit"

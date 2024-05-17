@@ -1,17 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Button, buttonVariants } from "../ui/button";
+import React from "react";
+import { buttonVariants } from "../ui/button";
 import { ChannelProps } from "@/types/channel";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { usePathname } from "next/navigation";
 import { useIsOnline } from "react-use-is-online";
-import { pusherClient } from "@/lib/pusher";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { gg } from "@/lib/actions/chat.actions";
 
 interface ChatCardProps {
   channel: ChannelProps;

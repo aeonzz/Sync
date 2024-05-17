@@ -14,6 +14,7 @@ export default async function ChatLayout({
     redirect("/auth");
   }
 
+
   return (
     <section className="sticky top-0 flex h-auto w-full">
       <ChatMenu currentUserId={session.user.id} />

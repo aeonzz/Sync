@@ -20,7 +20,6 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
   currentUserId,
   setIsOpen,
 }) => {
-
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -28,7 +27,12 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
   async function handleCreateChannel() {
     setIsLoading(true);
 
-    const response = await createChannel(user.id, currentUserId);
+    const data = {
+      to: user.id,
+      from: currentUserId,
+    };
+
+    const response = await createChannel(data);
 
     if (!response.redirect && response.status === 200) {
       queryClient.invalidateQueries({ queryKey: ["chat-cards"] });

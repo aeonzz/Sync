@@ -156,6 +156,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           side="top"
           align="end"
           sideOffset={12}
+          iconSize="w-4 h-4"
         />
       </div>
       {isEditing && (
