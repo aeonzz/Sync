@@ -39,7 +39,6 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
   isLoading,
   setIsLoading,
 }) => {
-
   const form = useForm<z.infer<typeof OnboardingValidation>>({
     resolver: zodResolver(OnboardingValidation),
     defaultValues: {
@@ -61,7 +60,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
   const [banner, setBanner] = useState<string>();
 
   async function onSubmit(data: z.infer<typeof OnboardingValidation>) {
-    console.log(data)
+    console.log(data);
     setIsLoading(true);
 
     let coverRes;
@@ -75,6 +74,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
         toast.error("Uh oh! Something went wrong.", {
           description: "Could not upload photo, Try again later.",
         });
+        return;
       }
     }
 
@@ -89,6 +89,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
         toast.error("Uh oh! Something went wrong.", {
           description: "Could not upload photo, Try again later.",
         });
+        return;
       }
     }
 

@@ -64,14 +64,21 @@ model Notification {
 }
 
 model Event {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  date        DateTime
-  location    String
-  organizer   User     @relation(fields: [organizerId], references: [id], name: "OrganizedEvents")
-  organizerId String
-  attendees   User[]   @relation("EventAttendees")
+  id             String             @id @default(uuid())
+  name           String
+  description    String
+  accessibility  AccessibilityType
+  date           DateTime
+  location       String
+  approvalStatus ApprovalStatusType @default(PENDING)
+  image          String?
+  blurDataUrl    String?
+  deleted        Boolean            @default(false)
+  createdAt      DateTime           @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime           @updatedAt @db.Timestamp(6)
+  organizer      User               @relation(fields: [organizerId], references: [id], name: "OrganizedEvents")
+  organizerId    String
+  attendees      User[]             @relation("EventAttendees")
 }
 
 model Post {
@@ -108,8 +115,8 @@ model Comment {
 
 model Image {
   id          Int     @id @default(autoincrement())
-  url         String? @db.VarChar(255)
-  blurDataUrl String  @db.VarChar(255)
+  url         String?
+  blurDataUrl String
   postId      String
   post        Post    @relation(fields: [postId], references: [postId])
 }
@@ -228,4 +235,15 @@ enum ChannelStatus {
   PENDING
   ACCEPTED
   DECLINED
+}
+
+enum AccessibilityType {
+  PUBLIC
+  EXCLUSIVE
+}
+
+enum ApprovalStatusType {
+  PENDING
+  APPROVED
+  REJECTED
 }

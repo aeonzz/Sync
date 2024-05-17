@@ -13,10 +13,27 @@ import {
 } from "@/components/ui/dialog";
 import EventForm from "../forms/event-form";
 import { X } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-const EventPage = () => {
+interface EventPageProps {
+  currentUserId: string;
+}
+
+const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [isDirty, setIsDirty] = useState<boolean>();
+  const [alertOpen, setAlertOpen] = useState(false);
 
   return (
     <section className="my-4">
@@ -30,18 +47,59 @@ const EventPage = () => {
               Create Event
             </Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-              <X className="h-5 w-5" />
-              <span className="sr-only">Close</span>
-            </DialogClose>
+          <DialogContent
+            onInteractOutside={(e) => {
+              if (isDirty) {
+                e.preventDefault();
+                if (!isLoading) {
+                  setAlertOpen(true);
+                }
+              }
+            }}
+          >
+            {isDirty ? (
+              <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+                <AlertDialogTrigger asChild>
+                  <button
+                    className="absolute right-4 top-4 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                    disabled={isLoading}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      You have unsaved changes. Are you sure you want to leave?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Continue editing</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => setOpen(false)}>
+                      Close
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : (
+              <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <X className="h-5 w-5" />
+                <span className="sr-only">Close</span>
+              </DialogClose>
+            )}
             <DialogHeader>
               <DialogTitle>Create Event</DialogTitle>
+              <DialogDescription>Get started with your event</DialogDescription>
             </DialogHeader>
             <EventForm
+              currentUserId={currentUserId}
               setOpen={setOpen}
               setIsLoading={setIsLoading}
               isLoading={isLoading}
+              setIsDirty={setIsDirty}
             />
           </DialogContent>
         </Dialog>

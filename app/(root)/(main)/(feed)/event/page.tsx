@@ -25,7 +25,7 @@ const Event = async () => {
   }
   return (
     <div className="w-[550px] min-h-screen">
-      <EventPage />
+      <EventPage currentUserId={session.user.id} />
     </div>
   );
 };

@@ -69,6 +69,7 @@ const OnboardingForm = () => {
         toast.error("Uh oh! Something went wrong.", {
           description: "Could not upload photo, Try again later.",
         });
+        return;
       }
     }
 

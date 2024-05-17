@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,24 +21,50 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ImagePlus } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import { Textarea } from "../ui/textarea";
 import Loader from "../loaders/loader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { AccessibilityType } from "@prisma/client";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { SingleImageDropzone } from "./single-image";
+import { useEdgeStore } from "@/lib/edgestore";
+import { toast } from "sonner";
+import { createEvent } from "@/lib/actions/event.actions";
 
 interface EventFormProps {
+  currentUserId: string;
   setOpen: (state: boolean) => void;
   isLoading: boolean;
   setIsLoading: (state: boolean) => void;
+  setIsDirty: (state: boolean) => void;
 }
 
 const EventForm: React.FC<EventFormProps> = ({
+  currentUserId,
   setOpen,
   isLoading,
   setIsLoading,
+  setIsDirty,
 }) => {
+  const [openImageInput, setOpenImageInput] = useState(false);
+  const [accordionValue, setAccourdionValue] = useState("");
+  const { edgestore } = useEdgeStore();
+  const [file, setFile] = useState<File>();
   const form = useForm<z.infer<typeof EventValidation>>({
     resolver: zodResolver(EventValidation),
     defaultValues: {
@@ -47,7 +73,52 @@ const EventForm: React.FC<EventFormProps> = ({
     },
   });
 
-  function onSubmit(data: z.infer<typeof EventValidation>) {}
+  async function onSubmit(data: z.infer<typeof EventValidation>) {
+    setIsLoading(true);
+    let res;
+    if (file) {
+      try {
+        res = await edgestore.publicImages.upload({
+          file,
+        });
+      } catch (error) {
+        setIsLoading(false);
+        toast.error("Uh oh! Something went wrong.", {
+          description: "Could not upload photo, Try again later.",
+        });
+        return;
+      }
+    }
+
+    const { accessibility, ...restData } = data;
+
+    const eventData = {
+      ...restData,
+      accessibility: accessibility as AccessibilityType,
+      image: res?.url,
+      userId: currentUserId,
+    };
+
+    const response = await createEvent(eventData);
+
+    if (response.status === 200) {
+      setIsLoading(false);
+      setOpen(false);
+      toast.success("Event Created", {
+        description: "Waiting for Admin approval",
+      });
+    } else {
+      setIsLoading(false);
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    }
+  }
+
+  useEffect(() => {
+    setIsDirty(form.formState.isDirty);
+  }, [form.formState.isDirty, file]);
 
   return (
     <Form {...form}>
@@ -55,7 +126,7 @@ const EventForm: React.FC<EventFormProps> = ({
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex w-full flex-col space-y-3"
       >
-        <div className="flex items-end space-x-3">
+        <div className="flex items-end space-x-2">
           <FormField
             control={form.control}
             name="name"
@@ -63,7 +134,12 @@ const EventForm: React.FC<EventFormProps> = ({
               <FormItem className="flex-1">
                 <FormLabel>Event Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Event name" {...field} />
+                  <Input
+                    placeholder="Event name"
+                    autoComplete="off"
+                    disabled={isLoading}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -71,17 +147,38 @@ const EventForm: React.FC<EventFormProps> = ({
           />
           <FormField
             control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Location</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Location"
+                    autoComplete="off"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex items-end space-x-2">
+          <FormField
+            control={form.control}
             name="date"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex flex-1 flex-col">
                 <FormLabel>Date of the Event</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant="secondary"
+                        disabled={isLoading}
                         className={cn(
-                          "w-40 py-2 pl-3 text-left font-normal",
+                          "w-auto py-2 pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground",
                         )}
                       >
@@ -110,6 +207,37 @@ const EventForm: React.FC<EventFormProps> = ({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="accessibility"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Accessibility</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={AccessibilityType.PUBLIC}
+                >
+                  <FormControl>
+                    <SelectTrigger
+                      className="text-muted-foreground"
+                      disabled={isLoading}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={AccessibilityType.PUBLIC}>
+                      Public
+                    </SelectItem>
+                    <SelectItem value={AccessibilityType.EXCLUSIVE}>
+                      Exclusive
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         <FormField
           control={form.control}
@@ -121,6 +249,7 @@ const EventForm: React.FC<EventFormProps> = ({
                 <Textarea
                   placeholder="Event description"
                   className="resize-none"
+                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -128,27 +257,77 @@ const EventForm: React.FC<EventFormProps> = ({
             </FormItem>
           )}
         />
-        <div className="mt-5 flex w-fit space-x-1 self-end">
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full"
+          value={accordionValue}
+          onValueChange={setAccourdionValue}
+        >
+          <AccordionItem value="item-1">
+            <AccordionContent>
+              <SingleImageDropzone
+                width={150}
+                height={150}
+                disabled={isLoading}
+                value={file}
+                onChange={(file) => {
+                  setFile(file);
+                }}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+        <div className="mt-5 flex items-center justify-between">
           <Button
-            disabled={isLoading}
-            size="sm"
+            className={cn(
+              openImageInput && "bg-green-500/15",
+              "group transition-all hover:bg-green-500/15 active:scale-95",
+            )}
+            size="icon"
             variant="ghost"
-            className="flex-1"
             onClick={(e) => {
               e.preventDefault();
-              setOpen(false);
+              setOpenImageInput((prev) => !prev);
+              setAccourdionValue((prev) =>
+                prev === ""
+                  ? "item-1"
+                  : "" || prev === "item-1"
+                    ? ""
+                    : "item-1",
+              );
             }}
-          >
-            Cancel
-          </Button>
-          <Button
-            className="flex-1"
-            size="sm"
-            type="submit"
             disabled={isLoading}
           >
-            {isLoading ? <Loader /> : <p>Continue</p>}
+            <ImagePlus
+              className={cn(
+                openImageInput ? "text-green-500/70" : "text-foreground",
+                "h-5 w-5 group-hover:text-green-500/70",
+              )}
+            />
           </Button>
+          <div className="flex w-fit space-x-1">
+            <Button
+              disabled={isLoading}
+              size="sm"
+              variant="ghost"
+              className="flex-1"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="flex-1"
+              size="sm"
+              type="submit"
+              disabled={isLoading}
+            >
+              Continue
+            </Button>
+          </div>
         </div>
       </form>
     </Form>
