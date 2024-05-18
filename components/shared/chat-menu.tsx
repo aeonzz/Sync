@@ -49,7 +49,10 @@ const ChatMenu: React.FC<ChatMenuProps> = ({ currentUserId }) => {
   });
 
   return (
-    <ScrollArea className="h-screen w-16 border-l" scrollBarColor="bg-transparent">
+    <ScrollArea
+      className="h-screen w-16 border-l bg-card/40"
+      scrollBarColor="bg-transparent"
+    >
       <aside className="flex h-auto w-auto flex-col items-center py-5">
         <TooltipProvider delayDuration={100}>
           <div className="flex flex-col space-y-1">

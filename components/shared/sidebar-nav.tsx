@@ -85,7 +85,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
   return (
     <div
       className={cn(
-        isChatRoom ? "w-[73px] bg-card/50" : "w-[254px]",
+        isChatRoom ? "w-[73px]" : "w-[254px]",
         "flex h-full flex-col items-start space-y-2 px-2 py-5 transition-all duration-300",
       )}
     >

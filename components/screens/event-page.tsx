@@ -24,6 +24,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { EventProps } from "@/types/event";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import FetchDataError from "../ui/fetch-data-error";
+import NoPostMessage from "../ui/no-post-message";
+import EventCard from "../cards/event-card";
 
 interface EventPageProps {
   currentUserId: string;
@@ -35,8 +41,18 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
   const [isDirty, setIsDirty] = useState<boolean>();
   const [alertOpen, setAlertOpen] = useState(false);
 
+  const getEvents = useQuery<EventProps[]>({
+    queryFn: async () => {
+      const response = await axios.get("/api/event");
+      return response.data.data;
+    },
+    queryKey: ["events"],
+  });
+
+  console.log(getEvents.data);
+
   return (
-    <section className="my-4">
+    <section className="my-4 space-y-3">
       <div className="flex w-full items-center justify-between">
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           Events
@@ -103,6 +119,21 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
             />
           </DialogContent>
         </Dialog>
+      </div>
+      <div className="space-y-3">
+        {getEvents.isLoading ? (
+          <h1>loading</h1>
+        ) : getEvents.isError ? (
+          <FetchDataError />
+        ) : getEvents.data?.length === 0 ? (
+          <NoPostMessage />
+        ) : (
+          <>
+            {getEvents.data?.map((event, index) => (
+              <EventCard key={index} event={event} currentUserId={currentUserId} />
+            ))}
+          </>
+        )}
       </div>
     </section>
   );

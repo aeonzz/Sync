@@ -1,6 +1,6 @@
 "use server";
 
-import { AccessibilityType, ApprovalStatusType } from "@prisma/client";
+import { AccessibilityType } from "@prisma/client";
 import getBase64 from "../base64";
 import prisma from "../db";
 
@@ -39,10 +39,26 @@ export async function createEvent({
         accessibility,
         image: image,
         blurDataUrl,
-        approvalStatus: ApprovalStatusType.PENDING,
       },
     });
 
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, status: 500 };
+  }
+}
+
+export async function deleteEvent(eventId: string) {
+  try {
+    await prisma.event.update({
+      where: {
+        id: eventId,
+      },
+      data: {
+        deleted: true,
+      },
+    });
     return { error: null, status: 200 };
   } catch (error: any) {
     console.log(error);

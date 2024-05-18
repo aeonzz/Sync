@@ -45,6 +45,7 @@ import { SingleImageDropzone } from "./single-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import { toast } from "sonner";
 import { createEvent } from "@/lib/actions/event.actions";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface EventFormProps {
   currentUserId: string;
@@ -63,6 +64,7 @@ const EventForm: React.FC<EventFormProps> = ({
 }) => {
   const [openImageInput, setOpenImageInput] = useState(false);
   const [accordionValue, setAccourdionValue] = useState("");
+  const queryClient = useQueryClient();
   const { edgestore } = useEdgeStore();
   const [file, setFile] = useState<File>();
   const form = useForm<z.infer<typeof EventValidation>>({
@@ -104,6 +106,7 @@ const EventForm: React.FC<EventFormProps> = ({
     if (response.status === 200) {
       setIsLoading(false);
       setOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["events"] });
       toast.success("Event Created", {
         description: "Waiting for Admin approval",
       });
@@ -215,14 +218,13 @@ const EventForm: React.FC<EventFormProps> = ({
                 <FormLabel>Accessibility</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={AccessibilityType.PUBLIC}
                 >
                   <FormControl>
                     <SelectTrigger
                       className="text-muted-foreground"
                       disabled={isLoading}
                     >
-                      <SelectValue />
+                      <SelectValue placeholder="Accessibility" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>

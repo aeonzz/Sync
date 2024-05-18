@@ -14,6 +14,7 @@ model User {
   id                       String            @id @default(uuid())
   studentId                Int               @unique
   email                    String            @unique
+  role                     UserRoleType      @default(USER)
   username                 String?           @unique
   password                 String
   avatarUrl                String?
@@ -71,6 +72,7 @@ model Event {
   date           DateTime
   location       String
   approvalStatus ApprovalStatusType @default(PENDING)
+  eventStatus    EventStatusType    @default(UPCOMING)
   image          String?
   blurDataUrl    String?
   deleted        Boolean            @default(false)
@@ -122,16 +124,16 @@ model Image {
 }
 
 model StudentData {
-  id         Int      @id @default(autoincrement())
-  studentId  Int      @unique
+  id         Int            @id @default(autoincrement())
+  studentId  Int            @unique
   firstName  String
   middleName String
   lastName   String
   yearLevel  String
-  department String
-  hasAccount Boolean  @default(false)
-  createdAt  DateTime @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime @updatedAt @db.Timestamp(6)
+  department DepartmentType
+  hasAccount Boolean        @default(false)
+  createdAt  DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime       @updatedAt @db.Timestamp(6)
   user       User?
 }
 
@@ -246,4 +248,25 @@ enum ApprovalStatusType {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum UserRoleType {
+  ADMIN
+  USER
+  SYSTEMADMIN
+}
+
+enum DepartmentType {
+  BSIT
+  BSNAME
+  BSESM
+  BSTCM
+  BSMET
+}
+
+enum EventStatusType {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
 }
