@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useRouter } from "next/navigation";
 
 interface EventCardProps {
   event: EventProps;
@@ -39,6 +40,7 @@ interface EventCardProps {
 const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
   const eventCreatedAt = new Date(event.createdAt);
   const eventDate = new Date(event.date);
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const [alertOpen, setAlertOpen] = useState(false);
@@ -50,7 +52,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
 
     if (response.status === 200) {
       setIsLoading(false);
+      router.refresh();
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      toast.success("Event Cancelled", {
+        description: "Cancelled Event approval successfuly",
+      });
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
@@ -70,7 +76,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
           {event.organizer.id === currentUserId && (
             <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
               <AlertDialogTrigger asChild>
-                <Button size="sm" variant="destructive">
+                <Button size="sm" variant="destructive" disabled={isLoading}>
                   Cancel
                 </Button>
               </AlertDialogTrigger>
@@ -82,8 +88,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Back</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteEvent}>
+                  <AlertDialogCancel disabled={isLoading}>
+                    Back
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={isLoading}
+                    onClick={handleDeleteEvent}
+                  >
                     Continue
                   </AlertDialogAction>
                 </AlertDialogFooter>
@@ -92,7 +103,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
           )}
         </div>
       )}
-      <Link href="/" className="group">
+      <Link href={`/event/${event.id}`} className="group">
         <Card className="mb-3 flex h-full items-center space-x-3 p-3 transition-colors hover:bg-input">
           <Image
             src={
@@ -114,13 +125,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
           <div className="flex h-[120px] w-full flex-col">
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center space-x-2">
-                <h3 className="break-word scroll-m-20 whitespace-pre-wrap text-2xl font-semibold tracking-tight">
-                  {event.name.slice(0, 10)}
-                  {event.description.length >= 10 && "..."}
+                <h3 className="break-all scroll-m-20 whitespace-pre-wrap text-2xl font-semibold tracking-tight">
+                  {event.name.slice(0, 15)}
+                  {event.description.length >= 15 && "..."}
                 </h3>
-                <Badge className="text-[10px] font-normal">
-                  {event.accessibility}
-                </Badge>
                 <Badge variant="secondary" className="text-[10px] font-normal">
                   {formatDistanceToNow(eventCreatedAt, { addSuffix: true })}
                 </Badge>
@@ -156,11 +164,17 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
                 </HoverCardContent>
               </HoverCard>
             </div>
-            <p className="break-word h-40 overflow-hidden whitespace-pre-wrap text-xs text-muted-foreground">
+            <p className="break-all h-40 overflow-hidden whitespace-pre-wrap text-xs text-muted-foreground">
               {event.description.slice(0, 190)}
               {event.description.length >= 190 && "..."}
             </p>
-            <div className="h-full">
+            <div className="h-full space-x-1">
+              <Badge className="text-[10px] font-normal">
+                {event.accessibility}
+              </Badge>
+              <Badge className="text-[10px] font-normal">
+                {event.eventStatus}
+              </Badge>
               <Badge variant="secondary" className="text-[10px] font-normal">
                 {format(eventDate, "PPp")}
               </Badge>

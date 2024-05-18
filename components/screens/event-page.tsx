@@ -30,12 +30,18 @@ import axios from "axios";
 import FetchDataError from "../ui/fetch-data-error";
 import NoPostMessage from "../ui/no-post-message";
 import EventCard from "../cards/event-card";
+import { format } from "date-fns";
 
 interface EventPageProps {
   currentUserId: string;
+  eventDates:
+    | {
+        date: Date;
+      }[]
+    | null;
 }
 
-const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
+const EventPage: React.FC<EventPageProps> = ({ currentUserId, eventDates }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [isDirty, setIsDirty] = useState<boolean>();
@@ -48,8 +54,6 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
     },
     queryKey: ["events"],
   });
-
-  console.log(getEvents.data);
 
   return (
     <section className="my-4 space-y-3">
@@ -116,6 +120,7 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
               setIsLoading={setIsLoading}
               isLoading={isLoading}
               setIsDirty={setIsDirty}
+              eventDates={eventDates}
             />
           </DialogContent>
         </Dialog>
@@ -130,7 +135,11 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
         ) : (
           <>
             {getEvents.data?.map((event, index) => (
-              <EventCard key={index} event={event} currentUserId={currentUserId} />
+              <EventCard
+                key={index}
+                event={event}
+                currentUserId={currentUserId}
+              />
             ))}
           </>
         )}

@@ -57,11 +57,29 @@ export async function deleteEvent(eventId: string) {
       },
       data: {
         deleted: true,
+        date: null,
       },
     });
     return { error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
     return { error: error.message, status: 500 };
+  }
+}
+
+export async function getEventDates() {
+  try {
+    const dates = await prisma.event.findMany({
+      where: {
+        deleted: false,
+      },
+      select: {
+        date: true,
+      },
+    });
+    return { data: dates, error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { data: null, error: error.message, status: 500 };
   }
 }

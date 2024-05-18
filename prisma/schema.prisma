@@ -69,7 +69,7 @@ model Event {
   name           String
   description    String
   accessibility  AccessibilityType
-  date           DateTime
+  date           DateTime?
   location       String
   approvalStatus ApprovalStatusType @default(PENDING)
   eventStatus    EventStatusType    @default(UPCOMING)

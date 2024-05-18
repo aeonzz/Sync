@@ -46,6 +46,8 @@ import { useEdgeStore } from "@/lib/edgestore";
 import { toast } from "sonner";
 import { createEvent } from "@/lib/actions/event.actions";
 import { useQueryClient } from "@tanstack/react-query";
+import { Matcher } from "react-day-picker";
+import { useRouter } from "next/navigation";
 
 interface EventFormProps {
   currentUserId: string;
@@ -53,6 +55,9 @@ interface EventFormProps {
   isLoading: boolean;
   setIsLoading: (state: boolean) => void;
   setIsDirty: (state: boolean) => void;
+  eventDates: {
+    date: Date;
+  }[] | null;
 }
 
 const EventForm: React.FC<EventFormProps> = ({
@@ -61,12 +66,15 @@ const EventForm: React.FC<EventFormProps> = ({
   isLoading,
   setIsLoading,
   setIsDirty,
+  eventDates,
 }) => {
   const [openImageInput, setOpenImageInput] = useState(false);
   const [accordionValue, setAccourdionValue] = useState("");
   const queryClient = useQueryClient();
   const { edgestore } = useEdgeStore();
+  const router = useRouter();
   const [file, setFile] = useState<File>();
+  const disabledDays = eventDates ? eventDates.map((date) => new Date(date.date)) : undefined;
   const form = useForm<z.infer<typeof EventValidation>>({
     resolver: zodResolver(EventValidation),
     defaultValues: {
@@ -107,6 +115,7 @@ const EventForm: React.FC<EventFormProps> = ({
       setIsLoading(false);
       setOpen(false);
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      router.refresh();
       toast.success("Event Created", {
         description: "Waiting for Admin approval",
       });
@@ -118,6 +127,7 @@ const EventForm: React.FC<EventFormProps> = ({
       });
     }
   }
+
 
   useEffect(() => {
     setIsDirty(form.formState.isDirty);
@@ -199,9 +209,7 @@ const EventForm: React.FC<EventFormProps> = ({
                       mode="single"
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
+                      disabled={disabledDays}
                       initialFocus
                     />
                   </PopoverContent>
@@ -216,9 +224,7 @@ const EventForm: React.FC<EventFormProps> = ({
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>Accessibility</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                >
+                <Select onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger
                       className="text-muted-foreground"
