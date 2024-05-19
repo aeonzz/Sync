@@ -179,7 +179,6 @@ const MessageActions: React.FC<MessageActionsProps> = ({
             <DropdownMenuContent side="left" className="p-1.5">
               <DropdownMenuItem
                 onClick={() => setMessageId(messageId)}
-                className="text-xs"
               >
                 <Reply className="mr-2 h-4 w-4" />
                 Reply
@@ -188,7 +187,7 @@ const MessageActions: React.FC<MessageActionsProps> = ({
                 {isSender && (
                   <AlertDialogTrigger asChild>
                     <DropdownMenuItem
-                      className="text-xs text-red-600"
+                      className="text-red-600"
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash className="mr-2 h-4 w-4" />

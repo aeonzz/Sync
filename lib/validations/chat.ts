@@ -15,5 +15,5 @@ export const RoomValidation = z.object({
   name: z
     .string()
     .min(5, "Room name should be atleast 5 characters")
-    .max(20, "Room name should not exceed 20 characters"),
+    .max(15, "Room name should not exceed 15 characters"),
 });

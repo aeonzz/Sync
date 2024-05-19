@@ -235,7 +235,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
             {session?.user.id === post.author.id && (
               <>
                 <DropdownMenuItem
-                  className="text-xs"
+                  className=""
                   disabled={isEditing}
                   onClick={() => setIsEditing(true)}
                 >
@@ -245,7 +245,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
                 <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
                   <AlertDialogTrigger asChild>
                     <DropdownMenuItem
-                      className="text-xs text-red-600"
+                      className="text-red-600"
                       onSelect={(e) => e.preventDefault()}
                     >
                       <Trash className="mr-2 h-4 w-4" />

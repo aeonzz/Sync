@@ -103,7 +103,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
           )}
         </div>
       )}
-      <Link href={`/event/${event.id}`} className="group">
+      <Link href={`/e/${event.id}/overview`} className="group">
         <Card className="mb-3 flex h-full items-center space-x-3 p-3 transition-colors hover:bg-input">
           <Image
             src={

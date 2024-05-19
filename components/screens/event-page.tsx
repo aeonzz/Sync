@@ -31,6 +31,7 @@ import FetchDataError from "../ui/fetch-data-error";
 import NoPostMessage from "../ui/no-post-message";
 import EventCard from "../cards/event-card";
 import { format } from "date-fns";
+import EventSkeleton from "../loaders/event-skeleton";
 
 interface EventPageProps {
   currentUserId: string;
@@ -127,7 +128,7 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId, eventDates }) => {
       </div>
       <div className="space-y-3">
         {getEvents.isLoading ? (
-          <h1>loading</h1>
+          <EventSkeleton />
         ) : getEvents.isError ? (
           <FetchDataError />
         ) : getEvents.data?.length === 0 ? (

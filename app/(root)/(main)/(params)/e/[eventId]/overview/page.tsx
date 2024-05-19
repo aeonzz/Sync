@@ -24,7 +24,7 @@ const page = async ({ params }: { params: { eventId: string } }) => {
   }
 
   return (
-    <div className="min-h-screen w-[550px]">
+    <div className="w-full">
       <EventDetails eventId={eventId} />
     </div>
   );
