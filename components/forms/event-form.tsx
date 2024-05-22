@@ -44,10 +44,11 @@ import {
 import { SingleImageDropzone } from "./single-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import { toast } from "sonner";
-import { createEvent } from "@/lib/actions/event.actions";
+import { createEvent, updateEvent } from "@/lib/actions/event.actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { Matcher } from "react-day-picker";
 import { useRouter } from "next/navigation";
+import { EventProps } from "@/types/event";
 
 interface EventFormProps {
   currentUserId: string;
@@ -55,9 +56,13 @@ interface EventFormProps {
   isLoading: boolean;
   setIsLoading: (state: boolean) => void;
   setIsDirty: (state: boolean) => void;
-  eventDates: {
-    date: Date;
-  }[] | null;
+  formData?: EventProps;
+  eventDates:
+    | {
+        date: Date;
+      }[]
+    | null;
+  setActionDropdown?: (state: boolean) => void;
 }
 
 const EventForm: React.FC<EventFormProps> = ({
@@ -67,6 +72,8 @@ const EventForm: React.FC<EventFormProps> = ({
   setIsLoading,
   setIsDirty,
   eventDates,
+  formData,
+  setActionDropdown,
 }) => {
   const [openImageInput, setOpenImageInput] = useState(false);
   const [accordionValue, setAccourdionValue] = useState("");
@@ -74,60 +81,91 @@ const EventForm: React.FC<EventFormProps> = ({
   const { edgestore } = useEdgeStore();
   const router = useRouter();
   const [file, setFile] = useState<File>();
-  const disabledDays = eventDates ? eventDates.map((date) => new Date(date.date)) : undefined;
+  const disabledDays = eventDates
+    ? eventDates.map((date) => new Date(date.date))
+    : undefined;
   const form = useForm<z.infer<typeof EventValidation>>({
     resolver: zodResolver(EventValidation),
     defaultValues: {
-      name: "",
-      description: "",
+      name: formData ? formData.name : "",
+      description: formData ? formData.description : "",
+      date: formData ? new Date(formData.date) : undefined,
+      location: formData ? formData.location : "",
+      accessibility: formData ? formData.accessibility : undefined,
     },
   });
 
   async function onSubmit(data: z.infer<typeof EventValidation>) {
     setIsLoading(true);
-    let res;
-    if (file) {
-      try {
-        res = await edgestore.publicImages.upload({
-          file,
+
+    if (formData) {
+      const { accessibility, ...restData } = data;
+      const eventData = {
+        ...restData,
+        accessibility: accessibility as AccessibilityType,
+        eventId: formData.id,
+      };
+      const response = await updateEvent(eventData);
+
+      if (response.status === 200) {
+        setIsLoading(false);
+        setOpen(false);
+        queryClient.invalidateQueries({ queryKey: ["events"] });
+        queryClient.invalidateQueries({ queryKey: [formData.id] });
+        toast.success("Event Updated", {
+          description: "Your event details have been successfully updated.",
         });
-      } catch (error) {
+        setActionDropdown?.(false);
+      } else {
         setIsLoading(false);
         toast.error("Uh oh! Something went wrong.", {
-          description: "Could not upload photo, Try again later.",
+          description:
+            "An error occurred while making the request. Please try again later",
         });
-        return;
+      }
+    } else {
+      let res;
+      if (file) {
+        try {
+          res = await edgestore.publicImages.upload({
+            file,
+          });
+        } catch (error) {
+          setIsLoading(false);
+          toast.error("Uh oh! Something went wrong.", {
+            description: "Could not upload photo, Try again later.",
+          });
+          return;
+        }
+      }
+
+      const { accessibility, ...restData } = data;
+
+      const eventData = {
+        ...restData,
+        accessibility: accessibility as AccessibilityType,
+        image: res?.url,
+        userId: currentUserId,
+      };
+
+      const response = await createEvent(eventData);
+
+      if (response.status === 200) {
+        setIsLoading(false);
+        setOpen(false);
+        queryClient.invalidateQueries({ queryKey: ["events"] });
+        toast.success("Event Created", {
+          description: "Waiting for Admin approval",
+        });
+      } else {
+        setIsLoading(false);
+        toast.error("Uh oh! Something went wrong.", {
+          description:
+            "An error occurred while making the request. Please try again later",
+        });
       }
     }
-
-    const { accessibility, ...restData } = data;
-
-    const eventData = {
-      ...restData,
-      accessibility: accessibility as AccessibilityType,
-      image: res?.url,
-      userId: currentUserId,
-    };
-
-    const response = await createEvent(eventData);
-
-    if (response.status === 200) {
-      setIsLoading(false);
-      setOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["events"] });
-      router.refresh();
-      toast.success("Event Created", {
-        description: "Waiting for Admin approval",
-      });
-    } else {
-      setIsLoading(false);
-      toast.error("Uh oh! Something went wrong.", {
-        description:
-          "An error occurred while making the request. Please try again later",
-      });
-    }
   }
-
 
   useEffect(() => {
     setIsDirty(form.formState.isDirty);
@@ -224,7 +262,12 @@ const EventForm: React.FC<EventFormProps> = ({
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>Accessibility</FormLabel>
-                <Select onValueChange={field.onChange}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={
+                    formData ? formData.accessibility : AccessibilityType.PUBLIC
+                  }
+                >
                   <FormControl>
                     <SelectTrigger
                       className="text-muted-foreground"
@@ -287,33 +330,37 @@ const EventForm: React.FC<EventFormProps> = ({
           </AccordionItem>
         </Accordion>
         <div className="mt-5 flex items-center justify-between">
-          <Button
-            className={cn(
-              openImageInput && "bg-green-500/15",
-              "group transition-all hover:bg-green-500/15 active:scale-95",
+          <div className="flex-1">
+            {!formData && (
+              <Button
+                className={cn(
+                  openImageInput && "bg-green-500/15",
+                  "group transition-all hover:bg-green-500/15 active:scale-95",
+                )}
+                size="icon"
+                variant="ghost"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpenImageInput((prev) => !prev);
+                  setAccourdionValue((prev) =>
+                    prev === ""
+                      ? "item-1"
+                      : "" || prev === "item-1"
+                        ? ""
+                        : "item-1",
+                  );
+                }}
+                disabled={isLoading}
+              >
+                <ImagePlus
+                  className={cn(
+                    openImageInput ? "text-green-500/70" : "text-foreground",
+                    "h-5 w-5 group-hover:text-green-500/70",
+                  )}
+                />
+              </Button>
             )}
-            size="icon"
-            variant="ghost"
-            onClick={(e) => {
-              e.preventDefault();
-              setOpenImageInput((prev) => !prev);
-              setAccourdionValue((prev) =>
-                prev === ""
-                  ? "item-1"
-                  : "" || prev === "item-1"
-                    ? ""
-                    : "item-1",
-              );
-            }}
-            disabled={isLoading}
-          >
-            <ImagePlus
-              className={cn(
-                openImageInput ? "text-green-500/70" : "text-foreground",
-                "h-5 w-5 group-hover:text-green-500/70",
-              )}
-            />
-          </Button>
+          </div>
           <div className="flex w-fit space-x-1">
             <Button
               disabled={isLoading}
@@ -333,7 +380,7 @@ const EventForm: React.FC<EventFormProps> = ({
               type="submit"
               disabled={isLoading}
             >
-              Continue
+              {FormData ? "Update" : "Continue"}
             </Button>
           </div>
         </div>

@@ -83,3 +83,40 @@ export async function getEventDates() {
     return { data: null, error: error.message, status: 500 };
   }
 }
+
+interface UpdateEventParams {
+  eventId: string;
+  name: string;
+  description: string;
+  accessibility: AccessibilityType;
+  date: Date;
+  location: string;
+}
+
+export async function updateEvent({
+  eventId,
+  name,
+  description,
+  accessibility,
+  date,
+  location,
+}: UpdateEventParams) {
+  try {
+    await prisma.event.update({
+      where: {
+        id: eventId,
+      },
+      data: {
+        name,
+        description,
+        accessibility,
+        date,
+        location,
+      },
+    });
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, status: 500 };
+  }
+}

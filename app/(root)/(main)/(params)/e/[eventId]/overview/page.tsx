@@ -1,5 +1,6 @@
 import EventDetails from "@/components/screens/event-details";
 import FetchDataError from "@/components/ui/fetch-data-error";
+import { getEventDates } from "@/lib/actions/event.actions";
 import { getUserById } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
@@ -23,9 +24,20 @@ const page = async ({ params }: { params: { eventId: string } }) => {
     redirect("/onboarding");
   }
 
+  const eventDates = await getEventDates();
+
+  if (!eventDates || eventDates.error) {
+    return <FetchDataError />;
+  }
+
   return (
     <div className="w-full">
-      <EventDetails eventId={eventId} />
+      <EventDetails
+        eventId={eventId}
+        currentUserId={session.user.id}
+        // @ts-ignore
+        eventDates={eventDates.data}
+      />
     </div>
   );
 };

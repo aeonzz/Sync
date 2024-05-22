@@ -15,8 +15,9 @@ export default async function Home() {
 
   const currentUser = await getUserById(session!.user.id);
   if (!currentUser.data || currentUser.error) {
-    return <FetchDataError />;
+    return (<FetchDataError />);
   }
+
 
   if (!currentUser.data.onboarded) {
     redirect("/onboarding");

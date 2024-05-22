@@ -27,14 +27,13 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
     redirect("/login");
   }
 
-  const currentUser = await getUserById(session.user.id);
   const userData = await getUserById(params.userId);
 
   if (!userData.data || !paramsId) {
     return <NotFound className="w-full" />;
   }
 
-  if (userData.error || currentUser.error || !currentUser.data) {
+  if (userData.error) {
     return <FetchDataError />;
   }
 
@@ -43,7 +42,7 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
   }
 
   const isAlreadyFollowed = await checkIfCurrentUserFollowedUser(
-    currentUser.data.id,
+    userData.data.id,
     paramsId,
   );
 
@@ -56,7 +55,7 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
           userData={userData.data}
           session={session}
           paramsId={paramsId}
-          currentUser={currentUser.data}
+          currentUser={userData.data}
           isAlreadyFollowed={isAlreadyFollowed}
         />
       </Card>

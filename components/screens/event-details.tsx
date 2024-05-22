@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Pencil, Trash } from "lucide-react";
+import { MoreVertical, Pencil, Trash, X } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,9 +32,25 @@ import {
 import { deleteEvent } from "@/lib/actions/event.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import EventForm from "../forms/event-form";
 
 interface EventDetailsProps {
   eventId: string;
+  currentUserId: string;
+  eventDates:
+    | {
+        date: Date;
+      }[]
+    | null;
 }
 
 const options = {
@@ -42,12 +58,20 @@ const options = {
   className: "text-blue-500 hover:underline",
 };
 
-const EventDetails: React.FC<EventDetailsProps> = ({ eventId }) => {
+const EventDetails: React.FC<EventDetailsProps> = ({
+  eventId,
+  currentUserId,
+  eventDates,
+}) => {
   const router = useRouter();
   const [actionDropdown, setActionDropdown] = useState(false);
+  console.log(actionDropdown)
   const [alertOpen, setAlertOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [isDirty, setIsDirty] = useState<boolean>();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
+
   const event = useQuery<EventProps>({
     queryFn: async () => {
       const response = await axios.get(`/api/event/${eventId}`);
@@ -105,58 +129,124 @@ const EventDetails: React.FC<EventDetailsProps> = ({ eventId }) => {
                 {event.data.eventStatus.charAt(0)}
                 {event.data.eventStatus.slice(1).toLowerCase()}
               </Badge>
-              <DropdownMenu
-                open={actionDropdown}
-                onOpenChange={setActionDropdown}
-              >
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="min-w-[100px] p-1.5"
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DropdownMenu
+                  open={actionDropdown}
+                  onOpenChange={setActionDropdown}
                 >
-                  <DropdownMenuItem>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-                    <AlertDialogTrigger asChild>
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onSelect={(e) => e.preventDefault()}
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        Delete
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="min-w-[100px] p-1.5"
+                  >
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Edit
                       </DropdownMenuItem>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Are you absolutely sure?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Deleting this event will permanently remove it from
-                          your calendar. Are you sure you want to proceed?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isLoading}>
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          disabled={isLoading}
-                          onClick={handleDeleteEvent}
+                    </DialogTrigger>
+                    <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+                      <AlertDialogTrigger asChild>
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onSelect={(e) => e.preventDefault()}
                         >
-                          Continue
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                          <Trash className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Deleting this event will permanently remove it from
+                            your calendar. Are you sure you want to proceed?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={isLoading}>
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            disabled={isLoading}
+                            onClick={handleDeleteEvent}
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DialogContent
+                  onInteractOutside={(e) => {
+                    if (isDirty) {
+                      e.preventDefault();
+                      if (!isLoading) {
+                        setAlertOpen(true);
+                      }
+                    }
+                  }}
+                >
+                  {isDirty ? (
+                    <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+                      <AlertDialogTrigger asChild>
+                        <button
+                          className="absolute right-4 top-4 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                          disabled={isLoading}
+                        >
+                          <X className="h-5 w-5" />
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            You have unsaved changes. Are you sure you want to
+                            leave?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>
+                            Continue editing
+                          </AlertDialogCancel>
+                          <AlertDialogAction onClick={() => setOpen(false)}>
+                            Close
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  ) : (
+                    <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                      <X className="h-5 w-5" />
+                      <span className="sr-only">Close</span>
+                    </DialogClose>
+                  )}
+                  <DialogHeader>
+                    <DialogTitle>Create Event</DialogTitle>
+                    <DialogDescription>
+                      Get started with your event
+                    </DialogDescription>
+                  </DialogHeader>
+                  <EventForm
+                    currentUserId={currentUserId}
+                    setOpen={setOpen}
+                    setIsLoading={setIsLoading}
+                    isLoading={isLoading}
+                    setIsDirty={setIsDirty}
+                    eventDates={eventDates}
+                    formData={event.data}
+                  />
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           <Separator />
