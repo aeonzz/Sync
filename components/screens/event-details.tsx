@@ -42,15 +42,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import EventForm from "../forms/event-form";
+import { Venue } from "@prisma/client";
 
 interface EventDetailsProps {
   eventId: string;
   currentUserId: string;
-  eventDates:
-    | {
-        date: Date;
-      }[]
-    | null;
+}
+
+interface DataProps {
+  event: EventProps;
+  venues: Venue[];
 }
 
 const options = {
@@ -61,18 +62,17 @@ const options = {
 const EventDetails: React.FC<EventDetailsProps> = ({
   eventId,
   currentUserId,
-  eventDates,
 }) => {
   const router = useRouter();
   const [actionDropdown, setActionDropdown] = useState(false);
-  console.log(actionDropdown)
   const [alertOpen, setAlertOpen] = useState(false);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false)
   const [open, setOpen] = useState(false);
   const [isDirty, setIsDirty] = useState<boolean>();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
-  const event = useQuery<EventProps>({
+  const event = useQuery<DataProps>({
     queryFn: async () => {
       const response = await axios.get(`/api/event/${eventId}`);
       return response.data.data;
@@ -113,21 +113,21 @@ const EventDetails: React.FC<EventDetailsProps> = ({
 
   return (
     <section className="h-full w-full overflow-hidden">
-      {event.data.deleted ? (
+      {event.data.event.deleted ? (
         <DeletedContent />
       ) : (
         <div className="flex flex-col space-y-3">
           <div className="flex-center flex justify-between py-6 pr-6">
             <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-              {event.data.name}
+              {event.data.event.name}
             </h1>
             <div className="flex items-center space-x-1">
               <Badge
                 variant="secondary"
                 className="h-fit px-6 py-2 font-normal"
               >
-                {event.data.eventStatus.charAt(0)}
-                {event.data.eventStatus.slice(1).toLowerCase()}
+                {event.data.event.eventStatus.charAt(0)}
+                {event.data.event.eventStatus.slice(1).toLowerCase()}
               </Badge>
               <Dialog open={open} onOpenChange={setOpen}>
                 <DropdownMenu
@@ -149,7 +149,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                         Edit
                       </DropdownMenuItem>
                     </DialogTrigger>
-                    <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+                    <AlertDialog open={deleteAlertOpen} onOpenChange={setDeleteAlertOpen}>
                       <AlertDialogTrigger asChild>
                         <DropdownMenuItem
                           className="text-red-600"
@@ -185,6 +185,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <DialogContent
+                  className="max-w-5xl"
                   onInteractOutside={(e) => {
                     if (isDirty) {
                       e.preventDefault();
@@ -231,9 +232,9 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                     </DialogClose>
                   )}
                   <DialogHeader>
-                    <DialogTitle>Create Event</DialogTitle>
+                    <DialogTitle>Update Event</DialogTitle>
                     <DialogDescription>
-                      Get started with your event
+                      Make changes to your event below.
                     </DialogDescription>
                   </DialogHeader>
                   <EventForm
@@ -242,8 +243,8 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                     setIsLoading={setIsLoading}
                     isLoading={isLoading}
                     setIsDirty={setIsDirty}
-                    eventDates={eventDates}
-                    formData={event.data}
+                    formData={event.data.event}
+                    venues={event.data.venues}
                   />
                 </DialogContent>
               </Dialog>
@@ -253,8 +254,8 @@ const EventDetails: React.FC<EventDetailsProps> = ({
           <div className="flex space-x-3 pt-6">
             <Image
               src={
-                event.data.image
-                  ? event.data.image
+                event.data.event.image
+                  ? event.data.event.image
                   : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/Group%2052%20(1).png"
               }
               alt="Event Image"
@@ -263,26 +264,28 @@ const EventDetails: React.FC<EventDetailsProps> = ({
               objectFit="contain"
               objectPosition="center"
               quality={100}
-              placeholder={event.data.blurDataUrl ? "blur" : undefined}
+              placeholder={event.data.event.blurDataUrl ? "blur" : undefined}
               blurDataURL={
-                event.data.blurDataUrl ? event.data.blurDataUrl : undefined
+                event.data.event.blurDataUrl
+                  ? event.data.event.blurDataUrl
+                  : undefined
               }
               priority
               className="aspect-square h-[345px] rounded-md border bg-stone-800 object-cover transition-transform duration-300 ease-in-out group-hover:scale-[1.01]"
             />
             <div className="space-y-1">
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-                {event.data.name}
+                {event.data.event.name}
               </h3>
               <div className="flex">
                 <Badge className="text-[10px] font-normal">
-                  {event.data.accessibility}
+                  {event.data.event.accessibility}
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground">Event Overview</p>
               <Linkify options={options}>
                 <p className="whitespace-pre-wrap break-all text-sm">
-                  {event.data.description}
+                  {event.data.event.description}
                 </p>
               </Linkify>
             </div>

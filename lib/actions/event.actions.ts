@@ -9,9 +9,11 @@ interface CreateEventParams {
   userId: string;
   description: string;
   name: string;
-  date: Date;
   location: string;
   accessibility: AccessibilityType;
+  venueId: string;
+  startTime: Date;
+  endTime: Date;
 }
 
 export async function createEvent({
@@ -19,9 +21,11 @@ export async function createEvent({
   userId,
   description,
   name,
-  date,
   location,
   accessibility,
+  venueId,
+  startTime,
+  endTime,
 }: CreateEventParams) {
   try {
     let blurDataUrl;
@@ -29,16 +33,25 @@ export async function createEvent({
       blurDataUrl = await getBase64(image);
     }
 
-    await prisma.event.create({
+    const event = await prisma.event.create({
       data: {
         organizerId: userId,
         description,
         name,
-        date,
         location,
         accessibility,
         image: image,
         blurDataUrl,
+        venueId,
+      },
+    });
+
+
+    await prisma.reservation.create({
+      data: {
+        eventId: event.id,
+        startTime,
+        endTime,
       },
     });
 
@@ -57,7 +70,6 @@ export async function deleteEvent(eventId: string) {
       },
       data: {
         deleted: true,
-        date: null,
       },
     });
     return { error: null, status: 200 };
@@ -67,29 +79,11 @@ export async function deleteEvent(eventId: string) {
   }
 }
 
-export async function getEventDates() {
-  try {
-    const dates = await prisma.event.findMany({
-      where: {
-        deleted: false,
-      },
-      select: {
-        date: true,
-      },
-    });
-    return { data: dates, error: null, status: 200 };
-  } catch (error: any) {
-    console.log(error);
-    return { data: null, error: error.message, status: 500 };
-  }
-}
-
 interface UpdateEventParams {
   eventId: string;
   name: string;
   description: string;
   accessibility: AccessibilityType;
-  date: Date;
   location: string;
 }
 
@@ -98,7 +92,6 @@ export async function updateEvent({
   name,
   description,
   accessibility,
-  date,
   location,
 }: UpdateEventParams) {
   try {
@@ -110,7 +103,6 @@ export async function updateEvent({
         name,
         description,
         accessibility,
-        date,
         location,
       },
     });

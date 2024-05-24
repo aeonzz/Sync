@@ -20,7 +20,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         classNames: {
           toast: cn(
             inter.className,
-            "group toast group-[.toaster]:bg-card group-[.toaster]:text-foreground group-[.toaster]:shadow-lg !border-stone-900 z-[100]",
+            "group toast group-[.toaster]:bg-card group-[.toaster]:text-foreground group-[.toaster]:shadow-lg !border-stone-900 group-[.toaster]:pointer-events-auto",
           ),
           description: "group-[.toast]:text-muted-foreground",
           actionButton:

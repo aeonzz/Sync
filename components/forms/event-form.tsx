@@ -22,7 +22,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon, ImagePlus } from "lucide-react";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Calendar } from "../ui/calendar";
 import { Textarea } from "../ui/textarea";
@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AccessibilityType } from "@prisma/client";
+import { AccessibilityType, Venue } from "@prisma/client";
 import {
   Accordion,
   AccordionContent,
@@ -46,9 +46,12 @@ import { useEdgeStore } from "@/lib/edgestore";
 import { toast } from "sonner";
 import { createEvent, updateEvent } from "@/lib/actions/event.actions";
 import { useQueryClient } from "@tanstack/react-query";
-import { Matcher } from "react-day-picker";
+import { DateRange, Matcher } from "react-day-picker";
 import { useRouter } from "next/navigation";
 import { EventProps } from "@/types/event";
+import { Card } from "../ui/card";
+import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Badge } from "../ui/badge";
 
 interface EventFormProps {
   currentUserId: string;
@@ -57,12 +60,8 @@ interface EventFormProps {
   setIsLoading: (state: boolean) => void;
   setIsDirty: (state: boolean) => void;
   formData?: EventProps;
-  eventDates:
-    | {
-        date: Date;
-      }[]
-    | null;
   setActionDropdown?: (state: boolean) => void;
+  venues: Venue[] | undefined;
 }
 
 const EventForm: React.FC<EventFormProps> = ({
@@ -71,32 +70,34 @@ const EventForm: React.FC<EventFormProps> = ({
   isLoading,
   setIsLoading,
   setIsDirty,
-  eventDates,
   formData,
   setActionDropdown,
+  venues,
 }) => {
   const [openImageInput, setOpenImageInput] = useState(false);
-  const [accordionValue, setAccourdionValue] = useState("");
   const queryClient = useQueryClient();
   const { edgestore } = useEdgeStore();
-  const router = useRouter();
+  const [date, setDate] = React.useState<DateRange | undefined>();
   const [file, setFile] = useState<File>();
-  const disabledDays = eventDates
-    ? eventDates.map((date) => new Date(date.date))
-    : undefined;
   const form = useForm<z.infer<typeof EventValidation>>({
     resolver: zodResolver(EventValidation),
     defaultValues: {
       name: formData ? formData.name : "",
       description: formData ? formData.description : "",
-      date: formData ? new Date(formData.date) : undefined,
       location: formData ? formData.location : "",
-      accessibility: formData ? formData.accessibility : undefined,
     },
   });
 
   async function onSubmit(data: z.infer<typeof EventValidation>) {
     setIsLoading(true);
+
+    if (!date?.from || !date?.to) {
+      toast.error("Date is required", {
+        description: "Please select a valid date for your event.",
+      });
+      setIsLoading(false);
+      return;
+    }
 
     if (formData) {
       const { accessibility, ...restData } = data;
@@ -146,6 +147,8 @@ const EventForm: React.FC<EventFormProps> = ({
         accessibility: accessibility as AccessibilityType,
         image: res?.url,
         userId: currentUserId,
+        startTime: date.from,
+        endTime: date.to,
       };
 
       const response = await createEvent(eventData);
@@ -175,9 +178,9 @@ const EventForm: React.FC<EventFormProps> = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex w-full flex-col space-y-3"
+        className="grid w-full grid-cols-3 gap-y-3"
       >
-        <div className="flex items-end space-x-2">
+        <div className="col-span-1 flex flex-col space-y-3">
           <FormField
             control={form.control}
             name="name"
@@ -214,48 +217,6 @@ const EventForm: React.FC<EventFormProps> = ({
               </FormItem>
             )}
           />
-        </div>
-        <div className="flex items-end space-x-2">
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex flex-1 flex-col">
-                <FormLabel>Date of the Event</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="secondary"
-                        disabled={isLoading}
-                        className={cn(
-                          "w-auto py-2 pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={disabledDays}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <FormField
             control={form.control}
             name="accessibility"
@@ -264,9 +225,7 @@ const EventForm: React.FC<EventFormProps> = ({
                 <FormLabel>Accessibility</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={
-                    formData ? formData.accessibility : AccessibilityType.PUBLIC
-                  }
+                  defaultValue={formData && formData.accessibility}
                 >
                   <FormControl>
                     <SelectTrigger
@@ -289,47 +248,107 @@ const EventForm: React.FC<EventFormProps> = ({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="venueId"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Venue</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={formData && formData.venue.name}
+                >
+                  <FormControl>
+                    <SelectTrigger
+                      className="text-muted-foreground"
+                      disabled={isLoading}
+                      defaultValue={formData && formData.venue.name}
+                    >
+                      <SelectValue
+                        placeholder="Venue"
+                        defaultValue={formData && formData.venue.name}
+                      />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {venues?.map((venue, index) => (
+                      <SelectItem key={index} value={venue.id}>
+                        {venue.name.charAt(0)}
+                        {venue.name.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Event description"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Event description"
-                  className="resize-none"
+        <div className="col-span-2 px-3">
+          <div>
+            {openImageInput ? (
+              <div className="mt-14 flex w-full items-center justify-center">
+                <SingleImageDropzone
+                  width={500}
+                  height={300}
                   disabled={isLoading}
-                  {...field}
+                  value={file}
+                  onChange={(file) => {
+                    setFile(file);
+                  }}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Accordion
-          type="single"
-          collapsible
-          className="w-full"
-          value={accordionValue}
-          onValueChange={setAccourdionValue}
-        >
-          <AccordionItem value="item-1">
-            <AccordionContent>
-              <SingleImageDropzone
-                width={150}
-                height={150}
-                disabled={isLoading}
-                value={file}
-                onChange={(file) => {
-                  setFile(file);
-                }}
-              />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-        <div className="mt-5 flex items-center justify-between">
+              </div>
+            ) : (
+              <>
+                <div className="flex h-7 items-center justify-between">
+                  <FormLabel>Event Date</FormLabel>
+                  <>
+                    {date?.from ? (
+                      date.to ? (
+                        <Badge variant="secondary">
+                          {format(date.from, "LLL dd, y")} -{" "}
+                          {format(date.to, "LLL dd, y")}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">
+                          {format(date.from, "LLL dd, y")}
+                        </Badge>
+                      )
+                    ) : null}
+                  </>
+                </div>
+                <Card className="flex flex-col items-center justify-start py-3">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={2}
+                  />
+                </Card>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="col-span-3 flex items-center justify-between">
           <div className="flex-1">
             {!formData && (
               <Button
@@ -342,13 +361,6 @@ const EventForm: React.FC<EventFormProps> = ({
                 onClick={(e) => {
                   e.preventDefault();
                   setOpenImageInput((prev) => !prev);
-                  setAccourdionValue((prev) =>
-                    prev === ""
-                      ? "item-1"
-                      : "" || prev === "item-1"
-                        ? ""
-                        : "item-1",
-                  );
                 }}
                 disabled={isLoading}
               >
@@ -380,7 +392,7 @@ const EventForm: React.FC<EventFormProps> = ({
               type="submit"
               disabled={isLoading}
             >
-              {FormData ? "Update" : "Continue"}
+              {formData ? "Update" : "Continue"}
             </Button>
           </div>
         </div>

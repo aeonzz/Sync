@@ -10,9 +10,6 @@ export const EventValidation = z.object({
   description: z.string().min(5, {
     message: "description must be at least 5 characters.",
   }),
-  date: z.date({
-    required_error: "Event date is required.",
-  }),
   location: z
     .string()
     .min(2, {
@@ -21,5 +18,8 @@ export const EventValidation = z.object({
     .max(20, "Event location name cannot exceed 20 characters"),
   accessibility: z.string({
     required_error: "Please select from accessibility options",
+  }),
+  venueId: z.string({
+    required_error: "Please select from venue options",
   }),
 });

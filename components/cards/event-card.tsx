@@ -31,6 +31,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import { DateRange } from "react-day-picker";
 
 interface EventCardProps {
   event: EventProps;
@@ -38,8 +39,8 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
+  console.log(event);
   const eventCreatedAt = new Date(event.createdAt);
-  const eventDate = new Date(event.date);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -69,7 +70,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
   return (
     <div className="relative">
       {event.approvalStatus === ApprovalStatusType.PENDING && (
-        <div className="absolute z-50 flex h-full w-full flex-col items-center justify-center space-y-1 rounded-md border bg-background/90">
+        <div className="absolute flex h-full w-full flex-col items-center justify-center space-y-1 rounded-md border bg-background/90">
           <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
             Waiting for Approval
           </h3>
@@ -125,7 +126,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
           <div className="flex h-[120px] w-full flex-col">
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center space-x-2">
-                <h3 className="break-all scroll-m-20 whitespace-pre-wrap text-2xl font-semibold tracking-tight">
+                <h3 className="scroll-m-20 whitespace-pre-wrap break-all text-2xl font-semibold tracking-tight">
                   {event.name.slice(0, 15)}
                   {event.description.length >= 15 && "..."}
                 </h3>
@@ -164,7 +165,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
                 </HoverCardContent>
               </HoverCard>
             </div>
-            <p className="break-all h-40 overflow-hidden whitespace-pre-wrap text-xs text-muted-foreground">
+            <p className="h-40 overflow-hidden whitespace-pre-wrap break-all text-xs text-muted-foreground">
               {event.description.slice(0, 190)}
               {event.description.length >= 190 && "..."}
             </p>
@@ -175,9 +176,27 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
               <Badge className="text-[10px] font-normal">
                 {event.eventStatus}
               </Badge>
-              <Badge variant="secondary" className="text-[10px] font-normal">
+              {event.reservation.startTime ? (
+                event.reservation.endTime ? (
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] font-normal"
+                  >
+                    {format(event.reservation.startTime, "PP")} -{" "}
+                    {format(event.reservation.endTime, "PP")}
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] font-normal"
+                  >
+                    {format(event.reservation.endTime, "PP")}
+                  </Badge>
+                )
+              ) : null}
+              {/* <Badge variant="secondary" className="text-[10px] font-normal">
                 {format(eventDate, "PPp")}
-              </Badge>
+              </Badge> */}
             </div>
           </div>
         </Card>

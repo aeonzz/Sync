@@ -32,23 +32,23 @@ import NoPostMessage from "../ui/no-post-message";
 import EventCard from "../cards/event-card";
 import { format } from "date-fns";
 import EventSkeleton from "../loaders/event-skeleton";
+import { Venue } from "@prisma/client";
 
 interface EventPageProps {
   currentUserId: string;
-  eventDates:
-    | {
-        date: Date;
-      }[]
-    | null;
+}
+interface DataProps {
+  events: EventProps[];
+  venues: Venue[];
 }
 
-const EventPage: React.FC<EventPageProps> = ({ currentUserId, eventDates }) => {
+const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [isDirty, setIsDirty] = useState<boolean>();
   const [alertOpen, setAlertOpen] = useState(false);
 
-  const getEvents = useQuery<EventProps[]>({
+  const getEvents = useQuery<DataProps>({
     queryFn: async () => {
       const response = await axios.get("/api/event");
       return response.data.data;
@@ -69,6 +69,7 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId, eventDates }) => {
             </Button>
           </DialogTrigger>
           <DialogContent
+            className="max-w-5xl"
             onInteractOutside={(e) => {
               if (isDirty) {
                 e.preventDefault();
@@ -121,7 +122,7 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId, eventDates }) => {
               setIsLoading={setIsLoading}
               isLoading={isLoading}
               setIsDirty={setIsDirty}
-              eventDates={eventDates}
+              venues={getEvents.data?.venues}
             />
           </DialogContent>
         </Dialog>
@@ -131,11 +132,11 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId, eventDates }) => {
           <EventSkeleton />
         ) : getEvents.isError ? (
           <FetchDataError />
-        ) : getEvents.data?.length === 0 ? (
+        ) : getEvents.data?.events.length === 0 ? (
           <NoPostMessage />
         ) : (
           <>
-            {getEvents.data?.map((event, index) => (
+            {getEvents.data?.events.map((event, index) => (
               <EventCard
                 key={index}
                 event={event}

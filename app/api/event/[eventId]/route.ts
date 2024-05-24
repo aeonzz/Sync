@@ -17,10 +17,14 @@ export async function GET(req: Request, params: Context) {
       },
       include: {
         organizer: true,
+        reservation: true,
+        venue: true,
       },
     });
+    
+    const venues = await prisma.venue.findMany();
 
-    return NextResponse.json({ data: event }, { status: 200 });
+    return NextResponse.json({ data: { event, venues } }, { status: 200 });
   } catch (error: any) {
     console.log(error);
     return NextResponse.json(
