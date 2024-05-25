@@ -46,7 +46,6 @@ export async function createEvent({
       },
     });
 
-
     await prisma.reservation.create({
       data: {
         eventId: event.id,
@@ -85,6 +84,8 @@ interface UpdateEventParams {
   description: string;
   accessibility: AccessibilityType;
   location: string;
+  startTime: Date;
+  endTime: Date;
 }
 
 export async function updateEvent({
@@ -93,6 +94,8 @@ export async function updateEvent({
   description,
   accessibility,
   location,
+  startTime,
+  endTime,
 }: UpdateEventParams) {
   try {
     await prisma.event.update({
@@ -106,6 +109,17 @@ export async function updateEvent({
         location,
       },
     });
+
+    await prisma.reservation.update({
+      where: {
+        eventId,
+      },
+      data: {
+        startTime,
+        endTime,
+      },
+    });
+
     return { error: null, status: 200 };
   } catch (error: any) {
     console.log(error);

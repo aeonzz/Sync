@@ -1,54 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
-import { Button } from "../ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import EventForm from "../forms/event-form";
-import { X } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { buttonVariants } from "../ui/button";
 import { EventProps } from "@/types/event";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import FetchDataError from "../ui/fetch-data-error";
 import NoPostMessage from "../ui/no-post-message";
 import EventCard from "../cards/event-card";
-import { format } from "date-fns";
 import EventSkeleton from "../loaders/event-skeleton";
 import { Venue } from "@prisma/client";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface EventPageProps {
   currentUserId: string;
 }
-interface DataProps {
-  events: EventProps[];
-  venues: Venue[];
-}
 
 const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [isDirty, setIsDirty] = useState<boolean>();
-  const [alertOpen, setAlertOpen] = useState(false);
-
-  const getEvents = useQuery<DataProps>({
+  const getEvents = useQuery<EventProps[]>({
     queryFn: async () => {
       const response = await axios.get("/api/event");
       return response.data.data;
@@ -62,81 +32,23 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           Events
         </h3>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" variant="secondary">
-              Create Event
-            </Button>
-          </DialogTrigger>
-          <DialogContent
-            className="max-w-5xl"
-            onInteractOutside={(e) => {
-              if (isDirty) {
-                e.preventDefault();
-                if (!isLoading) {
-                  setAlertOpen(true);
-                }
-              }
-            }}
-          >
-            {isDirty ? (
-              <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-                <AlertDialogTrigger asChild>
-                  <button
-                    className="absolute right-4 top-4 cursor-pointer rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-                    disabled={isLoading}
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      You have unsaved changes. Are you sure you want to leave?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Continue editing</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => setOpen(false)}>
-                      Close
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            ) : (
-              <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-0 focus:ring-ring focus:ring-offset-0 active:scale-95 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                <X className="h-5 w-5" />
-                <span className="sr-only">Close</span>
-              </DialogClose>
-            )}
-            <DialogHeader>
-              <DialogTitle>Create Event</DialogTitle>
-              <DialogDescription>Get started with your event</DialogDescription>
-            </DialogHeader>
-            <EventForm
-              currentUserId={currentUserId}
-              setOpen={setOpen}
-              setIsLoading={setIsLoading}
-              isLoading={isLoading}
-              setIsDirty={setIsDirty}
-              venues={getEvents.data?.venues}
-            />
-          </DialogContent>
-        </Dialog>
+        <Link
+          href="/e/create"
+          className={cn(buttonVariants({ variant: "secondary", size: "sm" }))}
+        >
+          Create Event
+        </Link>
       </div>
       <div className="space-y-3">
         {getEvents.isLoading ? (
           <EventSkeleton />
         ) : getEvents.isError ? (
           <FetchDataError />
-        ) : getEvents.data?.events.length === 0 ? (
+        ) : getEvents.data?.length === 0 ? (
           <NoPostMessage />
         ) : (
           <>
-            {getEvents.data?.events.map((event, index) => (
+            {getEvents.data?.map((event, index) => (
               <EventCard
                 key={index}
                 event={event}
