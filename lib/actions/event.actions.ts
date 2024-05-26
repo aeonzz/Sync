@@ -126,3 +126,18 @@ export async function updateEvent({
     return { error: error.message, status: 500 };
   }
 }
+
+export async function createAttendees(eventId: string, userId: string) {
+  try {
+    await prisma.eventAttendee.create({
+      data: {
+        eventId,
+        userId,
+      },
+    });
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, status: 500 };
+  }
+}

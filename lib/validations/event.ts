@@ -6,7 +6,7 @@ export const EventValidation = z.object({
     .min(2, {
       message: "Event name must be at least 2 characters.",
     })
-    .max(20, "Event name cannot exceed 20 characters"),
+    .max(40, "Event name cannot exceed 40 characters"),
   description: z.string().min(5, {
     message: "description must be at least 5 characters.",
   }),

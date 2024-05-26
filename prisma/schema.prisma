@@ -37,7 +37,7 @@ model User {
   ChannelMember            ChannelMember[]
   MessageReaction          MessageReaction[]
   organizedEvents          Event[]           @relation("OrganizedEvents")
-  attendedEvents           Event[]           @relation("EventAttendees")
+  EventAttendee            EventAttendee[]
 }
 
 model Follows {
@@ -79,20 +79,31 @@ model Event {
   updatedAt      DateTime           @updatedAt @db.Timestamp(6)
   organizer      User               @relation(fields: [organizerId], references: [id], name: "OrganizedEvents")
   organizerId    String
-  attendees      User[]             @relation("EventAttendees")
-  venue          Venue             @relation(fields: [venueId], references: [id])
+  venue          Venue              @relation(fields: [venueId], references: [id])
   venueId        String
   reservation    Reservation?
+  eventAttendee  EventAttendee[]
+}
+
+model EventAttendee {
+  id        String   @id @default(uuid())
+  eventId   String
+  userId    String
+  event     Event    @relation(fields: [eventId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([eventId, userId])
 }
 
 model Venue {
-  id          String        @id @default(uuid())
-  name        String
-  address     String
-  capacity    Int
-  events      Event[]       @relation
-  createdAt   DateTime      @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime      @updatedAt @db.Timestamp(6)
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  capacity  Int
+  events    Event[]  @relation
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
 }
 
 model Reservation {

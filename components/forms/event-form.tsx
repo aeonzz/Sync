@@ -170,7 +170,18 @@ const EventForm: React.FC<EventFormProps> = ({
             </p>
           </div>
           <div className="flex items-center space-x-1">
-            {!formData && (
+            {formData ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={(e) => {
+                  e.preventDefault();
+                  router.back();
+                }}
+              >
+                Cancel
+              </Button>
+            ) : (
               <Button
                 className={cn(
                   openImageInput && "bg-green-500/15 text-green-500/70",
@@ -204,7 +215,7 @@ const EventForm: React.FC<EventFormProps> = ({
           </div>
         </div>
         <Separator />
-        <div className="grid w-full grid-cols-3 gap-y-3">
+        <div className="grid w-full grid-cols-3 gap-3 gap-y-3">
           <div className="col-span-2 space-y-3">
             {openImageInput ? (
               <SingleImageDropzone
@@ -248,7 +259,10 @@ const EventForm: React.FC<EventFormProps> = ({
               </>
             )}
           </div>
-          <div className="col-span-1 flex flex-col space-y-1 pl-3">
+          <Card className="col-span-1 flex flex-col space-y-1 px-3 py-4">
+            <h1 className="text-md font-semibold leading-none tracking-tight">
+              Event Details
+            </h1>
             <FormField
               control={form.control}
               name="name"
@@ -366,7 +380,7 @@ const EventForm: React.FC<EventFormProps> = ({
                 </FormItem>
               )}
             />
-          </div>
+          </Card>
         </div>
       </form>
     </Form>

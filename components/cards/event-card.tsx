@@ -14,7 +14,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { format, formatDistanceToNow } from "date-fns";
-import { ApprovalStatusType, EventStatusType } from "@prisma/client";
+import {
+  AccessibilityType,
+  ApprovalStatusType,
+  EventStatusType,
+} from "@prisma/client";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -170,10 +174,17 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
               {event.description.length >= 190 && "..."}
             </p>
             <div className="h-full space-x-1">
-              <Badge className="text-[10px] font-normal">
+              <Badge
+                className="text-[10px] font-normal"
+                variant={
+                  event.accessibility === AccessibilityType.PUBLIC
+                    ? "green"
+                    : "yellow"
+                }
+              >
                 {event.accessibility}
               </Badge>
-              <Badge className="text-[10px] font-normal">
+              <Badge className="text-[10px] font-normal" variant="blue">
                 {event.eventStatus}
               </Badge>
               {event.reservation.startTime ? (
@@ -194,9 +205,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
                   </Badge>
                 )
               ) : null}
-              {/* <Badge variant="secondary" className="text-[10px] font-normal">
-                {format(eventDate, "PPp")}
-              </Badge> */}
             </div>
           </div>
         </Card>
