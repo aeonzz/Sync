@@ -27,7 +27,7 @@ const Event = async () => {
   return (
     <div className="min-h-screen w-[550px]">
       <EventPage
-        currentUserId={session.user.id}
+        currentUserData={currentUser.data}
       />
     </div>
   );

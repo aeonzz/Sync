@@ -9,15 +9,16 @@ import FetchDataError from "../ui/fetch-data-error";
 import NoPostMessage from "../ui/no-post-message";
 import EventCard from "../cards/event-card";
 import EventSkeleton from "../loaders/event-skeleton";
-import { Venue } from "@prisma/client";
+import { UserRoleType, Venue } from "@prisma/client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { UserProps } from "@/types/user";
 
 interface EventPageProps {
-  currentUserId: string;
+  currentUserData: UserProps;
 }
 
-const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
+const EventPage: React.FC<EventPageProps> = ({ currentUserData }) => {
   const getEvents = useQuery<EventProps[]>({
     queryFn: async () => {
       const response = await axios.get("/api/event");
@@ -32,12 +33,17 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           Events
         </h3>
-        <Link
-          href="/e/create"
-          className={cn(buttonVariants({ variant: "secondary", size: "sm" }))}
-        >
-          Create Event
-        </Link>
+        {currentUserData.role === UserRoleType.ADMIN ||
+          (currentUserData.role === UserRoleType.SYSTEMADMIN && (
+            <Link
+              href="/e/create"
+              className={cn(
+                buttonVariants({ variant: "secondary", size: "sm" }),
+              )}
+            >
+              Create Event
+            </Link>
+          ))}
       </div>
       <div className="space-y-3">
         {getEvents.isLoading ? (
@@ -52,7 +58,7 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserId }) => {
               <EventCard
                 key={index}
                 event={event}
-                currentUserId={currentUserId}
+                currentUserId={currentUserData.id}
               />
             ))}
           </>

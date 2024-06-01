@@ -1,4 +1,5 @@
-import EventDetails from "@/components/screens/event-details";
+import FollowingTab from "@/components/screens/following-tab";
+import CreatePost from "@/components/ui/create-post";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getUserById } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";
@@ -6,15 +7,14 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
 
-const page = async ({ params }: { params: { eventId: string } }) => {
-  const { eventId } = params;
+const page = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect("/login");
+    redirect("/auth");
   }
 
-  const currentUser = await getUserById(session.user.id);
+  const currentUser = await getUserById(session!.user.id);
   if (!currentUser.data || currentUser.error) {
     return <FetchDataError />;
   }
@@ -22,14 +22,10 @@ const page = async ({ params }: { params: { eventId: string } }) => {
   if (!currentUser.data.onboarded) {
     redirect("/onboarding");
   }
-
   return (
-    <div className="w-full">
-      <EventDetails
-        eventId={eventId}
-        currentUserData={currentUser.data}
-      />
-    </div>
+    <>
+      <FollowingTab session={session} />
+    </>
   );
 };
 

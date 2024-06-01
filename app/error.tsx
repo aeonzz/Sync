@@ -15,9 +15,9 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-gray-100 px-4 dark:bg-gray-800">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-stone-950">
       <div className="mx-auto max-w-md text-center">
-        <h1 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
+        <h1 className="text-5xl font-bold tracking-tight text-gray-50">
           Oops! Something went wrong.
         </h1>
         <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">

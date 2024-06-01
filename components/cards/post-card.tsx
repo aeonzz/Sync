@@ -11,12 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button, buttonVariants } from "../ui/button";
-import {
-  MoreHorizontal,
-  Pencil,
-  Trash,
-  X,
-} from "lucide-react";
+import { MoreHorizontal, Pencil, Trash, X } from "lucide-react";
 import Linkify from "linkify-react";
 import { PostProps } from "@/types/post";
 import { cn } from "@/lib/utils";
@@ -102,7 +97,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
 
   const contentToDisplay = showFullContent
     ? post.content
-    : post.content.slice(0, 100);
+    : post.content.slice(0, 300);
 
   const toggleContentVisibility = () => {
     setShowFullContent(!showFullContent);
@@ -172,7 +167,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
 
   return (
     <Card className="mb-4 min-h-[200px]">
-      <CardHeader className="flex-row items-center justify-between">
+      <CardHeader className="flex-row items-center justify-between pb-2">
         <div className="relative flex items-center space-x-2">
           <HoverCard openDelay={200} closeDelay={100}>
             <HoverCardTrigger asChild>
@@ -275,7 +270,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
-      <CardContent className="pb-0">
+      <CardContent className="pb-0 px-5">
         <AnimatePresence>
           {isEditing && (
             <motion.div
@@ -293,13 +288,45 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
             </motion.div>
           )}
         </AnimatePresence>
+        <AnimatePresence initial={false}>
+          {isEditing === false && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className={cn(
+                "overflow-hidden",
+              )}
+            >
+              <Linkify options={options}>
+                <p
+                  className={cn(
+                    ShortContentWithNoImage ? "text-2xl" : "text-sm",
+                    "whitespace-pre-wrap break-words",
+                  )}
+                >
+                  {post.imageUrls.length > 0 ? contentToDisplay : post.content}
+                  {post.imageUrls.length > 0 && post.content.length > 100 && (
+                    <Button
+                      variant="link"
+                      onClick={toggleContentVisibility}
+                      className="-mt-5 ml-1 p-0 text-xs h-fit"
+                    >
+                      {showFullContent ? "See Less" : "...See More"}
+                    </Button>
+                  )}
+                </p>
+              </Linkify>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <ImageView
           openImageViewer={openImageViewer}
           setOpenImageViewer={setOpenImageViewer}
           imageUrls={post.imageUrls}
         />
         <Link href={`/f/${post.postId}`}>
-          <div className="relative flex w-full overflow-hidden rounded-md">
+          <div className="relative flex w-full overflow-hidden rounded-md my-2">
             <div
               className={cn(
                 post.imageUrls?.length === 1 ? "grid-cols-1" : "grid-cols-2",
@@ -350,39 +377,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
             </div>
           </div>
         </Link>
-        <AnimatePresence initial={false}>
-          {isEditing === false && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className={cn(
-                post.imageUrls.length !== 0 && "mt-3",
-                "overflow-hidden",
-              )}
-            >
-              <Linkify options={options}>
-                <p
-                  className={cn(
-                    ShortContentWithNoImage ? "text-2xl" : "text-sm",
-                    "whitespace-pre-wrap break-words",
-                  )}
-                >
-                  {post.imageUrls.length > 0 ? contentToDisplay : post.content}
-                  {post.imageUrls.length > 0 && post.content.length > 100 && (
-                    <Button
-                      variant="link"
-                      onClick={toggleContentVisibility}
-                      className="-mt-5 ml-1 p-0 text-xs text-slate-200"
-                    >
-                      {showFullContent ? "See Less" : "...See More"}
-                    </Button>
-                  )}
-                </p>
-              </Linkify>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </CardContent>
       <CardFooter>
         <div className="flex w-full items-center justify-between">

@@ -31,15 +31,16 @@ import {
 } from "../ui/alert-dialog";
 import { createAttendees, deleteEvent } from "@/lib/actions/event.actions";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { AccessibilityType, Venue } from "@prisma/client";
 import Link from "next/link";
 import { Card, CardHeader } from "../ui/card";
 import EventDetailsSkeleton from "../loaders/event-details-skeleton";
+import { UserProps } from "@/types/user";
 
 interface EventDetailsProps {
   eventId: string;
-  currentUserId: string;
+  currentUserData: UserProps;
 }
 
 const options = {
@@ -49,7 +50,7 @@ const options = {
 
 const EventDetails: React.FC<EventDetailsProps> = ({
   eventId,
-  currentUserId,
+  currentUserData,
 }) => {
   const router = useRouter();
   const [actionDropdown, setActionDropdown] = useState(false);
@@ -89,7 +90,9 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   }
 
   async function joinEvent() {
-    if (event.data?.eventAttendee.some((user) => user.id === currentUserId)) {
+    if (
+      event.data?.eventAttendee.some((user) => user.id === currentUserData.id)
+    ) {
       setIsLoading(false);
       toast("yawa");
       return;
@@ -97,7 +100,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
 
     setIsLoading(true);
 
-    const response = await createAttendees(eventId, currentUserId);
+    const response = await createAttendees(eventId, currentUserData.id);
 
     if (response.status === 200) {
       setIsLoading(false);
@@ -117,7 +120,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   }
 
   if (!event.data) {
-    return <NotFound />;
+    notFound();
   }
 
   return (
@@ -135,68 +138,70 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                 {event.data.eventStatus.charAt(0)}
                 {event.data.eventStatus.slice(1).toLowerCase()}
               </Badge>
-              <DropdownMenu
-                open={actionDropdown}
-                onOpenChange={setActionDropdown}
-              >
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="min-w-[100px] p-1.5"
+              {currentUserData.id === event.data.organizer.id && (
+                <DropdownMenu
+                  open={actionDropdown}
+                  onOpenChange={setActionDropdown}
                 >
-                  {event.data.organizer.id === currentUserId && (
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      asChild
-                    >
-                      <Link href={`/e/create?edit=${eventId}`}>
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Edit
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  <AlertDialog
-                    open={deleteAlertOpen}
-                    onOpenChange={setDeleteAlertOpen}
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreVertical />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="min-w-[100px] p-1.5"
                   >
-                    <AlertDialogTrigger asChild>
+                    {event.data.organizer.id === currentUserData.id && (
                       <DropdownMenuItem
-                        className="text-red-600"
                         onSelect={(e) => e.preventDefault()}
+                        asChild
                       >
-                        <Trash className="mr-2 h-4 w-4" />
-                        Delete
+                        <Link href={`/e/create?edit=${eventId}`}>
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Edit
+                        </Link>
                       </DropdownMenuItem>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Are you absolutely sure?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Deleting this event will permanently remove it from
-                          your calendar. Are you sure you want to proceed?
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isLoading}>
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          disabled={isLoading}
-                          onClick={handleDeleteEvent}
+                    )}
+                    <AlertDialog
+                      open={deleteAlertOpen}
+                      onOpenChange={setDeleteAlertOpen}
+                    >
+                      <AlertDialogTrigger asChild>
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onSelect={(e) => e.preventDefault()}
                         >
-                          Continue
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                          <Trash className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Deleting this event will permanently remove it from
+                            your calendar. Are you sure you want to proceed?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={isLoading}>
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            disabled={isLoading}
+                            onClick={handleDeleteEvent}
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
           <Separator />

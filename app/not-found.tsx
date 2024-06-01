@@ -30,7 +30,7 @@ export default function NotFound({ className }: { className?: string }) {
           </p>
           <Link
             href="/home"
-            className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+            className={cn(buttonVariants({ variant: "default", size: "sm" }))}
           >
             Go to Homepage
           </Link>

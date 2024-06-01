@@ -284,7 +284,7 @@ const EditContentForm: React.FC<EditContentFormProps> = ({
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-        <div className="absolute -top-[68px] right-8 flex justify-end">
+        <div className="absolute -top-[57px] right-10 flex justify-end">
           <Button
             className={cn(
               openImageInput && "bg-green-500/15",

@@ -1,5 +1,8 @@
+import { UserRoleType } from "@prisma/client";
+
 export type UserProps = {
   id: string;
+  role: UserRoleType;
   studentId: number;
   password: string;
   avatarUrl: string | null;

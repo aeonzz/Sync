@@ -32,7 +32,6 @@ const FollowingTab = ({ session }: { session: Session }) => {
     status,
   } = useInfiniteQuery({
     queryKey: ["followedPost"],
-    gcTime: 1000,
     queryFn: fetchPosts,
     initialPageParam: 0,
     refetchOnWindowFocus: false,

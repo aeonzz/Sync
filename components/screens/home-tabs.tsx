@@ -4,60 +4,43 @@ import { UserProps } from "@/types/user";
 import { Session } from "next-auth";
 import CreatePost from "../ui/create-post";
 import Feed from "./feed";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import FollowingTab from "./following-tab";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-interface HomeTabsProps {
-  session: Session;
-  currentUserData: UserProps;
-}
-
-const HomeTabs: React.FC<HomeTabsProps> = ({ session, currentUserData }) => {
-  const [isActive, setIsActive] = useState("feed");
-
+const HomeTabs = () => {
+  const pathname = usePathname()
   return (
-    <div className="relative w-[550px]">
+    <div className="relative">
       <div className="sticky top-0 z-10 mb-3 flex h-16 w-full backdrop-blur-sm backdrop-filter dark:bg-background/50">
-        <Button
-          variant="tab"
-          value="feed"
-          onClick={() => setIsActive("feed")}
+        <Link
+          href="/home"
           className={cn(
-            isActive === "feed"
+            buttonVariants({ variant: "tab" }),
+            pathname === "/home"
               ? "border-b border-b-primary text-foreground"
               : "text-muted-foreground",
             "h-full flex-1",
           )}
         >
           Feed
-        </Button>
-        <Button
-          variant="tab"
-          value="following"
-          onClick={() => setIsActive("following")}
+        </Link>
+        <Link
+          href="/home/following"
           className={cn(
-            isActive === "following"
+            buttonVariants({ variant: "tab" }),
+            pathname === "/home/following"
               ? "border-b border-b-primary text-foreground"
               : "text-muted-foreground",
             "h-full flex-1",
           )}
         >
           Following
-        </Button>
+        </Link>
       </div>
-      {isActive === "feed" ? (
-        <>
-          <CreatePost currentUser={currentUserData} />
-          <Feed session={session} />
-        </>
-      ) : (
-        <>
-          <CreatePost currentUser={currentUserData} />
-          <FollowingTab session={session} />
-        </>
-      )}
     </div>
   );
 };

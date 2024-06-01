@@ -23,13 +23,13 @@ const EventMenu: React.FC<EventMenuProps> = ({ eventId }) => {
           Event
         </h2>
       </div>
-      <ul className="flex items-center space-x-1">
+      <ul className="flex items-center">
         <li>
           <Link
             href={`/e/${eventId}/overview`}
             className={cn(
-              buttonVariants({ variant: "ghost", size: "sm" }),
-              pathname === `/e/${eventId}/overview` && "bg-primary hover:bg-primary/90",
+              buttonVariants({ variant: "tab"}),
+              pathname === `/e/${eventId}/overview` ? "border-b border-b-primary text-foreground" : "text-muted-foreground",
               "w-20",
             )}
           >
@@ -40,8 +40,8 @@ const EventMenu: React.FC<EventMenuProps> = ({ eventId }) => {
           <Link
             href={`/e/${eventId}/guest`}
             className={cn(
-              buttonVariants({ variant: "ghost", size: "sm" }),
-              pathname === `/e/${eventId}/guest` && "bg-primaryhover:bg-primary/90",
+              buttonVariants({ variant: "tab"}),
+              pathname === `/e/${eventId}/guest` ? "border-b border-b-primary text-foreground" : "text-muted-foreground",
               "w-20",
             )}
           >

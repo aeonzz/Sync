@@ -127,7 +127,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
             <DialogHeader>
               <DialogTitle>Create post</DialogTitle>
             </DialogHeader>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 border border-white">
               <Avatar className="group relative h-9 w-9 dark:border">
                 <Link href={`/u/${currentUser.id}`} className="relative">
                   <div className="absolute z-10 h-9 w-9 bg-stone-950 opacity-0 transition group-hover:opacity-40"></div>
