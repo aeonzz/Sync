@@ -15,9 +15,16 @@ export default function Error({
   }, [error]);
 
   return (
-    <div>
-      <h2>Something went wrong!</h2>
-      <Button onClick={() => reset()}>Try again</Button>
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-gray-100 px-4 dark:bg-gray-800">
+      <div className="mx-auto max-w-md text-center">
+        <h1 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-50">
+          Oops! Something went wrong.
+        </h1>
+        <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
+          We're sorry, but the page you were trying to access is not available.
+        </p>
+        <Button onClick={() => reset()}>Try again</Button>
+      </div>
     </div>
   );
 }

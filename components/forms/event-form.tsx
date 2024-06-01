@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AccessibilityType, Venue } from "@prisma/client";
+import { AccessibilityType } from "@prisma/client";
 import { SingleImageDropzone } from "./single-image";
 import { useEdgeStore } from "@/lib/edgestore";
 import { toast } from "sonner";
@@ -40,12 +40,18 @@ import { EventProps } from "@/types/event";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
+import { VenueProps } from "@/types/venue";
 
 interface EventFormProps {
   currentUserId: string;
   formData?: EventProps;
-  venues: Venue[] | undefined;
+  venues: VenueProps[] | undefined;
 }
+
+type DisabledRange = {
+  from: Date;
+  to: Date;
+};
 
 const EventForm: React.FC<EventFormProps> = ({
   currentUserId,
@@ -62,7 +68,8 @@ const EventForm: React.FC<EventFormProps> = ({
   });
   const [file, setFile] = useState<File>();
   const router = useRouter();
-  const disablePastDates = (date: Date) => isBefore(date, startOfToday());
+  const [disabledRanges, setDisabledRanges] = useState<DisabledRange[]>([]);
+
   const form = useForm<z.infer<typeof EventValidation>>({
     resolver: zodResolver(EventValidation),
     defaultValues: {
@@ -72,12 +79,41 @@ const EventForm: React.FC<EventFormProps> = ({
     },
   });
 
+  const selectedVenue = form.watch("venueId");
+  const checkDateConflict = (selectedDates: DateRange) => {
+    return disabledRanges.some((reservedDate) => {
+      return (
+        (selectedDates.from &&
+          selectedDates.from >= reservedDate.from &&
+          selectedDates.from &&
+          selectedDates.from < reservedDate.to) ||
+        (selectedDates.to &&
+          selectedDates.to > reservedDate.from &&
+          selectedDates.to <= reservedDate.to) ||
+        (selectedDates.from &&
+          selectedDates.from <= reservedDate.from &&
+          selectedDates.to &&
+          selectedDates.to >= reservedDate.to)
+      );
+    });
+  };
+
   async function onSubmit(data: z.infer<typeof EventValidation>) {
     setIsLoading(true);
 
-    if (!date?.from || !date?.to) {
+    const selectedDates = date;
+    if (!selectedDates?.from || !selectedDates?.to) {
       toast.error("Date is required", {
         description: "Please select a valid date for your event.",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const isConflicting = checkDateConflict(selectedDates);
+    if (isConflicting) {
+      toast.error("Date conflict", {
+        description: "The selected dates conflict with reserved dates.",
       });
       setIsLoading(false);
       return;
@@ -89,8 +125,8 @@ const EventForm: React.FC<EventFormProps> = ({
         ...restData,
         accessibility: accessibility as AccessibilityType,
         eventId: formData.id,
-        startTime: date.from,
-        endTime: date.to,
+        startTime: selectedDates.from,
+        endTime: selectedDates.to,
       };
       const response = await updateEvent(eventData);
 
@@ -132,8 +168,8 @@ const EventForm: React.FC<EventFormProps> = ({
         accessibility: accessibility as AccessibilityType,
         image: res?.url,
         userId: currentUserId,
-        startTime: date.from,
-        endTime: date.to,
+        startTime: selectedDates.from,
+        endTime: selectedDates.to,
       };
 
       const response = await createEvent(eventData);
@@ -154,6 +190,26 @@ const EventForm: React.FC<EventFormProps> = ({
       }
     }
   }
+
+  useEffect(() => {
+    if (selectedVenue) {
+      const venue = venues?.find((v) => v.id === selectedVenue);
+      const reservations =
+        venue?.events.map((event) => ({
+          start: new Date(event.reservation.startTime),
+          end: new Date(event.reservation.endTime),
+        })) || [];
+
+      setDisabledRanges(
+        reservations.map((reservation) => ({
+          from: reservation.start,
+          to: reservation.end,
+        })),
+      );
+    } else {
+      setDisabledRanges([]);
+    }
+  }, [selectedVenue, venues]);
 
   return (
     <Form {...form}>
@@ -237,11 +293,11 @@ const EventForm: React.FC<EventFormProps> = ({
                     selected={date}
                     onSelect={setDate}
                     numberOfMonths={2}
-                    disabled={disablePastDates}
+                    disabled={disabledRanges}
                   />
                 </Card>
-                <Card className="h-14 p-3">
-                  <>
+                <Card className="flex h-14 items-center justify-between px-6 py-3">
+                  <div>
                     {date?.from ? (
                       date.to ? (
                         <Badge variant="orange">
@@ -254,7 +310,11 @@ const EventForm: React.FC<EventFormProps> = ({
                         </Badge>
                       )
                     ) : null}
-                  </>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-xs font-semibold">Reserved</p>
+                    <div className="h-3 w-3 bg-red-900" />
+                  </div>
                 </Card>
               </>
             )}

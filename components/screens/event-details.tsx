@@ -35,6 +35,7 @@ import { useRouter } from "next/navigation";
 import { AccessibilityType, Venue } from "@prisma/client";
 import Link from "next/link";
 import { Card, CardHeader } from "../ui/card";
+import EventDetailsSkeleton from "../loaders/event-details-skeleton";
 
 interface EventDetailsProps {
   eventId: string;
@@ -90,6 +91,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   async function joinEvent() {
     if (event.data?.eventAttendee.some((user) => user.id === currentUserId)) {
       setIsLoading(false);
+      toast("yawa");
       return;
     }
 
@@ -111,7 +113,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   }
 
   if (event.isLoading) {
-    return <h1>Loading</h1>;
+    return <EventDetailsSkeleton />;
   }
 
   if (!event.data) {
