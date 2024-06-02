@@ -13,7 +13,7 @@ import {
 import { Button, buttonVariants } from "../ui/button";
 import { MoreHorizontal, Pencil, Trash, X } from "lucide-react";
 import Linkify from "linkify-react";
-import { PostProps } from "@/types/post";
+import { PostLikeProps, PostProps } from "@/types/post";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Session } from "next-auth";
@@ -63,14 +63,22 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import ProfileHover from "../shared/profile-hover";
 import ImageView from "../ui/image-view";
-import { useQueryClient } from "@tanstack/react-query";
-import { NotificationType } from "@prisma/client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { NotificationType, PostLike } from "@prisma/client";
 import { createNotification } from "@/lib/actions/notification.actions";
+import axios from "axios";
+import FetchDataError from "../ui/fetch-data-error";
+import Error from "next/error";
 
 interface PostCardProps {
   post: PostProps;
   session: Session;
   detailsView?: boolean | undefined;
+}
+
+interface LikeData {
+  liked: boolean;
+  newLikes: PostLikeProps[];
 }
 
 const options = {
@@ -81,14 +89,12 @@ const options = {
 const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
   const [actionDropdown, setActionDropdown] = useState(false);
   const [openImageViewer, setOpenImageViewer] = useState(false);
-  const [likedBy, setLikedBy] = useState(post.postLike);
   const [open, setOpen] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const postedAt = new Date(post.createdAt);
   const [isEditing, setIsEditing] = useState(false);
   const { setIsMutate } = useMutationSuccess();
-  const [liked, setLiked] = useState(post.isLikedByCurrentUser);
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -102,6 +108,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
   const toggleContentVisibility = () => {
     setShowFullContent(!showFullContent);
   };
+
+  const likeData = useQuery<LikeData>({
+    queryFn: async () => {
+      const response = await axios.get(`/api/post/${post.postId}/post-like`);
+      return response.data.data;
+    },
+    queryKey: [post.postId],
+  });
 
   async function handleDelete() {
     const response = await deletePost(post.postId);
@@ -117,24 +131,19 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
     }
   }
 
-  async function handleLike(
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) {
-    e.stopPropagation();
-
-    const data = {
-      userId: session!.user.id,
-      postId: post.postId,
-    };
-
-    const response = await likePost(data);
-
-    if (response.status === 200) {
-      setLiked((prev) => !prev);
-      setLikedBy(response.data ?? []);
-
+  const { mutate, isPending } = useMutation({
+    mutationFn: (userId: string) => {
+      return axios.patch(`/api/post/${post.postId}`, { userId: userId });
+    },
+    onError: () => {
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    },
+    onSuccess: async () => {
       if (session.user.id !== post.author.id) {
-        if (!liked) {
+        if (!likeData.data?.liked) {
           const notificationData = {
             type: NotificationType.LIKE,
             from: session.user.id,
@@ -146,24 +155,13 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
           await createNotification(notificationData);
         }
       }
-    } else {
-      toast.error("Uh oh! Something went wrong.", {
-        description:
-          "An error occurred while making the request. Please try again later",
-      });
-    }
-  }
+      return await queryClient.invalidateQueries({ queryKey: [post.postId] });
+    },
+  });
 
-  // useEffect(() => {
-  //   const checkIfUserLiked = async () => {
-  //     const response = await checkIfUserLikedPost(
-  //       session!.user.id,
-  //       post.postId,
-  //     );
-  //     setLiked(response);
-  //   };
-  //   checkIfUserLiked();
-  // }, [post, session]);
+  if (likeData.error) {
+    return <Error statusCode={500} />;
+  }
 
   return (
     <Card className="mb-4 min-h-[200px]">
@@ -270,7 +268,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
-      <CardContent className="pb-0 px-5">
+      <CardContent className="px-5 pb-0">
         <AnimatePresence>
           {isEditing && (
             <motion.div
@@ -294,9 +292,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className={cn(
-                "overflow-hidden",
-              )}
+              className={cn("overflow-hidden")}
             >
               <Linkify options={options}>
                 <p
@@ -310,7 +306,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
                     <Button
                       variant="link"
                       onClick={toggleContentVisibility}
-                      className="-mt-5 ml-1 p-0 text-xs h-fit"
+                      className="-mt-5 ml-1 h-fit p-0 text-xs"
                     >
                       {showFullContent ? "See Less" : "...See More"}
                     </Button>
@@ -326,7 +322,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
           imageUrls={post.imageUrls}
         />
         <Link href={`/f/${post.postId}`}>
-          <div className="relative flex w-full overflow-hidden rounded-md my-2">
+          <div className="relative my-2 flex w-full overflow-hidden rounded-md">
             <div
               className={cn(
                 post.imageUrls?.length === 1 ? "grid-cols-1" : "grid-cols-2",
@@ -381,7 +377,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
       <CardFooter>
         <div className="flex w-full items-center justify-between">
           <div className="-mr-5 flex items-center">
-            {likedBy.slice(0, 5).map((user, index) => (
+            {likeData.data?.newLikes.slice(0, 5).map((user, index) => (
               <HoverCard openDelay={200} closeDelay={100} key={index}>
                 <HoverCardTrigger asChild>
                   <Link href={`/u/${user.user.id}`} className="group relative">
@@ -415,18 +411,22 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
                 <TooltipTrigger asChild>
                   <p
                     className="ml-1 h-auto cursor-pointer p-0 text-[11px] text-muted-foreground hover:underline"
-                    onClick={() => likedBy.length !== 0 && setOpen(true)}
+                    onClick={() =>
+                      likeData.data?.newLikes.length !== 0 && setOpen(true)
+                    }
                   >
-                    {likedBy.length > 1
-                      ? `Liked by ${likedBy[1].user.username} and ${likedBy.length - 1} others`
-                      : likedBy[0]
-                        ? `Liked by ${likedBy[0].user.username}`
+                    {likeData.data?.newLikes &&
+                    likeData.data?.newLikes.length > 1
+                      ? `Liked by ${likeData.data?.newLikes[1].user.username} and ${likeData.data?.newLikes.length - 1} others`
+                      : likeData.data?.newLikes[0]
+                        ? `Liked by ${likeData.data?.newLikes[0].user.username}`
                         : null}
                   </p>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  {likedBy.length > 0 &&
-                    likedBy.map((user, index) => (
+                  {likeData.data?.newLikes &&
+                    likeData.data?.newLikes.length > 0 &&
+                    likeData.data?.newLikes.map((user, index) => (
                       <p key={index} className="text-xs">
                         {user.user.username}
                       </p>
@@ -462,7 +462,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
                     <Button
                       variant="ghost"
                       size="iconRound"
-                      onClick={(e) => handleLike(e)}
+                      disabled={isPending}
+                      onClick={() => mutate(session.user.id)}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -471,7 +472,13 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
                         strokeWidth="1.5"
                         stroke="currentColor"
                         className={cn(
-                          liked && "fill-red-500 stroke-red-500",
+                          isPending && likeData.data?.liked
+                            ? "fill-none stroke-white"
+                            : isPending && !likeData.data?.liked
+                              ? "fill-red-500 stroke-red-500"
+                              : likeData.data?.liked
+                                ? "fill-red-500 stroke-red-500"
+                                : "fill-none stroke-white",
                           "h-6 w-6",
                         )}
                       >

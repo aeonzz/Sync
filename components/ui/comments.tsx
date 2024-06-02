@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useMutationSuccess } from "@/context/store";
 import { useRouter } from "next/navigation";
+import CommentSkeleton from "../loaders/comment-skeleton";
 
 interface CommentsProps {
   userId: string;
@@ -28,16 +29,13 @@ const Comments: React.FC<CommentsProps> = ({
   const { isMutate, setIsMutate } = useMutationSuccess();
   const queryClient = useQueryClient();
 
-  const {
-    data: comments,
-    isLoading,
-  } = useQuery({
+  const { data: comments, isLoading } = useQuery({
     queryFn: async () => {
       const response = await axios.get(`/api/post/${postId}`);
       return response.data;
     },
     refetchOnWindowFocus: false,
-    queryKey: ["comments", [postId]],
+    queryKey: ["comments"],
   });
 
   const handleRefetch = () => {
@@ -54,9 +52,9 @@ const Comments: React.FC<CommentsProps> = ({
   return (
     <div>
       {isLoading ? (
-        <h1>loading</h1>
-        ) : (
-          <>
+        <CommentSkeleton />
+      ) : (
+        <>
           {comments?.data.length > 0 ? (
             comments?.data.map((comment: CommentProps, index: number) => (
               <CommentCard

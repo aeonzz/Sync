@@ -5,6 +5,7 @@ import { ScrollArea } from "./scroll-area";
 import { cn } from "@/lib/utils";
 import { Separator } from "./separator";
 import Comments from "./comments";
+import { Card } from "./card";
 
 interface CommentBoxProps {
   avatarUrl: string | null;
@@ -22,18 +23,20 @@ const CommentBox: React.FC<CommentBoxProps> = async ({
   postAuthor,
 }) => {
   return (
-    <div className="relative mt-4 flex flex-col space-y-2 bg-background">
-      <h2 className="scroll-m-20 text-lg font-semibold tracking-tight first:mt-0">
-        Comments
-      </h2>
-      <CommentForm
-        avatarUrl={avatarUrl}
-        username={username}
-        userId={userId}
-        postId={postId}
-        postAuthor={postAuthor}
-      />
-      <ScrollArea className="relative h-[calc(100vh-180px)]">
+    <div className="relative flex flex-col space-y-2">
+      <Card className="space-y-2 p-3">
+        <h2 className="scroll-m-20 text-lg font-semibold tracking-tight first:mt-0">
+          Comments
+        </h2>
+        <CommentForm
+          avatarUrl={avatarUrl}
+          username={username}
+          userId={userId}
+          postId={postId}
+          postAuthor={postAuthor}
+        />
+      </Card>
+      <ScrollArea className="relative h-[calc(100vh-180px)] px-[14px]">
         <div className="absolute z-20 h-5 w-full bg-gradient-to-b from-background to-transparent" />
         <div className="absolute bottom-0 z-20 h-5 w-full bg-gradient-to-t from-background to-transparent" />
         <Comments

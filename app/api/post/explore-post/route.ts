@@ -25,18 +25,6 @@ export async function GET(req: Request) {
           },
         },
         imageUrls: true,
-        postLike: {
-          orderBy: {
-            id: "desc",
-          },
-          include: {
-            user: {
-              include: {
-                studentData: true,
-              },
-            },
-          },
-        },
       },
       where: {
         sequenceId: cursor ? { lt: cursor } : undefined,
@@ -50,27 +38,9 @@ export async function GET(req: Request) {
     const lastPost = posts[posts.length - 1];
     const nextCursor = lastPost?.sequenceId || undefined;
 
-    const postWithLikedStatus = await Promise.all(
-      posts.map(async (post) => {
-        const likeRecord = await prisma.postLike.findUnique({
-          where: {
-            userId_postId: {
-              userId: session!.user.id,
-              postId: post.postId,
-            },
-          },
-        });
-
-        return {
-          ...post,
-          isLikedByCurrentUser: likeRecord !== null,
-        };
-      }),
-    );
-
     return NextResponse.json(
       {
-        data: postWithLikedStatus,
+        data: posts,
         nextCursor,
       },
       { status: 200 },

@@ -86,3 +86,42 @@ export async function GET(req: Request, params: Context) {
     );
   }
 }
+
+export async function PATCH(req: Request, params: Context) {
+  const { postId } = params.params;
+  const body = await req.json();
+
+  try {
+    const existingLike = await prisma.postLike.findUnique({
+      where: {
+        userId_postId: {
+          userId: body.userId,
+          postId,
+        },
+      },
+    });
+
+    if (existingLike) {
+      await prisma.postLike.delete({
+        where: {
+          id: existingLike.id,
+        },
+      });
+    } else {
+      await prisma.postLike.create({
+        data: {
+          userId: body.userId,
+          postId,
+        },
+      });
+    }
+    
+    return NextResponse.json({ data: existingLike }, { status: 200 });
+  } catch (error: any) {
+    console.log(error);
+    return NextResponse.json(
+      { message: "could not get post" },
+      { status: 500 },
+    );
+  }
+}

@@ -21,7 +21,7 @@ export default function Error({
           Oops! Something went wrong.
         </h1>
         <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
-          We're sorry, but the page you were trying to access is not available.
+          We&apos;re sorry, but the page you were trying to access is not available.
         </p>
         <Button onClick={() => reset()}>Try again</Button>
       </div>

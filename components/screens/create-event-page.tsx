@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import EventForm from "../forms/event-form";
 import axios from "axios";
-import { useSearchParams } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import { EventProps } from "@/types/event";
 import EventSkeleton from "../loaders/event-skeleton";
 import FetchDataError from "../ui/fetch-data-error";
@@ -13,6 +13,11 @@ import EventFormSkeleton from "../loaders/event-form-skeleton";
 
 interface CreateEventPageProps {
   currentUserId: string;
+}
+
+interface EventData {
+  event: EventProps;
+  isJoined: boolean;
 }
 
 const CreateEventPage: React.FC<CreateEventPageProps> = ({ currentUserId }) => {
@@ -26,7 +31,7 @@ const CreateEventPage: React.FC<CreateEventPageProps> = ({ currentUserId }) => {
     queryKey: ["venues"],
   });
 
-  const getEvent = useQuery<EventProps>({
+  const getEvent = useQuery<EventData>({
     queryFn: async () => {
       const response = await axios.get(`/api/event/${eventId}`);
       return response.data.data;
@@ -35,7 +40,7 @@ const CreateEventPage: React.FC<CreateEventPageProps> = ({ currentUserId }) => {
   });
 
   if (eventId !== null && !getEvent.data && !getEvent.isLoading) {
-    return <NotFound />;
+    notFound();
   }
 
   return (
@@ -48,7 +53,7 @@ const CreateEventPage: React.FC<CreateEventPageProps> = ({ currentUserId }) => {
         <EventForm
           currentUserId={currentUserId}
           venues={getVenues.data}
-          formData={getEvent.data}
+          formData={getEvent.data?.event}
         />
       )}
     </section>

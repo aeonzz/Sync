@@ -44,7 +44,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
     <Link
       href={notification.resourceId}
       onClick={() => handleNotificationClick()}
-      className="relative flex h-20 cursor-pointer items-center rounded-sm border-b px-6 py-2 hover:bg-accent/50 w-full"
+      className="relative flex h-20 w-full cursor-pointer items-center rounded-sm border-b px-6 py-2 hover:bg-accent/50"
     >
       {notification.isRead == false && (
         <div className="absolute left-1 top-1">
@@ -62,7 +62,9 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
               alt={notification.from.username ?? "No avatar"}
               className="object-cover"
             />
-            <AvatarFallback className="h-10 w-10 bg-stone-900 pb-1 pr-1"></AvatarFallback>
+            <AvatarFallback className="h-10 w-10 bg-stone-900 pb-1 pr-1">
+              {notification.from.username?.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           {notification.type === "POST" && (
             <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-blue-500">

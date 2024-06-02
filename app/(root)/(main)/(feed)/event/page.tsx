@@ -1,4 +1,3 @@
-import PostCard from "@/components/cards/post-card";
 import EventPage from "@/components/screens/event-page";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getUserById } from "@/lib/actions/user.actions";

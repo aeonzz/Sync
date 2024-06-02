@@ -49,7 +49,7 @@ const SignInForm = () => {
           description: signInData.error,
         });
       } else if (signInData?.ok) {
-        router.push("/onboarding");
+        router.push("/home");
         router.refresh()
       }
     } catch (error) {

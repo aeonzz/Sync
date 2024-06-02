@@ -2,10 +2,9 @@
 
 import React, { useState } from "react";
 import { EventProps } from "@/types/event";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import DeletedContent from "../cards/deleted-content";
-import NotFound from "@/app/not-found";
 import Image from "next/image";
 import Linkify from "linkify-react";
 import { Button, buttonVariants } from "../ui/button";
@@ -29,7 +28,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { createAttendees, deleteEvent } from "@/lib/actions/event.actions";
+import { deleteEvent } from "@/lib/actions/event.actions";
 import { toast } from "sonner";
 import { notFound, useRouter } from "next/navigation";
 import { AccessibilityType, Venue } from "@prisma/client";
@@ -37,6 +36,7 @@ import Link from "next/link";
 import { Card, CardHeader } from "../ui/card";
 import EventDetailsSkeleton from "../loaders/event-details-skeleton";
 import { UserProps } from "@/types/user";
+import Loader from "../loaders/loader";
 
 interface EventDetailsProps {
   eventId: string;
@@ -48,6 +48,11 @@ const options = {
   className: "text-blue-500 hover:underline",
 };
 
+interface EventData {
+  event: EventProps;
+  isJoined: boolean;
+}
+
 const EventDetails: React.FC<EventDetailsProps> = ({
   eventId,
   currentUserData,
@@ -58,7 +63,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
-  const event = useQuery<EventProps>({
+  const event = useQuery<EventData>({
     queryFn: async () => {
       const response = await axios.get(`/api/event/${eventId}`);
       return response.data.data;
@@ -89,56 +94,48 @@ const EventDetails: React.FC<EventDetailsProps> = ({
     }
   }
 
-  async function joinEvent() {
-    if (
-      event.data?.eventAttendee.some((user) => user.id === currentUserData.id)
-    ) {
-      setIsLoading(false);
-      toast("yawa");
-      return;
-    }
-
-    setIsLoading(true);
-
-    const response = await createAttendees(eventId, currentUserData.id);
-
-    if (response.status === 200) {
-      setIsLoading(false);
-      queryClient.invalidateQueries({ queryKey: [eventId] });
-      toast("hahahaha");
-    } else {
-      setIsLoading(false);
+  const { mutate, isPending } = useMutation({
+    mutationFn: (userId: string) => {
+      return axios.patch(`/api/event/${eventId}`, { userId: userId });
+    },
+    onError: () => {
       toast.error("Uh oh! Something went wrong.", {
         description:
           "An error occurred while making the request. Please try again later",
       });
-    }
-  }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: [eventId] });
+      toast.success("Welcome aboard!", {
+        description: "You're officially registered for the Event",
+      });
+    },
+  });
 
   if (event.isLoading) {
     return <EventDetailsSkeleton />;
   }
 
-  if (!event.data) {
+  if (!event.data?.event) {
     notFound();
   }
 
   return (
     <section className="h-full w-full overflow-hidden">
-      {event.data.deleted ? (
+      {event.data?.event.deleted ? (
         <DeletedContent />
       ) : (
         <div className="flex flex-col space-y-3">
           <div className="flex-center flex justify-between py-2">
             <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-              {event.data.name}
+              {event.data?.event.name}
             </h1>
             <div className="flex items-center space-x-1">
               <Badge variant="blue" className="h-fit px-6 py-2 font-normal">
-                {event.data.eventStatus.charAt(0)}
-                {event.data.eventStatus.slice(1).toLowerCase()}
+                {event.data?.event.eventStatus.charAt(0)}
+                {event.data?.event.eventStatus.slice(1).toLowerCase()}
               </Badge>
-              {currentUserData.id === event.data.organizer.id && (
+              {currentUserData.id === event.data?.event.organizer.id && (
                 <DropdownMenu
                   open={actionDropdown}
                   onOpenChange={setActionDropdown}
@@ -152,7 +149,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                     align="end"
                     className="min-w-[100px] p-1.5"
                   >
-                    {event.data.organizer.id === currentUserData.id && (
+                    {event.data?.event.organizer.id === currentUserData.id && (
                       <DropdownMenuItem
                         onSelect={(e) => e.preventDefault()}
                         asChild
@@ -209,8 +206,8 @@ const EventDetails: React.FC<EventDetailsProps> = ({
             <div className="flex h-auto w-[345px] flex-col space-y-3">
               <Image
                 src={
-                  event.data.image
-                    ? event.data.image
+                  event.data?.event.image
+                    ? event.data?.event.image
                     : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/Group%2052%20(1).png"
                 }
                 alt="Event Image"
@@ -219,9 +216,11 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                 objectFit="contain"
                 objectPosition="center"
                 quality={100}
-                placeholder={event.data.blurDataUrl ? "blur" : undefined}
+                placeholder={event.data?.event.blurDataUrl ? "blur" : undefined}
                 blurDataURL={
-                  event.data.blurDataUrl ? event.data.blurDataUrl : undefined
+                  event.data?.event.blurDataUrl
+                    ? event.data?.event.blurDataUrl
+                    : undefined
                 }
                 priority
                 className="h-[200px] w-full rounded-md border bg-stone-800 object-cover transition-transform duration-300 ease-in-out group-hover:scale-[1.01]"
@@ -250,7 +249,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                     </svg>
                     <div>
                       <h4 className="scroll-m-20 whitespace-pre-wrap break-all text-sm font-semibold tracking-tight">
-                        {event.data.location}
+                        {event.data?.event.location}
                       </h4>
                       <p className="text-xs text-muted-foreground">Location</p>
                     </div>
@@ -285,7 +284,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                     </svg>
                     <div>
                       <h4 className="scroll-m-20 whitespace-pre-wrap break-all text-sm font-semibold tracking-tight">
-                        {event.data.venue.name}
+                        {event.data?.event.venue.name}
                       </h4>
                       <p className="text-xs text-muted-foreground">Venue</p>
                     </div>
@@ -321,7 +320,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                     </svg>
                     <div>
                       <h4 className="scroll-m-20 whitespace-pre-wrap break-all text-sm font-semibold tracking-tight">
-                        {event.data.venue.capacity}
+                        {event.data?.event.venue.capacity}
                       </h4>
                       <p className="text-xs text-muted-foreground">
                         Venue Capacity
@@ -331,33 +330,39 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                 </Card>
                 <Button
                   className="col-span-2"
-                  onClick={joinEvent}
-                  disabled={isLoading}
+                  onClick={() => mutate(currentUserData.id)}
+                  disabled={isPending || event.data.isJoined}
                 >
-                  Join
+                  {isPending ? (
+                    <Loader />
+                  ) : event.data.isJoined ? (
+                    "Attended"
+                  ) : (
+                    "Attend"
+                  )}
                 </Button>
               </div>
             </div>
             <div className="flex-1 space-y-1">
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-                {event.data.name}
+                {event.data?.event.name}
               </h3>
               <div className="flex">
                 <Badge
                   className="text-[10px] font-normal"
                   variant={
-                    event.data.accessibility === AccessibilityType.PUBLIC
+                    event.data?.event.accessibility === AccessibilityType.PUBLIC
                       ? "green"
                       : "yellow"
                   }
                 >
-                  {event.data.accessibility}
+                  {event.data?.event.accessibility}
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground">Event Overview</p>
               <Linkify options={options}>
                 <p className="whitespace-pre-wrap break-all text-sm">
-                  {event.data.description}
+                  {event.data?.event.description}
                 </p>
               </Linkify>
             </div>

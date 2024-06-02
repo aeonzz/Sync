@@ -1,3 +1,5 @@
+import { UserProps } from "./user";
+
 export type PostProps = {
   sequenceId: number;
   postId: string;
@@ -246,3 +248,9 @@ export type ReplyProps = {
     };
   };
 };
+
+
+export type PostLikeProps = {
+  id: string;
+  user: UserProps;
+}

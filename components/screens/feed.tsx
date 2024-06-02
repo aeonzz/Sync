@@ -46,11 +46,9 @@ const Feed = ({ session }: { session: Session }) => {
         ) : null
       ) : (
         <div>
-          {group.data.map(
-            (post: PostProps & { isLikedByCurrentUser: boolean }) => (
-              <PostCard key={post.postId} post={post} session={session} />
-            ),
-          )}
+          {group.data.map((post: PostProps) => (
+            <PostCard key={post.postId} post={post} session={session} />
+          ))}
         </div>
       )}
     </div>
