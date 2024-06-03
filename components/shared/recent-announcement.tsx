@@ -16,6 +16,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
+import { Badge } from "../ui/badge";
+import { differenceInHours, format, parseISO } from "date-fns";
 
 const RecentAnnouncement = () => {
   const { data, isLoading, isError } = useQuery<PostProps[]>({
@@ -26,8 +29,31 @@ const RecentAnnouncement = () => {
     queryKey: ["new-announcement"],
   });
 
+  const shouldRenderBadge = (createdAt: Date) => {
+    const now = new Date();
+    const parseCreatedAt = format(createdAt, "yyyy-MM-dd HH:mm:ss");
+    const createdAtDate = parseISO(parseCreatedAt);
+    const diffHours = differenceInHours(now, createdAtDate);
+    return diffHours <= 48;
+  };
+
   if (isLoading) {
-    return <h1>fukc this</h1>;
+    return (
+      <div className="h-[212px] w-full space-y-5 rounded-md border p-4">
+        <div className="flex justify-between">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-6 w-20" />
+        </div>
+        <div className="flex h-32 w-full space-x-2 rounded-md border p-2">
+          <Skeleton className="h-full w-[120px] rounded-lg" />
+          <div className="flex flex-col space-y-1">
+            <Skeleton className="h-3 w-[335px]" />
+            <Skeleton className="h-3 w-[335px]" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (isError) {
@@ -40,10 +66,18 @@ const RecentAnnouncement = () => {
         ? data.map((announcement) => (
             <Card>
               <CardHeader className="flex-row items-center justify-between">
-                <CardTitle>Latest Announcement</CardTitle>
+                <div className="flex space-x-3">
+                  <CardTitle>Latest Announcement</CardTitle>
+                  {shouldRenderBadge(announcement.createdAt) && (
+                    <Badge>New</Badge>
+                  )}
+                </div>
                 <Link
                   href="/announcement"
-                  className={cn(buttonVariants({ variant: "link" }), "h-fit py-0")}
+                  className={cn(
+                    buttonVariants({ variant: "link", size: "sm" }),
+                    "h-fit py-0",
+                  )}
                 >
                   View all
                 </Link>
@@ -75,7 +109,7 @@ const RecentAnnouncement = () => {
                         ? announcement.imageUrls[0].blurDataUrl
                         : undefined
                     }
-                    className="aspect-square h-[120px] rounded-sm border bg-stone-800 object-cover transition-transform duration-300 ease-in-out group-hover:scale-[1.01]"
+                    className="aspect-square h-[120px] rounded-lg border bg-stone-800 object-cover transition-transform duration-300 ease-in-out group-hover:scale-[1.01]"
                   />
                   <CardDescription className="whitespace-pre-wrap break-words text-xs">
                     {announcement.content.slice(0, 320)}
