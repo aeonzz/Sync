@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import getBase64 from "../base64";
 import prisma from "../db";
+import { PostType } from "@prisma/client";
 
 // export async function getPosts(page: number) {
 //   const take = 7;
@@ -76,7 +77,7 @@ export async function getPostById(postId: string, currentUserId: string) {
             deleted: false,
           },
           orderBy: {
-            sequenceId: "desc"
+            sequenceId: "desc",
           },
           include: {
             _count: {
@@ -105,7 +106,7 @@ export async function getPostById(postId: string, currentUserId: string) {
                 deleted: false,
               },
               orderBy: {
-                sequenceId: "desc"
+                sequenceId: "desc",
               },
               include: {
                 _count: {
@@ -165,6 +166,7 @@ interface CreatePostParams {
   title?: string | undefined;
   content: string;
   images: (string | undefined)[];
+  type: PostType;
 }
 
 export async function createPost({
@@ -172,6 +174,7 @@ export async function createPost({
   title,
   content,
   images,
+  type,
 }: CreatePostParams) {
   try {
     const imageObjects = await Promise.all(
@@ -187,6 +190,7 @@ export async function createPost({
       data: {
         title: title,
         content: content,
+        type: type,
         author: {
           connect: {
             id: userId,

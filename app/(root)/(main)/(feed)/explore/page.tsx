@@ -1,5 +1,4 @@
 import ExplorePage from "@/components/screens/explore-page";
-import CreatePost from "@/components/ui/create-post";
 import ExploreSearch from "@/components/ui/explore-search";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getUserById } from "@/lib/actions/user.actions";

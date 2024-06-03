@@ -40,21 +40,6 @@ export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
 
   try {
-    const followingPosts = await prisma.follows.findMany({
-      where: { followerId: session?.user.id },
-      select: {
-        following: {
-          select: {
-            post: {
-              select: {
-                postId: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
     const posts = await prisma.post.findMany({
       include: {
         _count: {
@@ -72,21 +57,9 @@ export async function GET(req: Request) {
         imageUrls: true,
       },
       where: {
-        OR: [
-          {
-            postId: {
-              in: followingPosts.flatMap((follow) =>
-                follow.following.post.map((post) => post.postId),
-              ),
-            },
-          },
-          {
-            authorId: session?.user.id,
-          },
-        ],
         sequenceId: cursor ? { lt: cursor } : undefined,
         deleted: false,
-        type: PostType.POST,
+        type: PostType.ANNOUNCEMENT,
       },
       orderBy: {
         sequenceId: "desc",

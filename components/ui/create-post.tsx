@@ -27,12 +27,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import Link from "next/link";
 import { useState } from "react";
 import { UserProps } from "@/types/user";
+import { Switch } from "./switch";
+import { Label } from "./label";
+import { cn } from "@/lib/utils";
 
 interface CreatePostProps {
   currentUser: UserProps;
+  announcement: boolean;
 }
 
-const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
+const CreatePost: React.FC<CreatePostProps> = ({
+  currentUser,
+  announcement,
+}) => {
+  const [checked, setChecked] = useState<boolean>(announcement);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
@@ -43,7 +51,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
   const fullname = `${currentUser.studentData.firstName} ${currentUser.studentData.middleName.charAt(0).toUpperCase()} ${currentUser.studentData.lastName}`;
 
   return (
-    <Card className="mb-4 w-full">
+    <Card className={cn(announcement ? "mb-0" : "mb-4", "w-full")}>
       <div className="flex items-center px-5 pb-2 pt-1">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="group flex w-full items-center space-x-3">
@@ -65,7 +73,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
               </Link>
             </Avatar>
             <Input
-              placeholder="What's on your mind?"
+              placeholder={
+                announcement ? "Post an announcement" : "What's on your mind?"
+              }
               className="rounded-none border-none bg-transparent pl-0 transition focus-visible:ring-0 focus-visible:ring-black"
             />
             <svg
@@ -127,31 +137,48 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
             <DialogHeader>
               <DialogTitle>Create post</DialogTitle>
             </DialogHeader>
-            <div className="flex items-center space-x-2 border border-white">
-              <Avatar className="group relative h-9 w-9 dark:border">
-                <Link href={`/u/${currentUser.id}`} className="relative">
-                  <div className="absolute z-10 h-9 w-9 bg-stone-950 opacity-0 transition group-hover:opacity-40"></div>
-                  <AvatarImage
-                    src={
-                      currentUser.avatarUrl ? currentUser.avatarUrl : undefined
-                    }
-                    alt={
-                      currentUser.username ? currentUser.username : "No avatar"
-                    }
-                    className="object-cover"
-                  />
-                  <AvatarFallback className="h-9 w-9 bg-stone-900 pb-1 pr-1">
-                    {initialLetter}
-                  </AvatarFallback>
-                </Link>
-              </Avatar>
-              <div className="space-y-1">
-                <h4 className="text-md scroll-m-20 font-medium leading-none tracking-tight">
-                  {username}
-                </h4>
-                <h4 className="scroll-m-20 text-xs text-muted-foreground">
-                  {fullname}
-                </h4>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Avatar className="group relative h-9 w-9 dark:border">
+                  <Link href={`/u/${currentUser.id}`} className="relative">
+                    <div className="absolute z-10 h-9 w-9 bg-stone-950 opacity-0 transition group-hover:opacity-40"></div>
+                    <AvatarImage
+                      src={
+                        currentUser.avatarUrl
+                          ? currentUser.avatarUrl
+                          : undefined
+                      }
+                      alt={
+                        currentUser.username
+                          ? currentUser.username
+                          : "No avatar"
+                      }
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="h-9 w-9 bg-stone-900 pb-1 pr-1">
+                      {initialLetter}
+                    </AvatarFallback>
+                  </Link>
+                </Avatar>
+                <div className="space-y-1">
+                  <h4 className="text-md scroll-m-20 font-medium leading-none tracking-tight">
+                    {username}
+                  </h4>
+                  <h4 className="scroll-m-20 text-xs text-muted-foreground">
+                    {fullname}
+                  </h4>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="announcement" className="text-xs">
+                  Announcement
+                </Label>
+                <Switch
+                  id="announcement"
+                  checked={checked}
+                  onCheckedChange={setChecked}
+                />
               </div>
             </div>
             <PostForm
@@ -160,6 +187,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ currentUser }) => {
               hasUserImages={setIsImageDirty}
               onLoading={setIsLoading}
               currentUser={currentUser}
+              checked={checked}
             />
           </DialogContent>
         </Dialog>

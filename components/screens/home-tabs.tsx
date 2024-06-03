@@ -2,7 +2,6 @@
 
 import { UserProps } from "@/types/user";
 import { Session } from "next-auth";
-import CreatePost from "../ui/create-post";
 import Feed from "./feed";
 import { Button, buttonVariants } from "../ui/button";
 import { useState } from "react";

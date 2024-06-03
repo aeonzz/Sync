@@ -128,6 +128,7 @@ model Post {
   deleted    Boolean    @default(false)
   author     User       @relation(fields: [authorId], references: [id])
   authorId   String
+  type       PostType   @default(POST)
   imageUrls  Image[]
   comment    Comment[]
   postLike   PostLike[]
@@ -304,4 +305,9 @@ enum EventStatusType {
   ONGOING
   COMPLETED
   CANCELLED
+}
+
+enum PostType {
+  ANNOUNCEMENT
+  POST
 }

@@ -28,7 +28,7 @@ import { useSession } from "next-auth/react";
 import EmojiPicker from "../ui/emoji-picker";
 import { createNotification } from "@/lib/actions/notification.actions";
 import { UserProps } from "@/types/user";
-import { NotificationType } from "@prisma/client";
+import { NotificationType, PostType } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
@@ -36,6 +36,7 @@ interface PostFormProps {
   hasUserImages: (state: boolean) => void;
   onLoading: (state: boolean) => void;
   currentUser: UserProps;
+  checked: boolean;
 }
 
 const PostForm: React.FC<PostFormProps> = ({
@@ -44,6 +45,7 @@ const PostForm: React.FC<PostFormProps> = ({
   hasUserImages,
   onLoading,
   currentUser,
+  checked,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openImageInput, setOpenImageInput] = useState(false);
@@ -123,6 +125,7 @@ const PostForm: React.FC<PostFormProps> = ({
       ...data,
       userId: currentUser.id,
       images: uploadImage,
+      type: checked ? PostType.ANNOUNCEMENT : PostType.POST,
     };
 
     const response = await createPost(postData);
@@ -167,7 +170,9 @@ const PostForm: React.FC<PostFormProps> = ({
             <FormItem>
               <FormControl>
                 <Textarea
-                  placeholder="What's on your mind?"
+                  placeholder={
+                    checked ? "Post an announcement" : "What's on your mind?"
+                  }
                   className={cn(
                     watchFormContent.length >= 90
                       ? "text-md h-[150px]"

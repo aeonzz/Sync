@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { PostType } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -29,6 +30,7 @@ export async function GET(req: Request) {
       where: {
         sequenceId: cursor ? { lt: cursor } : undefined,
         deleted: false,
+        type: PostType.POST,
       },
       orderBy: {
         sequenceId: "desc",

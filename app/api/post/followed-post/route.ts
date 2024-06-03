@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
+import { PostType } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -8,7 +9,7 @@ export async function GET(req: Request) {
   const cursorParam = url.searchParams.get("cursor");
   const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
   const session = await getServerSession(authOptions);
-  
+
   try {
     const followingPosts = await prisma.follows.findMany({
       where: { followerId: session?.user.id },
@@ -49,6 +50,7 @@ export async function GET(req: Request) {
         },
         sequenceId: cursor ? { lt: cursor } : undefined,
         deleted: false,
+        type: PostType.POST,
       },
       orderBy: {
         sequenceId: "desc",

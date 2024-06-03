@@ -29,7 +29,7 @@ export default async function FeedLayout({
   return (
     <div className="w-[550px]">
       <HomeTabs />
-      <CreatePost currentUser={currentUser.data} />
+      <CreatePost currentUser={currentUser.data} announcement={false} />
       {children}
     </div>
   );

@@ -1,5 +1,4 @@
 import FollowingTab from "@/components/screens/following-tab";
-import CreatePost from "@/components/ui/create-post";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getUserById } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";

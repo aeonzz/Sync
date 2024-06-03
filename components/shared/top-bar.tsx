@@ -17,7 +17,7 @@ const TopBar = async () => {
 
   return (
     <header className="sticky top-0 z-40 flex w-full items-center justify-between bg-background py-5">
-      <CreatePost currentUser={currentUser.data} />
+      <CreatePost currentUser={currentUser.data} announcement={false} />
       <div className="flex items-center space-x-2">
         <ThemeToggle />
         <UserNav />

@@ -1,13 +1,9 @@
 import home from "@/public/icons/home.svg";
-import megaphone from "@/public/icons/megaphone.svg";
 import events from "@/public/icons/events.svg";
-import bird from "@/public/icons/bird.svg";
-import highlights from "@/public/icons/highlights.svg";
 import explore from "@/public/icons/explore.svg";
 import notification from "@/public/icons/notifcation.svg";
-import profile from "@/public/icons/profile.svg";
 import chatRoom from "@/public/icons/chat-room.svg";
-import { type } from "os";
+import announcement from "@/public/icons/announcement.svg";
 
 export const sidebarNav = [
   {
@@ -22,10 +18,10 @@ export const sidebarNav = [
   {
     type: "link",
     data: {
-      title: "Highlights",
-      icon: highlights,
-      link: "/highlights",
-      alt: "highlights",
+      title: "Announcements",
+      icon: announcement,
+      link: "/announcement",
+      alt: "announcement",
     },
   },
   {
