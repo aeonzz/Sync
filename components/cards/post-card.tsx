@@ -164,7 +164,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
   }
 
   return (
-    <Card className="mb-4 min-h-[200px]">
+    <Card className="mb-3 min-h-[200px]">
       <CardHeader className="flex-row items-center justify-between pb-2">
         <div className="relative flex items-center space-x-2">
           <HoverCard openDelay={200} closeDelay={100}>

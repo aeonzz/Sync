@@ -9,8 +9,9 @@ const LeftSideBar = async () => {
   if (!session) return null;
 
   return (
-    <aside className="sticky left-0 top-0 flex h-screen w-auto flex-col items-center justify-between space-y-7">
+    <aside className="sticky left-0 top-0 flex h-screen w-auto flex-col items-center justify-between">
       <SideBarNav currentUserId={session.user.id} />
+      <UserNav />
     </aside>
   );
 };

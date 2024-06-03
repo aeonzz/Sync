@@ -34,7 +34,7 @@ const UserNav = async () => {
         <Button
           variant="secondary"
           size="lg"
-          className="flex h-[52px] w-[230px] justify-start space-x-2 border bg-card px-3 shadow-sm"
+          className="flex h-[52px] w-[230px] justify-start space-x-2 border bg-card px-3 shadow-sm mb-3"
         >
           <Avatar>
             <AvatarImage

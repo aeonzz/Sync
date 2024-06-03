@@ -170,8 +170,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
               </HoverCard>
             </div>
             <p className="h-40 overflow-hidden whitespace-pre-wrap break-all text-xs text-muted-foreground">
-              {event.description.slice(0, 190)}
-              {event.description.length >= 190 && "..."}
+              {event.description.slice(0, 170)}
+              {event.description.length > 170 && "..."}
             </p>
             <div className="h-full space-x-1">
               <Badge

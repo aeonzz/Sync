@@ -51,7 +51,7 @@ const CreatePost: React.FC<CreatePostProps> = ({
   const fullname = `${currentUser.studentData.firstName} ${currentUser.studentData.middleName.charAt(0).toUpperCase()} ${currentUser.studentData.lastName}`;
 
   return (
-    <Card className={cn(announcement ? "mb-0" : "mb-4", "w-full")}>
+    <Card className={cn(announcement ? "mb-0" : "mb-3", "w-full")}>
       <div className="flex items-center px-5 pb-2 pt-1">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger className="group flex w-full items-center space-x-3">

@@ -46,8 +46,8 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
   }
 
   return (
-      <div className="flex flex-1 space-x-2 pr-4 mt-3">
-        <div className="min-h-[400px] w-[550px] space-y-2">
+      <div className="flex flex-1 space-x-3 pr-4 mt-3">
+        <div className="min-h-[400px] w-[550px] space-y-3">
           <Card className="flex h-[54px] items-center space-x-2 px-2">
             <BackButton />
             <h2 className="scroll-m-20 text-lg font-semibold tracking-tight first:mt-0">

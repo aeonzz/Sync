@@ -25,12 +25,14 @@ export default async function Home() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between my-4 space-x-6">
-        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+    <div className="min-h-screen w-[550px]">
+      <div className="my-3 flex items-center justify-between">
+        <h3 className="flex-1 scroll-m-20 text-2xl font-semibold tracking-tight">
           Announcements
         </h3>
-        <CreatePost currentUser={currentUser.data} announcement />
+        <div className="flex-1">
+          <CreatePost currentUser={currentUser.data} announcement />
+        </div>
       </div>
       <Announcements session={session} />
     </div>
