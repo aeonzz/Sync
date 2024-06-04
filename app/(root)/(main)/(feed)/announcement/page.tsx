@@ -5,7 +5,6 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import HomeTabs from "@/components/screens/home-tabs";
-import Feed from "@/components/screens/feed";
 import Announcements from "@/components/screens/announcement";
 
 export default async function Home() {

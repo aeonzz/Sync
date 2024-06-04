@@ -2,7 +2,6 @@
 
 import { UserProps } from "@/types/user";
 import { Session } from "next-auth";
-import Feed from "./feed";
 import { Button, buttonVariants } from "../ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";

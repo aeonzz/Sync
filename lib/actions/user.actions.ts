@@ -13,10 +13,12 @@ export async function getUserById(userId: string) {
       },
       include: {
         studentData: true,
+        followers: true,
         following: true,
         _count: {
           select: {
             following: true,
+            followers: true,
           },
         },
       },
