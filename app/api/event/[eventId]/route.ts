@@ -19,7 +19,11 @@ export async function GET(req: Request, params: Context) {
         id: eventId,
       },
       include: {
-        organizer: true,
+        organizer: {
+          include: {
+            studentData: true,
+          },
+        },
         reservation: true,
         venue: true,
         eventAttendee: {

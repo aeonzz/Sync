@@ -34,6 +34,7 @@ import { notFound, useRouter } from "next/navigation";
 import {
   AccessibilityType,
   DepartmentType,
+  EventStatusType,
   Venue,
   YearLevel,
 } from "@prisma/client";
@@ -120,7 +121,18 @@ const GuestPage: React.FC<GuestPageProps> = ({ eventId, currentUserData }) => {
               {event.data?.event.name}
             </h1>
             <div className="flex items-center space-x-1">
-              <Badge variant="blue" className="h-fit px-6 py-2 font-normal">
+              <Badge
+                variant={
+                  event.data.event.eventStatus === EventStatusType.UPCOMING
+                    ? "sky"
+                    : event.data.event.eventStatus === EventStatusType.CANCELLED
+                      ? "destructive"
+                      : event.data.event.eventStatus === EventStatusType.ONGOING
+                        ? "green"
+                        : "orange"
+                }
+                className="h-fit px-6 py-2 font-normal"
+              >
                 {event.data?.event.eventStatus.charAt(0)}
                 {event.data?.event.eventStatus.slice(1).toLowerCase()}
               </Badge>

@@ -184,7 +184,18 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
               >
                 {event.accessibility}
               </Badge>
-              <Badge className="text-[10px] font-normal" variant="blue">
+              <Badge
+                className="text-[10px] font-normal"
+                variant={
+                  event.eventStatus === EventStatusType.UPCOMING
+                    ? "sky"
+                    : event.eventStatus === EventStatusType.CANCELLED
+                      ? "destructive"
+                      : event.eventStatus === EventStatusType.ONGOING
+                        ? "green"
+                        : "orange"
+                }
+              >
                 {event.eventStatus}
               </Badge>
               {event.reservation.startTime ? (

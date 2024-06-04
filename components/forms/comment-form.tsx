@@ -136,7 +136,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
           }}
           rows={1}
           maxRows={5}
-          placeholder="Write a message..."
+          placeholder="Write a comment..."
           className={cn(
             "flex h-auto w-full resize-none bg-input px-4 py-3 text-sm shadow-sm ring-offset-background transition duration-300 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
           )}

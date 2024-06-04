@@ -28,10 +28,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { deleteEvent } from "@/lib/actions/event.actions";
+import { deleteEvent, updateEventStatus } from "@/lib/actions/event.actions";
 import { toast } from "sonner";
 import { notFound, useRouter } from "next/navigation";
-import { AccessibilityType, Venue } from "@prisma/client";
+import { AccessibilityType, EventStatusType, Venue } from "@prisma/client";
 import Link from "next/link";
 import { Card, CardHeader } from "../ui/card";
 import EventDetailsSkeleton from "../loaders/event-details-skeleton";
@@ -60,6 +60,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
   const router = useRouter();
   const [actionDropdown, setActionDropdown] = useState(false);
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const [cancelAlertOpen, setCancelAlertOpen] = useState(false);
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -77,11 +78,8 @@ const EventDetails: React.FC<EventDetailsProps> = ({
     const response = await deleteEvent(eventId);
 
     if (response.status === 200) {
-      setActionDropdown(false);
+      await queryClient.invalidateQueries({ queryKey: ["events"] });
       router.push("/event");
-      router.refresh();
-      setIsLoading(false);
-      queryClient.invalidateQueries({ queryKey: ["events"] });
       toast.success("Event Deleted", {
         description: "Your event has been successfully deleted.",
       });
@@ -112,6 +110,26 @@ const EventDetails: React.FC<EventDetailsProps> = ({
     },
   });
 
+  async function handeEventStatus(status: EventStatusType) {
+    setIsLoading(true);
+
+    const response = await updateEventStatus(eventId, status);
+
+    if (response.status === 200) {
+      await queryClient.invalidateQueries({ queryKey: [eventId] });
+      setIsLoading(false);
+      toast.success(`Event ${status}`, {
+        description: "Event Successfully updated",
+      });
+    } else {
+      setIsLoading(false);
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    }
+  }
+
   if (event.isLoading) {
     return <EventDetailsSkeleton />;
   }
@@ -131,7 +149,18 @@ const EventDetails: React.FC<EventDetailsProps> = ({
               {event.data?.event.name}
             </h1>
             <div className="flex items-center space-x-1">
-              <Badge variant="blue" className="h-fit px-6 py-2 font-normal">
+              <Badge
+                variant={
+                  event.data.event.eventStatus === EventStatusType.UPCOMING
+                    ? "sky"
+                    : event.data.event.eventStatus === EventStatusType.CANCELLED
+                      ? "destructive"
+                      : event.data.event.eventStatus === EventStatusType.ONGOING
+                        ? "green"
+                        : "orange"
+                }
+                className="h-fit px-6 py-2 font-normal"
+              >
                 {event.data?.event.eventStatus.charAt(0)}
                 {event.data?.event.eventStatus.slice(1).toLowerCase()}
               </Badge>
@@ -225,7 +254,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                 priority
                 className="h-[200px] w-full rounded-md border bg-stone-800 object-cover transition-transform duration-300 ease-in-out group-hover:scale-[1.01]"
               />
-              <div className="grid h-auto grid-cols-2 grid-rows-3 gap-3">
+              <div className="grid h-auto grid-cols-2 grid-rows-2 gap-3">
                 <Card className="rounded-sm">
                   <div className="flex items-center space-x-2 p-3">
                     <svg
@@ -328,20 +357,116 @@ const EventDetails: React.FC<EventDetailsProps> = ({
                     </div>
                   </div>
                 </Card>
-                <Button
-                  className="col-span-2"
-                  onClick={() => mutate(currentUserData.id)}
-                  disabled={isPending || event.data.isJoined}
-                >
-                  {isPending ? (
-                    <Loader />
-                  ) : event.data.isJoined ? (
-                    "Attended"
-                  ) : (
-                    "Attend"
-                  )}
-                </Button>
               </div>
+              {currentUserData.id === event.data.event.organizer.id ? (
+                <div className="flex flex-col space-y-2">
+                  {event.data.event.eventStatus !==
+                    EventStatusType.CANCELLED && (
+                    <Button
+                      onClick={() =>
+                        handeEventStatus(
+                          event.data.event.eventStatus ===
+                            EventStatusType.ONGOING
+                            ? EventStatusType.COMPLETED
+                            : EventStatusType.ONGOING,
+                        )
+                      }
+                      disabled={
+                        isLoading ||
+                        event.data.event.eventStatus ===
+                          EventStatusType.COMPLETED
+                      }
+                      variant={
+                        event.data.event.eventStatus === EventStatusType.ONGOING
+                          ? "green"
+                          : event.data.event.eventStatus ===
+                              EventStatusType.COMPLETED
+                            ? "orange"
+                            : "default"
+                      }
+                    >
+                      {event.data.event.eventStatus === EventStatusType.ONGOING
+                        ? "Finish Event"
+                        : event.data.event.eventStatus ===
+                            EventStatusType.COMPLETED
+                          ? "Event Finished"
+                          : "Start Event"}
+                    </Button>
+                  )}
+                  {event.data.event.eventStatus === EventStatusType.UPCOMING ||
+                  event.data.event.eventStatus === EventStatusType.CANCELLED ? (
+                    <AlertDialog
+                      open={cancelAlertOpen}
+                      onOpenChange={setCancelAlertOpen}
+                    >
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          disabled={
+                            isLoading ||
+                            event.data.event.eventStatus ===
+                              EventStatusType.CANCELLED
+                          }
+                          variant="destructive"
+                        >
+                          {event.data.event.eventStatus ===
+                          EventStatusType.CANCELLED
+                            ? "Cancelled"
+                            : "Cancel"}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you absolutely sure you want to cancel the
+                            Event?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={isLoading}>
+                            Back
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            disabled={isLoading}
+                            onClick={() =>
+                              handeEventStatus(EventStatusType.CANCELLED)
+                            }
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  ) : null}
+                </div>
+              ) : (
+                <>
+                  {event.data.event.eventStatus ===
+                    EventStatusType.UPCOMING && (
+                    <Button
+                      onClick={() => mutate(currentUserData.id)}
+                      disabled={
+                        isPending ||
+                        event.data.isJoined ||
+                        (event.data.event.accessibility ===
+                          AccessibilityType.EXCLUSIVE &&
+                          currentUserData.studentData.department !==
+                            event.data.event.organizer.studentData.department)
+                      }
+                    >
+                      {isPending ? (
+                        <Loader />
+                      ) : event.data.isJoined ? (
+                        "Attended"
+                      ) : (
+                        "Attend"
+                      )}
+                    </Button>
+                  )}
+                </>
+              )}
             </div>
             <div className="flex-1 space-y-1">
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
