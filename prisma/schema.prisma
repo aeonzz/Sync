@@ -165,8 +165,8 @@ model StudentData {
   firstName  String
   middleName String
   lastName   String
-  section    String?
-  yearLevel  YearLevel      @default(first)
+  section    String
+  yearLevel  YearLevel
   department DepartmentType
   hasAccount Boolean        @default(false)
   createdAt  DateTime       @default(now()) @db.Timestamp(6)
@@ -226,6 +226,8 @@ model ChannelMember {
   user      User    @relation(fields: [userId], references: [id])
   channelId String
   channel   Channel @relation(fields: [channelId], references: [id])
+
+  isConfirmed Boolean @default(false)
 
   @@id([userId, channelId])
 }

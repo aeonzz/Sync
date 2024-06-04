@@ -47,7 +47,7 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
   );
 
   return (
-    <div className="h-screen w-full">
+    <div className="h-screen w-full space-y-28">
       <Card className="relative h-[200px] border-none">
         <ProfileCover userData={userData.data} />
         <ProfileAvatar userData={userData.data} />
@@ -59,6 +59,9 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
           isAlreadyFollowed={isAlreadyFollowed}
         />
       </Card>
+      <div className="border border-white w-full h-20">
+
+      </div>
     </div>
   );
 };

@@ -14,13 +14,25 @@ export async function GET(req: Request, context: Context) {
   try {
     const channels = await prisma.channel.findMany({
       where: {
-        members: {
-          some: {
-            userId,
-          },
-        },
-        status: ChannelStatus.ACCEPTED,
         type: ChannelType.PRIVATE,
+        OR: [
+          {
+            members: {
+              some: {
+                userId: userId,
+                isConfirmed: false,
+              },
+            },
+          },
+          {
+            members: {
+              every: {
+                isConfirmed: true,
+              },
+            },
+          },
+        ],
+        // status: ChannelStatus.ACCEPTED,
       },
       include: {
         members: {

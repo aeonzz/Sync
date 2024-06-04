@@ -21,6 +21,7 @@ export async function createChannel({
             },
           },
         },
+        type: ChannelType.PRIVATE,
       },
       include: {
         members: true,
@@ -46,6 +47,7 @@ export async function createChannel({
       data: {
         userId: to,
         channelId: channel.id,
+        isConfirmed: true,
       },
     });
 
@@ -56,12 +58,11 @@ export async function createChannel({
       },
     });
 
-    return { channel, redirect: false, error: null, status: 200 };
+    return { channel, error: null, status: 200 };
   } catch (error: any) {
     console.log(error);
     return {
       channel: null,
-      redirect: false,
       error: error.message,
       status: 500,
     };
@@ -155,14 +156,13 @@ export async function inviteUser(roomId: string, userId: string) {
   }
 }
 
-export async function getRoomByID({roomId} : {roomId: string}) {
+export async function getRoomByID({ roomId }: { roomId: string }) {
   try {
-
     const room = await prisma.room.findFirst({
       where: {
         id: roomId,
-      }
-    })
+      },
+    });
 
     return { data: room, error: null, status: 200 };
   } catch (error: any) {
@@ -321,15 +321,24 @@ export async function updateMessageRequest(
   status: ChannelStatus,
 ) {
   try {
-    await prisma.channel.update({
-      where: {
-        id: channelId,
-      },
-      data: {
-        status,
-      },
-    });
-
+    await prisma.$transaction([
+      prisma.channel.update({
+        where: {
+          id: channelId,
+        },
+        data: {
+          status: status,
+        },
+      }),
+      prisma.channelMember.updateMany({
+        where: {
+          channelId: channelId,
+        },
+        data: {
+          isConfirmed: true,
+        },
+      }),
+    ]);
     return { error: null, status: 200 };
   } catch (error: any) {
     return { error: error.message, status: 500 };

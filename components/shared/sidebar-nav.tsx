@@ -15,7 +15,11 @@ import {
 } from "@/components/ui/drawer";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import axios from "axios";
 import NotificationCard from "../cards/notification-card";
 import { NotificationProps } from "@/types/notification";
@@ -25,33 +29,83 @@ import { toast } from "sonner";
 import Loader from "../loaders/loader";
 import { pusherClient } from "@/lib/pusher";
 import UserNav from "../ui/user-nav";
+import { useInView } from "react-intersection-observer";
 
 interface SideBarNavProps {
   currentUserId: string;
 }
 
 const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
+  const { ref, inView } = useInView();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const isChatRoom = pathname.startsWith("/chat-rooms");
 
+  const fetchNotifications = async ({ pageParam = 0 }) => {
+    const res = await axios.get(
+      `/api/notification/${currentUserId}?cursor=${pageParam}`,
+    );
+    return res.data;
+  };
+
   const {
     data: notifications,
-    isLoading: isLoadingNotifications,
-    isError,
-  } = useQuery<NotificationProps[]>({
-    queryFn: async () => {
-      const response = await axios.get(`/api/notification/${currentUserId}`);
-      return response.data.data;
-    },
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
     queryKey: ["notifications"],
+    queryFn: fetchNotifications,
+    initialPageParam: 0,
+    refetchOnWindowFocus: false,
+    getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
   });
 
-  const hasActiveNotifications = notifications?.some(
+  const content = notifications?.pages.map((group, i) => (
+    <div key={i}>
+      {group.data.length === 0 ? (
+        status === "success" ? (
+          <p className="p-10 text-center text-sm">
+            You have no notifications yet.
+          </p>
+        ) : null
+      ) : (
+        <div>
+          {group.data.map((notification: NotificationProps) => (
+            <NotificationCard
+              key={notification.id}
+              notification={notification}
+              setOpen={setOpen}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  ));
+
+  // const {
+  //   data: notifications,
+  //   isLoading: isLoadingNotifications,
+  //   isError,
+  // } = useQuery<NotificationProps[]>({
+  //   queryFn: async () => {
+  //     const response = await axios.get(`/api/notification/${currentUserId}`);
+  //     return response.data.data;
+  //   },
+  //   queryKey: ["notifications"],
+  // });
+
+  const hasActiveNotifications = notifications?.pages.some(
     (item) => item.isRead === false,
   );
+
+  const hasUnreadNotifications = notifications?.pages.some(page =>
+    page.data.some((notification: NotificationProps) => notification.isRead === false)
+  );
+
 
   async function handleMarkAllAsRead() {
     setIsLoading(true);
@@ -82,6 +136,12 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
       pusherClient.unsubscribe("notify-post");
     };
   }, [currentUserId]);
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, inView, fetchNextPage]);
 
   return (
     <div
@@ -139,7 +199,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
                   "group relative flex w-full justify-start py-6 text-base tracking-tight active:text-slate-400",
                 )}
               >
-                {hasActiveNotifications && (
+                {hasUnreadNotifications && (
                   <div className="absolute left-4 top-3">
                     <span className="relative flex h-3 w-3">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
@@ -181,7 +241,19 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
             </div>
           </DrawerHeader>
           <ScrollArea className="flex h-screen flex-col">
-            {isLoadingNotifications && <Loader />}
+            {status === "pending" ? (
+              <Loader />
+            ) : status === "error" ? (
+              <p className="text-center text-sm">
+                Error fetching notifications
+              </p>
+            ) : (
+              content
+            )}
+            <div className="mt-10 flex h-24 justify-center" ref={ref}>
+              {isFetchingNextPage ? <Loader /> : null}
+            </div>
+            {/* {isLoadingNotifications && <Loader />}
             {isError && (
               <p className="text-center text-sm">
                 Error fetching notifications
@@ -202,7 +274,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
                   />
                 ))}
               </>
-            )}
+            )} */}
           </ScrollArea>
         </DrawerContent>
       </Drawer>

@@ -106,7 +106,9 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
       setOpen(false);
       setIsLoading(false);
       router.refresh();
-      toast("Profile successfully updated");
+      toast.success("Successful", {
+        description: "Profile successfully updated",
+      });
       setIsLoading(false);
     } else {
       setIsLoading(false);
@@ -144,7 +146,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({
               }}
             />
           </div>
-          <Banners setBanner={setBanner} />
+          {/* <Banners setBanner={setBanner} /> */}
         </div>
         <div className="w-full space-y-2 pt-12">
           <FormField

@@ -1,5 +1,5 @@
 import prisma from "@/lib/db";
-import { ChannelStatus } from "@prisma/client";
+import { ChannelStatus, ChannelType } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 interface Context {
@@ -16,12 +16,16 @@ export async function GET(req: Request, context: Context) {
       where: {
         members: {
           some: {
-            userId,
+            userId: {
+              not: userId,
+            },
+            isConfirmed: false,
           },
         },
-        status: {
-          equals: ChannelStatus.PENDING,
-        },
+        type: ChannelType.PRIVATE,
+        // status: {
+        //   equals: ChannelStatus.PENDING,
+        // },
       },
       include: {
         members: {

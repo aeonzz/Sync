@@ -146,14 +146,16 @@ const NewChat: React.FC<NewChatProps> = ({ currentUserId }) => {
                 </p>
               ) : (
                 <ScrollArea className="max-h-60">
-                  {data?.map((user, index) => (
-                    <ConversationCard
-                      key={index}
-                      user={user}
-                      currentUserId={currentUserId}
-                      setIsOpen={setIsOpen}
-                    />
-                  ))}
+                  {data
+                    ?.filter((user) => user.id !== currentUserId)
+                    .map((user, index) => (
+                      <ConversationCard
+                        key={index}
+                        user={user}
+                        currentUserId={currentUserId}
+                        setIsOpen={setIsOpen}
+                      />
+                    ))}
                 </ScrollArea>
               )}
             </>

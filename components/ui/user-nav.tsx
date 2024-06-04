@@ -97,10 +97,6 @@ const UserNav: React.FC<UserNavProps> = ({ currentUserId }) => {
               Profile
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Settings className="mr-2 h-5 w-5" />
-            Settings
-          </DropdownMenuItem>
         </DropdownMenuGroup>
         <Logout />
       </DropdownMenuContent>

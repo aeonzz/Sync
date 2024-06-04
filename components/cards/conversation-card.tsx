@@ -34,13 +34,10 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
 
     const response = await createChannel(data);
 
-    if (!response.redirect && response.status === 200) {
+    if (response.status === 200) {
       queryClient.invalidateQueries({ queryKey: ["chat-cards"] });
       setIsOpen(false);
       setIsLoading(false);
-    } else if (response.redirect === true) {
-      setIsOpen(false);
-      router.push(`/chat-rooms/${response.channel}`);
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {
@@ -49,6 +46,8 @@ const ConversationCard: React.FC<ConversationCardProps> = ({
       });
     }
   }
+
+  // if (currentUserId === user.id) return null;
 
   return (
     <div className="mb-2 flex items-center justify-between">

@@ -44,7 +44,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
     <Link
       href={notification.resourceId}
       onClick={() => handleNotificationClick()}
-      className="relative flex h-20 w-full cursor-pointer items-center rounded-sm border-b px-6 py-2 hover:bg-accent/50"
+      className="relative flex h-20 w-full cursor-pointer items-center overflow-hidden rounded-sm border-b px-6 py-2 hover:bg-accent/50"
     >
       {notification.isRead == false && (
         <div className="absolute left-1 top-1">

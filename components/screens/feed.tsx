@@ -28,7 +28,6 @@ const Feed = ({ session }: { session: Session }) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    refetch,
     status,
   } = useInfiniteQuery({
     queryKey: ["feed"],

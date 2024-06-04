@@ -14,7 +14,7 @@ interface MessageRequestCardProps {
 }
 
 const MessageRequestCard: React.FC<MessageRequestCardProps> = ({ channel }) => {
-  const chatPartner = channel.members[0];
+  const chatPartner = channel.members[1];
   const createdAt = new Date(channel.createdAt);
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -61,14 +61,14 @@ const MessageRequestCard: React.FC<MessageRequestCardProps> = ({ channel }) => {
         </div>
       </div>
       <div className="flex space-x-2">
-        <Button
+        {/* <Button
           variant="destructive"
           size="sm"
           disabled={isLoading}
           onClick={() => handleDm(ChannelStatus.DECLINED)}
         >
           Ignore
-        </Button>
+        </Button> */}
         <Button
           size="sm"
           disabled={isLoading}

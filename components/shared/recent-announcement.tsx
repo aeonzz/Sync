@@ -63,8 +63,8 @@ const RecentAnnouncement = () => {
   return (
     <>
       {data
-        ? data.map((announcement) => (
-            <Card>
+        ? data.map((announcement, index) => (
+            <Card key={index}>
               <CardHeader className="flex-row items-center justify-between">
                 <div className="flex space-x-3">
                   <CardTitle>Latest Announcement</CardTitle>

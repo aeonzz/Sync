@@ -1,4 +1,5 @@
 import prisma from "@/lib/db";
+import { ChannelType } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -14,6 +15,9 @@ export async function GET(req: Request) {
 
     const channels = await prisma.channelMember.findMany({
       where: {
+        channel: {
+          type: ChannelType.PRIVATE,
+        },
         user: {
           username: {
             contains: searchTerm,

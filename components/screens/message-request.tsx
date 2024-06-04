@@ -14,6 +14,8 @@ interface MessageRequestProps {
 const MessageRequest: React.FC<MessageRequestProps> = ({ currentUserId }) => {
   const { channel, isLoading, isError } = useMessageRequestsStore();
 
+  console.log(channel)
+
   return (
     <div>
       <h3 className="ml-4 py-2 text-sm text-muted-foreground">
