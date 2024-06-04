@@ -13,6 +13,7 @@ import { UserRoleType, Venue } from "@prisma/client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { UserProps } from "@/types/user";
+import { Card } from "../ui/card";
 
 interface EventPageProps {
   currentUserData: UserProps;
@@ -28,23 +29,20 @@ const EventPage: React.FC<EventPageProps> = ({ currentUserData }) => {
   });
 
   return (
-    <section className="my-4 space-y-3">
-      <div className="flex w-full items-center justify-between">
+    <section className="my-2 space-y-3">
+      <Card className="flex h-[54px] w-full items-center justify-between px-4">
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           Events
         </h3>
-        {currentUserData.role === UserRoleType.ADMIN ||
-          (currentUserData.role === UserRoleType.SYSTEMADMIN && (
-            <Link
-              href="/e/create"
-              className={cn(
-                buttonVariants({ variant: "secondary", size: "sm" }),
-              )}
-            >
-              Create Event
-            </Link>
-          ))}
-      </div>
+        {currentUserData.role !== UserRoleType.USER && (
+          <Link
+            href="/e/create"
+            className={cn(buttonVariants({ variant: "secondary", size: "sm" }))}
+          >
+            Create Event
+          </Link>
+        )}
+      </Card>
       <div className="space-y-3">
         {getEvents.isLoading ? (
           <EventSkeleton />

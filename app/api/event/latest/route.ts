@@ -3,22 +3,18 @@ import { PostType } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-  const newAnnouncement = await prisma.post.findMany({
+  const recentEvents = await prisma.event.findMany({
     where: {
-      type: PostType.ANNOUNCEMENT,
       deleted: false,
-    },
-    include: {
-      imageUrls: true,
     },
     orderBy: {
       createdAt: "desc",
     },
-    take: 1,
+    take: 5,
   });
 
   try {
-    return NextResponse.json({ data: newAnnouncement }, { status: 200 });
+    return NextResponse.json({ data: recentEvents }, { status: 200 });
   } catch (error: any) {
     console.log(error);
     return NextResponse.json(

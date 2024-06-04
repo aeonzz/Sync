@@ -17,32 +17,39 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { UserProps } from "@/types/user";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
-const UserNav = () => {
-  const session = useSession();
+interface UserNavProps {
+  currentUserId: string;
+}
 
+const UserNav: React.FC<UserNavProps> = ({ currentUserId }) => {
+  const pathname = usePathname();
+  const chatRooms = pathname.startsWith("/chat-rooms");
   const { data } = useQuery<UserProps>({
     queryFn: async () => {
-      const response = await axios.get(`/api/user/${session.data?.user.id}`);
+      const response = await axios.get(`/api/user/${currentUserId}`);
       return response.data.data;
     },
     queryKey: ["current-user-data"],
   });
 
-  console.log(data)
-
   if (!data) return null;
 
-  // const initialLetter = data.username?.charAt(0).toUpperCase();
-  // const fullname = `${data.studentData.firstName} ${data.studentData.middleName.charAt(0).toUpperCase()} ${data.studentData.lastName}`;
+  const initialLetter = data.username?.charAt(0).toUpperCase();
+  const fullname = `${data.studentData.firstName} ${data.studentData.middleName.charAt(0).toUpperCase()} ${data.studentData.lastName}`;
 
   return (
     <DropdownMenu modal={false}>
-      {/* <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild>
         <Button
           variant="secondary"
           size="lg"
-          className="mb-3 flex h-[52px] w-[230px] justify-start space-x-2 border bg-card px-3 shadow-sm"
+          className={cn(
+            chatRooms ? "w-fit" : "w-full",
+            "mb-3 flex h-[52px] justify-start border bg-card p-2 shadow-sm transition-all duration-300",
+          )}
         >
           <Avatar>
             <AvatarImage
@@ -51,15 +58,30 @@ const UserNav = () => {
             />
             <AvatarFallback>{initialLetter}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col items-start space-y-1">
-            <p className="text-sm font-medium leading-none">{data.username}</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {fullname}
-            </p>
-          </div>
+          {!chatRooms && (
+            <div
+              className={cn(
+                chatRooms && "opacity-0 duration-300",
+                "ml-2 flex flex-col items-start space-y-1",
+              )}
+            >
+              <p className="text-sm font-medium leading-none">
+                {data.username}
+              </p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {fullname}
+              </p>
+            </div>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="z-50 w-[230px]" align="center" forceMount>
+      <DropdownMenuContent
+        className={cn(chatRooms ? "w-auto" : "w-[230px]", "z-50")}
+        align={chatRooms ? "end" : "center"}
+        side={chatRooms ? "right" : "bottom"}
+        alignOffset={-115}
+        forceMount
+      >
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{data.username}</p>
@@ -70,7 +92,7 @@ const UserNav = () => {
         </DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href={`/u/${session.data?.user.id}`}>
+            <Link href={`/u/${currentUserId}`}>
               <UserRound className="mr-2 h-5 w-5" />
               Profile
             </Link>
@@ -81,7 +103,7 @@ const UserNav = () => {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <Logout />
-      </DropdownMenuContent> */}
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 };

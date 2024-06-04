@@ -22,7 +22,15 @@ export async function GET(req: Request, params: Context) {
         organizer: true,
         reservation: true,
         venue: true,
-        eventAttendee: true,
+        eventAttendee: {
+          include: {
+            user: {
+              include: {
+                studentData: true,
+              },
+            },
+          },
+        },
       },
     });
 

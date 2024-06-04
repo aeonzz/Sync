@@ -1,5 +1,4 @@
 import RightSideBar from "@/components/shared/right-sidebar";
-import UserNav from "@/components/ui/user-nav";
 import React from "react";
 
 export default function FeedLayout({

@@ -181,6 +181,7 @@ const PostForm: React.FC<PostFormProps> = ({
                     "h-150px mb-5 resize-none border-none bg-transparent placeholder:font-medium",
                   )}
                   disabled={isLoading}
+                  autoFocus
                   {...field}
                 />
               </FormControl>

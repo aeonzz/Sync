@@ -24,6 +24,7 @@ import { updateAllReadStatus } from "@/lib/actions/notification.actions";
 import { toast } from "sonner";
 import Loader from "../loaders/loader";
 import { pusherClient } from "@/lib/pusher";
+import UserNav from "../ui/user-nav";
 
 interface SideBarNavProps {
   currentUserId: string;
@@ -205,6 +206,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ currentUserId }) => {
           </ScrollArea>
         </DrawerContent>
       </Drawer>
+      <UserNav currentUserId={currentUserId} />
     </div>
   );
 };

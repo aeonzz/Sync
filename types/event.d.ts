@@ -22,6 +22,9 @@ export type EventProps = {
   createdAt: Date;
   updatedAt: Date;
   organizer: UserProps;
-  eventAttendee: UserProps[];
+  eventAttendee: {
+    user: UserProps;
+    createdAt: Date;
+  }[];
   reservation: Reservation;
 };

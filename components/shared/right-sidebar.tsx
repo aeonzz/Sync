@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import RecentEvents from "./recent-events";
 import RecentAnnouncement from "./recent-announcement";
+import { ScrollArea } from "../ui/scroll-area";
 
 const RightSideBar = async () => {
   const session = await getServerSession(authOptions);
@@ -13,11 +14,13 @@ const RightSideBar = async () => {
   }
 
   return (
-    <div className="w-full space-y-3">
-      <RecentAnnouncement />
-      <RecentEvents />
-      <PopularUsers currentUserId={session.user.id} />
-    </div>
+    <ScrollArea scrollBarColor="bg-transparent">
+      <div className="w-full space-y-3">
+        <RecentAnnouncement />
+        <RecentEvents />
+        <PopularUsers currentUserId={session.user.id} />
+      </div>
+    </ScrollArea>
   );
 };
 

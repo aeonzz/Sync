@@ -165,7 +165,8 @@ model StudentData {
   firstName  String
   middleName String
   lastName   String
-  yearLevel  String
+  section    String?
+  yearLevel  YearLevel      @default(first)
   department DepartmentType
   hasAccount Boolean        @default(false)
   createdAt  DateTime       @default(now()) @db.Timestamp(6)
@@ -310,4 +311,11 @@ enum EventStatusType {
 enum PostType {
   ANNOUNCEMENT
   POST
+}
+
+enum YearLevel {
+  first  @map("1")
+  second @map("2")
+  third  @map("3")
+  fourth @map("4")
 }

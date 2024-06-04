@@ -1,4 +1,4 @@
-import { UserRoleType } from "@prisma/client";
+import { UserRoleType, YearLevel } from "@prisma/client";
 
 export type UserProps = {
   id: string;
@@ -20,6 +20,8 @@ export type UserProps = {
     middleName: string;
     lastName: string;
     department: string;
+    yearLevel: YearLevel;
+    section: string | null;
   };
   following: {
     followerId: string;
