@@ -147,6 +147,7 @@ const PostForm: React.FC<PostFormProps> = ({
 
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       queryClient.invalidateQueries({ queryKey: ["new-announcement"] });
+      queryClient.invalidateQueries({ queryKey: ["user-feed"] });
     } else {
       setIsLoading(false);
       toast.error("Uh oh! Something went wrong.", {

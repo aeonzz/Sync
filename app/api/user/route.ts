@@ -57,3 +57,17 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function GET(req: Request) {
+  try {
+    const users = await prisma.user.findMany();
+
+    return NextResponse.json({ data: users }, { status: 200 });
+  } catch (error: any) {
+    console.log(error);
+    return NextResponse.json(
+      { message: "could not get post" },
+      { status: 500 },
+    );
+  }
+}

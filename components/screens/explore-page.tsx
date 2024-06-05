@@ -1,16 +1,13 @@
-import { Session } from 'next-auth'
-import React from 'react'
-import ExplorePost from './explore-post'
-
+import { Session } from "next-auth";
+import React from "react";
+import ExplorePost from "./explore-post";
 
 interface ExplorePageProps {
-  session: Session
+  session: Session;
 }
 
 const ExplorePage: React.FC<ExplorePageProps> = ({ session }) => {
-  return (
-    <ExplorePost session={session} />
-  )
-}
+  return <ExplorePost session={session} />;
+};
 
-export default ExplorePage
+export default ExplorePage;

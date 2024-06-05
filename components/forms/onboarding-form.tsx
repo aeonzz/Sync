@@ -163,57 +163,6 @@ const OnboardingForm = () => {
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <FormLabel>URLs</FormLabel>
-              <div className="flex items-center justify-between">
-                <FormDescription>
-                  Add links to your website, blog, or social media profiles.
-                </FormDescription>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="text-xs"
-                  onClick={() => append({ value: "" })}
-                >
-                  <Plus className="mr-1 h-4 w-4" />
-                  Add URL
-                </Button>
-              </div>
-              <ScrollArea
-                className={cn(
-                  fields.length !== 0 ? "h-20" : "",
-                  "w-full rounded-md",
-                )}
-              >
-                {fields.map((field, index) => (
-                  <div
-                    key={field.id}
-                    className="mb-4 flex items-center space-x-2"
-                  >
-                    <FormField
-                      control={form.control}
-                      name={`urls.${index}.value`}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input {...field} disabled={isLoading} />
-                          </FormControl>
-                          <FormMessage className="-bottom-4" />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => remove(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </ScrollArea>
-            </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader />}
               {isLoading ? null : <p>Confirm</p>}

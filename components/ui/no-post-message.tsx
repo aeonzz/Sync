@@ -1,6 +1,6 @@
 export default function NoPostMessage() {
   return (
-    <div className="flex h-[400px] w-[580px] flex-col items-center justify-center space-y-4">
+    <div className="flex h-[400px] w-[550px] flex-col items-center justify-center space-y-4">
       <IconNoPosts className=" text-gray-400" />
       <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
         No More Posts Available

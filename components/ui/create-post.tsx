@@ -30,6 +30,7 @@ import { UserProps } from "@/types/user";
 import { Switch } from "./switch";
 import { Label } from "./label";
 import { cn } from "@/lib/utils";
+import { UserRoleType } from "@prisma/client";
 
 interface CreatePostProps {
   currentUser: UserProps;
@@ -54,8 +55,8 @@ const CreatePost: React.FC<CreatePostProps> = ({
     <Card className={cn(announcement ? "mb-0" : "mb-3", "w-full")}>
       <div className="flex items-center px-5 pb-2 pt-1">
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger className="group flex w-full items-center space-x-3">
-            <Avatar className="group/avatar relative h-9 w-9 dark:border">
+          <DialogTrigger className="group mt-1 flex w-full items-center justify-center space-x-3">
+            <Avatar className="group/avatar relative h-9 w-9">
               <Link href={`/u/${currentUser.id}`} className="relative">
                 <div className="absolute z-10 h-9 w-9 bg-stone-950 opacity-0 transition group-hover/avatar:opacity-40"></div>
                 <AvatarImage
@@ -169,17 +170,18 @@ const CreatePost: React.FC<CreatePostProps> = ({
                   </h4>
                 </div>
               </div>
-
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="announcement" className="text-xs">
-                  Announcement
-                </Label>
-                <Switch
-                  id="announcement"
-                  checked={checked}
-                  onCheckedChange={setChecked}
-                />
-              </div>
+              {currentUser.role !== UserRoleType.USER && (
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="announcement" className="text-xs">
+                    Announcement
+                  </Label>
+                  <Switch
+                    id="announcement"
+                    checked={checked}
+                    onCheckedChange={setChecked}
+                  />
+                </div>
+              )}
             </div>
             <PostForm
               onMutationSuccess={setOpen}

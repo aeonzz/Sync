@@ -4,6 +4,7 @@ import { hash } from "bcrypt";
 import prisma from "../db";
 import { revalidatePath } from "next/cache";
 import { pusherServer } from "../pusher";
+import { UserRoleType } from "@prisma/client";
 
 export async function getUserById(userId: string) {
   try {
@@ -178,3 +179,21 @@ export async function followUser(followerId: string, followingId: string) {
 //     return { error: error.message, status: 500 };
 //   }
 // }
+
+export async function editUserRole(userId: string, value: UserRoleType) {
+  try {
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        role: value,
+      },
+    });
+
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, status: 500 };
+  }
+}

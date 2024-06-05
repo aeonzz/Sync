@@ -19,6 +19,7 @@ import { authOptions } from "@/lib/auth";
 import NotFound from "@/app/not-found";
 import ProfileActions from "@/components/ui/edit-profile";
 import UserFeed from "@/components/shared/user-feed";
+import CreatePost from "@/components/ui/create-post";
 
 interface UserProfileProps {
   params: {
@@ -54,7 +55,7 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
   );
 
   return (
-    <div className="h-screen w-full space-y-32">
+    <div className="h-auto w-full space-y-32">
       <Card className="relative h-[200px] border-none">
         <ProfileCover userData={userData.data} />
         <ProfileAvatar userData={userData.data} />
@@ -67,7 +68,13 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
         />
       </Card>
       <div className="flex h-auto w-full space-x-2">
-        <Card className="flex-1">
+        <div className="w-[550px]">
+          {paramsId === session.user.id && (
+            <CreatePost currentUser={userData.data} announcement={false} />
+          )}
+          <UserFeed session={session} userId={userData.data.id} />
+        </div>
+        <Card className="flex-1 h-fit">
           <CardHeader>
             <CardTitle>Profile Info.</CardTitle>
           </CardHeader>
@@ -88,9 +95,6 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
             </div>
           </CardContent>
         </Card>
-        <div className="w-[550px] border border-white h-screen">
-          {/* <UserFeed session={session} userId={userData.data.id} /> */}
-        </div>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import prisma from "@/lib/db";
+import { ApprovalStatusType, EventStatusType } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -6,6 +7,14 @@ export async function GET(req: Request) {
     const events = await prisma.event.findMany({
       where: {
         deleted: false,
+        OR: [
+          {
+            approvalStatus: ApprovalStatusType.PENDING,
+          },
+          {
+            approvalStatus: ApprovalStatusType.APPROVED,
+          },
+        ],
       },
       orderBy: {
         createdAt: "desc",

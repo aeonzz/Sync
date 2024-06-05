@@ -24,6 +24,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { ApprovalStatusType } from "@prisma/client";
 
 const RecentEvents = () => {
   const { data, isLoading, isError } = useQuery<EventProps[]>({
@@ -75,7 +76,14 @@ const RecentEvents = () => {
             {data.map((event, index) => (
               <CarouselItem key={index} className="basis-1/2 pl-1">
                 <div className="p-1">
-                  <Card>
+                  <Card className="relative">
+                    {event.approvalStatus === ApprovalStatusType.PENDING && (
+                      <div className="absolute flex h-full w-full flex-col items-center justify-center space-y-1 rounded-md border bg-background/90">
+                        <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
+                          Waiting for Approval
+                        </h3>
+                      </div>
+                    )}
                     <Link href={`/e/${event.id}/overview`}>
                       <CardContent className="flex aspect-square flex-col p-0">
                         <Image
@@ -94,7 +102,7 @@ const RecentEvents = () => {
                           blurDataURL={
                             event.blurDataUrl ? event.blurDataUrl : undefined
                           }
-                          className="h-[120px] w-full rounded-t-lg border bg-stone-800 object-cover transition-transform duration-300 ease-in-out group-hover:scale-[1.01]"
+                          className="h-[120px] w-full rounded-t-lg border bg-stone-800 object-cover"
                         />
                         <CardDescription className="whitespace-pre-wrap break-words p-2 text-xs">
                           {event.description.slice(0, 150)}

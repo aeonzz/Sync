@@ -4,6 +4,7 @@ import explore from "@/public/icons/explore.svg";
 import notification from "@/public/icons/notifcation.svg";
 import chatRoom from "@/public/icons/chat-room.svg";
 import announcement from "@/public/icons/announcement.svg";
+import users from "@/public/icons/users.svg"
 
 export const sidebarNav = [
   {
@@ -139,5 +140,20 @@ export const emojis = [
   {
     id: 5,
     emoji: "😍",
+  },
+];
+
+export const dashboardNav = [
+  {
+    title: "Users",
+    icon: users,
+    link: "/dashboard",
+    alt: "users",
+  },
+  {
+    title: "Student Data",
+    icon: users,
+    link: "/dashboard/student",
+    alt: "student",
   },
 ];

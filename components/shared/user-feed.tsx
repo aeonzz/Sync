@@ -25,13 +25,13 @@ const UserFeed = ({
   const { isMutate, setIsMutate } = useMutationSuccess();
 
   const fetchPosts = async ({ pageParam = 0 }) => {
-    const res = await axios.get(`/api/post/${userId}?cursor=${pageParam}`);
+    const res = await axios.get(`/api/post/profile/${userId}?cursor=${pageParam}`);
     return res.data;
   };
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     useInfiniteQuery({
-      queryKey: [userId, "user-feed"],
+      queryKey: ["user-feed"],
       queryFn: fetchPosts,
       initialPageParam: 0,
       refetchOnWindowFocus: false,

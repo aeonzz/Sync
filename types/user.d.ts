@@ -22,6 +22,7 @@ export type UserProps = {
     department: string;
     yearLevel: YearLevel;
     section: string | null;
+    createdAt: Date;
   };
   following: {
     followerId: string;
