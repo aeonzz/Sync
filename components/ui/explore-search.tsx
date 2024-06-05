@@ -26,6 +26,10 @@ const ExploreSearch = () => {
   const [searchUsersResults, setSearchUsersResults] = useState<
     UserProps[] | null
   >([]);
+  const [searchPostsResults, setSearchPostsResults] = useState<
+    PostProps[] | null
+  >([]);
+
 
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
@@ -33,9 +37,11 @@ const ExploreSearch = () => {
         setIsLoading(true);
         const response = await axios.get(`/api/search?q=${searchTerm}`);
         setSearchUsersResults(response.data.users);
+        setSearchPostsResults(response.data.posts);
         setIsLoading(false);
       } else {
         setSearchUsersResults([]);
+        setSearchPostsResults([]);
       }
     }, 500);
 
@@ -114,55 +120,132 @@ const ExploreSearch = () => {
               </Button>
             </div>
             <div className="min-h-14 w-[85%] rounded-md border bg-popover p-1">
-              <div className="h-auto w-full flex justify-center items-center border border-white">
-                {!isLoading && searchUsersResults?.length === 0 && (
-                  <div className="py-3 border border-white">
-                    <h4 className="w-full text-sm">No results</h4>
-                  </div>
-                )}
-                {isLoading && (
-                  <div className="py-5">
-                    <Loader className="!bg-primary" />
-                  </div>
-                )}
-                <div className="max-h-[420px] w-full flex-col items-center justify-center overflow-y-scroll">
-                  {searchUsersResults?.map((user, index) => (
-                    <Link
-                      key={index}
-                      href={`/u/${user.id}`}
-                      className="flex h-14 w-full items-center rounded-sm px-2 hover:bg-accent/50"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <Avatar>
-                          <AvatarImage
-                            src={user.avatarUrl ? user.avatarUrl : undefined}
-                            className="object-cover"
-                            alt={user.avatarUrl ? user.avatarUrl : undefined}
-                          />
-                          <AvatarFallback>
-                            {user.username?.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="flex items-center gap-1 hover:underline">
-                            {renderColoredText(user.username ?? "")}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            <span>
-                              {renderColoredText(user.studentData.firstName)}
-                            </span>{" "}
-                            <span>
-                              {renderColoredText(user.studentData.middleName)}
-                            </span>{" "}
-                            <span>
-                              {renderColoredText(user.studentData.lastName)}
-                            </span>
-                          </p>
-                        </div>
+              <div className="h-auto w-full">
+                <Tabs defaultValue="user" className="w-full">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="user" className="flex-1">
+                      Users
+                    </TabsTrigger>
+                    <TabsTrigger value="post" className="flex-1">
+                      Posts
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent
+                    value="user"
+                    className="flex flex-col items-center justify-center"
+                  >
+                    {!isLoading && searchUsersResults?.length === 0 && (
+                      <div className="py-3">
+                        <h4 className="w-full text-sm">No results</h4>
                       </div>
-                    </Link>
-                  ))}
-                </div>
+                    )}
+                    {isLoading && (
+                      <div className="py-5">
+                        <Loader className="!bg-primary" />
+                      </div>
+                    )}
+                    <div className="max-h-[420px] w-full flex-col items-center justify-center overflow-y-scroll">
+                      {searchUsersResults?.map((user, index) => (
+                        <Link
+                          key={index}
+                          href={`/u/${user.id}`}
+                          className="flex h-14 w-full items-center rounded-sm px-2 hover:bg-accent/50"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Avatar>
+                              <AvatarImage
+                                src={
+                                  user.avatarUrl ? user.avatarUrl : undefined
+                                }
+                                className="object-cover"
+                                alt={
+                                  user.avatarUrl ? user.avatarUrl : undefined
+                                }
+                              />
+                              <AvatarFallback>
+                                {user.username?.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="flex items-center gap-1 hover:underline">
+                                {renderColoredText(user.username ?? "")}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                <span>
+                                  {renderColoredText(
+                                    user.studentData.firstName,
+                                  )}
+                                </span>{" "}
+                                <span>
+                                  {renderColoredText(
+                                    user.studentData.middleName,
+                                  )}
+                                </span>{" "}
+                                <span>
+                                  {renderColoredText(user.studentData.lastName)}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </TabsContent>
+                  <TabsContent
+                    value="post"
+                    className="flex flex-col items-center justify-center"
+                  >
+                    {!isLoading && searchPostsResults?.length === 0 && (
+                      <div className="py-3">
+                        <h4 className="w-full text-sm">No results</h4>
+                      </div>
+                    )}
+                    {isLoading && (
+                      <div className="py-5">
+                        <Loader className="!bg-primary" />
+                      </div>
+                    )}
+                    <div className="max-h-[420px] w-full flex-col items-center justify-center overflow-y-scroll">
+                      {searchPostsResults?.map((post, index) => (
+                        <Link
+                          key={index}
+                          href={`/f/${post.postId}`}
+                          className="overfolow-hidden flex h-24 w-full items-center space-x-4 rounded-sm px-2 hover:bg-accent/50"
+                        >
+                          <div className="flex max-w-56 items-center space-x-2">
+                            <Avatar>
+                              <AvatarImage
+                                src={
+                                  post.author.avatarUrl
+                                    ? post.author.avatarUrl
+                                    : undefined
+                                }
+                                className="object-cover"
+                                alt={
+                                  post.author.avatarUrl
+                                    ? post.author.avatarUrl
+                                    : undefined
+                                }
+                              />
+                              <AvatarFallback>
+                                {post.author.username?.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="flex items-center gap-1 hover:underline">
+                                {post.author.username}
+                              </p>
+                              <p className="text-xs text-muted-foreground">{`${post.author.studentData.firstName} ${post.author.studentData.middleName.charAt(0).toUpperCase()} ${post.author.studentData.lastName}`}</p>
+                            </div>
+                          </div>
+                          <p className="flex-1 whitespace-pre-wrap break-words break-all text-xs text-muted-foreground">
+                            {renderColoredText(post.content)}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </div>
             </div>
           </PopoverContent>
