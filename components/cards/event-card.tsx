@@ -22,7 +22,7 @@ import {
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { deleteEvent } from "@/lib/actions/event.actions";
+import { deleteEvent, updateApprovalStatus } from "@/lib/actions/event.actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,8 +34,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
 
 interface EventCardProps {
   event: EventProps;
@@ -43,12 +44,12 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
-  console.log(event);
   const eventCreatedAt = new Date(event.createdAt);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const [alertOpen, setAlertOpen] = useState(false);
+  const pathname = usePathname();
 
   async function handleDeleteEvent() {
     setIsLoading(true);
@@ -71,45 +72,86 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
     }
   }
 
+  async function handleApproval(status: ApprovalStatusType) {
+    setIsLoading(true);
+
+    const response = await updateApprovalStatus(event.id, status);
+
+    if (response.status === 200) {
+      setIsLoading(false);
+      queryClient.invalidateQueries({ queryKey: ["confirmation-data"] });
+      {
+        status === ApprovalStatusType.APPROVED
+          ? toast.success("Success", {
+              description: "Event successfuly approved",
+            })
+          : toast.success("Success", {
+              description: "Event successfuly rejected",
+            });
+      }
+    } else {
+      setIsLoading(false);
+      toast.error("Uh oh! Something went wrong.", {
+        description:
+          "An error occurred while making the request. Please try again later",
+      });
+    }
+  }
+
   return (
-    <div className="relative">
-      {event.approvalStatus === ApprovalStatusType.PENDING && (
-        <div className="absolute flex h-full w-full flex-col items-center justify-center space-y-1 rounded-md border bg-background/90">
-          <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
-            Waiting for Approval
-          </h3>
-          {event.organizer.id === currentUserId && (
-            <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-              <AlertDialogTrigger asChild>
-                <Button size="sm" variant="destructive" disabled={isLoading}>
-                  Cancel
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to cancel?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel disabled={isLoading}>
-                    Back
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    disabled={isLoading}
-                    onClick={handleDeleteEvent}
-                  >
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+    <div className="relative mb-3 flex flex-col space-y-2">
+      {pathname.startsWith("/dashboard") ? null : (
+        <>
+          {event.approvalStatus === ApprovalStatusType.PENDING && (
+            <div className="absolute z-10 flex h-full w-full flex-col items-center justify-center space-y-1 rounded-md border bg-background/90">
+              <h3 className="scroll-m-20 text-xl font-semibold tracking-tight">
+                Waiting for Approval
+              </h3>
+              {event.organizer.id === currentUserId && (
+                <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={isLoading}
+                    >
+                      Cancel
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to cancel?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel disabled={isLoading}>
+                        Back
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={isLoading}
+                        onClick={handleDeleteEvent}
+                      >
+                        Continue
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
       <Link href={`/e/${event.id}/overview`} className="group">
-        <Card className="mb-3 flex h-full items-center space-x-3 p-3 transition-colors hover:bg-input">
+        <Card
+          className={cn(
+            pathname.startsWith("/dashboard") && "bg-background",
+            "flex h-full items-center space-x-3 p-3 transition-colors hover:bg-input",
+          )}
+        >
           <Image
             src={
               event.image
@@ -220,6 +262,25 @@ const EventCard: React.FC<EventCardProps> = ({ event, currentUserId }) => {
           </div>
         </Card>
       </Link>
+      {pathname.startsWith("/dashboard") && (
+        <div className="h-10 w-full space-x-2">
+          <Button
+            size="sm"
+            disabled={isLoading}
+            onClick={() => handleApproval(ApprovalStatusType.APPROVED)}
+          >
+            Approve
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={isLoading}
+            onClick={() => handleApproval(ApprovalStatusType.REJECTED)}
+          >
+            Reject
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

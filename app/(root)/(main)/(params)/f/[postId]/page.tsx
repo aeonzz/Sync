@@ -46,28 +46,33 @@ const PostDetails: React.FC<PostDetailsProps> = async ({ params }) => {
   }
 
   return (
-      <div className="flex flex-1 space-x-3 pr-4 mt-3">
-        <div className="min-h-[400px] w-[550px] space-y-3">
-          <Card className="flex h-[54px] items-center space-x-2 px-2">
-            <BackButton />
-            <h2 className="scroll-m-20 text-lg font-semibold tracking-tight first:mt-0">
-              Post
-            </h2>
-          </Card>
-          <PostCard post={post.data} session={session} detailsView={true} />
-        </div>
-        <div className="relative flex-1">
-          <div className="sticky top-0 h-auto w-full rounded-md">
-            <CommentBox
-              avatarUrl={currentUser.data.avatarUrl}
-              username={currentUser.data.username}
-              userId={currentUser.data.id}
-              postId={params.postId}
-              postAuthor={post.data.author.id}
-            />
-          </div>
+    <div className="mt-3 flex flex-1 space-x-3 pr-4">
+      <div className="min-h-[400px] w-[550px] space-y-3">
+        <Card className="flex h-[54px] items-center space-x-2 px-2">
+          <BackButton />
+          <h2 className="scroll-m-20 text-lg font-semibold tracking-tight first:mt-0">
+            Post
+          </h2>
+        </Card>
+        <PostCard
+          post={post.data}
+          session={session}
+          detailsView={true}
+          currentUserData={currentUser.data}
+        />
+      </div>
+      <div className="relative flex-1">
+        <div className="sticky top-0 h-auto w-full rounded-md">
+          <CommentBox
+            avatarUrl={currentUser.data.avatarUrl}
+            username={currentUser.data.username}
+            userId={currentUser.data.id}
+            postId={params.postId}
+            postAuthor={post.data.author.id}
+          />
         </div>
       </div>
+    </div>
   );
 };
 

@@ -55,9 +55,11 @@ const MessageRequestCard: React.FC<MessageRequestCardProps> = ({ channel }) => {
               {format(createdAt, "PPp")}
             </span>
           </p>
-          <p className="text-sm text-muted-foreground">
-            {channel.messages[channel.messages.length - 1].text}
-          </p>
+          {channel.messages[channel.messages.length - 1]?.text && (
+            <p className="text-sm text-muted-foreground">
+              {channel.messages[channel.messages.length - 1].text}
+            </p>
+          )}
         </div>
       </div>
       <div className="flex space-x-2">

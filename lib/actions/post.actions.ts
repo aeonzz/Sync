@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import getBase64 from "../base64";
 import prisma from "../db";
-import { PostType } from "@prisma/client";
+import { AccessibilityType, PostType } from "@prisma/client";
 
 // export async function getPosts(page: number) {
 //   const take = 7;
@@ -167,6 +167,7 @@ interface CreatePostParams {
   content: string;
   images: (string | undefined)[];
   type: PostType;
+  accessibility: AccessibilityType;
 }
 
 export async function createPost({
@@ -175,6 +176,7 @@ export async function createPost({
   content,
   images,
   type,
+  accessibility,
 }: CreatePostParams) {
   try {
     const imageObjects = await Promise.all(
@@ -191,6 +193,7 @@ export async function createPost({
         title: title,
         content: content,
         type: type,
+        accessibility,
         author: {
           connect: {
             id: userId,

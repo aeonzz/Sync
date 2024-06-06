@@ -3,7 +3,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   try {
-    const students = await prisma.studentData.findMany();
+    const students = await prisma.studentData.findMany({
+      orderBy: {
+        id: "desc",
+      },
+    });
 
     return NextResponse.json({ data: students }, { status: 200 });
   } catch (error: any) {

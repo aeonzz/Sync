@@ -12,20 +12,25 @@ import { useMutationSuccess } from "@/context/store";
 import { Session } from "next-auth";
 import PostSkeleton from "../loaders/post-skeleton";
 import NoPostMessage from "../ui/no-post-message";
+import { UserProps } from "@/types/user";
 
 const UserFeed = ({
   session,
   userId,
+  currentUserData,
 }: {
   session: Session;
   userId: string;
+  currentUserData: UserProps;
 }) => {
   const { ref, inView } = useInView();
   const queryClient = useQueryClient();
   const { isMutate, setIsMutate } = useMutationSuccess();
 
   const fetchPosts = async ({ pageParam = 0 }) => {
-    const res = await axios.get(`/api/post/profile/${userId}?cursor=${pageParam}`);
+    const res = await axios.get(
+      `/api/post/profile/${userId}?cursor=${pageParam}`,
+    );
     return res.data;
   };
 
@@ -47,7 +52,12 @@ const UserFeed = ({
       ) : (
         <div>
           {group.data.map((post: PostProps) => (
-            <PostCard key={post.postId} post={post} session={session} />
+            <PostCard
+              key={post.postId}
+              post={post}
+              session={session}
+              currentUserData={currentUserData}
+            />
           ))}
         </div>
       )}

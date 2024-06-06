@@ -1,6 +1,10 @@
 "use server";
 
-import { AccessibilityType, EventStatusType } from "@prisma/client";
+import {
+  AccessibilityType,
+  ApprovalStatusType,
+  EventStatusType,
+} from "@prisma/client";
 import getBase64 from "../base64";
 import prisma from "../db";
 
@@ -127,7 +131,10 @@ export async function updateEvent({
   }
 }
 
-export async function updateEventStatus(eventId: string, status: EventStatusType) {
+export async function updateEventStatus(
+  eventId: string,
+  status: EventStatusType,
+) {
   try {
     await prisma.event.update({
       where: {
@@ -135,6 +142,26 @@ export async function updateEventStatus(eventId: string, status: EventStatusType
       },
       data: {
         eventStatus: status,
+      },
+    });
+    return { error: null, status: 200 };
+  } catch (error: any) {
+    console.log(error);
+    return { error: error.message, status: 500 };
+  }
+}
+
+export async function updateApprovalStatus(
+  eventID: string,
+  stats: ApprovalStatusType,
+) {
+  try {
+    await prisma.event.update({
+      where: {
+        id: eventID,
+      },
+      data: {
+        approvalStatus: stats,
       },
     });
     return { error: null, status: 200 };

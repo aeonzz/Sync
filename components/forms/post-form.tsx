@@ -28,7 +28,7 @@ import { useSession } from "next-auth/react";
 import EmojiPicker from "../ui/emoji-picker";
 import { createNotification } from "@/lib/actions/notification.actions";
 import { UserProps } from "@/types/user";
-import { NotificationType, PostType } from "@prisma/client";
+import { AccessibilityType, NotificationType, PostType } from "@prisma/client";
 import { useQueryClient } from "@tanstack/react-query";
 interface PostFormProps {
   onMutationSuccess: (state: boolean) => void;
@@ -37,6 +37,7 @@ interface PostFormProps {
   onLoading: (state: boolean) => void;
   currentUser: UserProps;
   checked: boolean;
+  accChecked: boolean;
 }
 
 const PostForm: React.FC<PostFormProps> = ({
@@ -46,6 +47,7 @@ const PostForm: React.FC<PostFormProps> = ({
   onLoading,
   currentUser,
   checked,
+  accChecked,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [openImageInput, setOpenImageInput] = useState(false);
@@ -126,6 +128,7 @@ const PostForm: React.FC<PostFormProps> = ({
       userId: currentUser.id,
       images: uploadImage,
       type: checked ? PostType.ANNOUNCEMENT : PostType.POST,
+      accessibility: accChecked ? AccessibilityType.EXCLUSIVE : AccessibilityType.PUBLIC,
     };
 
     const response = await createPost(postData);

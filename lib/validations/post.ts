@@ -2,8 +2,8 @@ import * as z from "zod";
 
 export const PostValidation = z.object({
   title: z.string().optional(),
-  content: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
+  content: z.string().min(1, {
+    message: "Description must be at least 1 character.",
   }),
 });
 

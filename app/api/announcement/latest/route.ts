@@ -10,6 +10,11 @@ export async function GET(req: Request) {
     },
     include: {
       imageUrls: true,
+      author: {
+        include: {
+          studentData: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",

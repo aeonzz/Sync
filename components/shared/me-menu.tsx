@@ -50,7 +50,7 @@ const MeMenu: React.FC<MeMenu> = ({ currentUserId }) => {
       );
       return response.data.channels;
     },
-    queryKey: ["message-request"],
+    queryKey: ["message-request", currentUserId],
   });
 
   useEffect(() => {

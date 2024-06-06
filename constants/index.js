@@ -5,6 +5,7 @@ import notification from "@/public/icons/notifcation.svg";
 import chatRoom from "@/public/icons/chat-room.svg";
 import announcement from "@/public/icons/announcement.svg";
 import users from "@/public/icons/users.svg"
+import confirmations from "@/public/icons/confirmations.svg"
 
 export const sidebarNav = [
   {
@@ -155,5 +156,11 @@ export const dashboardNav = [
     icon: users,
     link: "/dashboard/student",
     alt: "student",
+  },
+  {
+    title: "Confirmations",
+    icon: confirmations,
+    link: "/dashboard/confirmations",
+    alt: "confirmations",
   },
 ];

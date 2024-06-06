@@ -1,3 +1,4 @@
+import NotFound from "@/app/not-found";
 import ChatMessages from "@/components/ui/chat-messages";
 import ChatTopBar from "@/components/ui/chat-topbar";
 import FetchDataError from "@/components/ui/fetch-data-error";
@@ -24,8 +25,12 @@ const Chat: React.FC<ChatProps> = async ({ params }) => {
 
   const channel = await getChannelById(channelId, session.user.id);
 
-  if (!channel.data || channel.error) {
+  if (channel.error) {
     return <FetchDataError />;
+  }
+
+  if (!channel.data) {
+    return <NotFound />;
   }
 
   const currentUser = await getUserById(session.user.id);

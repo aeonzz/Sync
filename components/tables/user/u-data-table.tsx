@@ -49,7 +49,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DepartmentType, UserRoleType, YearLevel } from "@prisma/client";
-import StudentForm from "@/components/forms/student-form";
 import { UDataTablePagination } from "./u-data-table-pagination";
 
 interface UDataTableProps<TData, TValue> {
@@ -114,10 +113,10 @@ export function UDataTable<TData, TValue>({
             <Input
               placeholder="Filter email..."
               value={
-                (table.getColumn("lastName")?.getFilterValue() as string) ?? ""
+                (table.getColumn("email")?.getFilterValue() as string) ?? ""
               }
               onChange={(event) =>
-                table.getColumn("lastName")?.setFilterValue(event.target.value)
+                table.getColumn("email")?.setFilterValue(event.target.value)
               }
               className="max-w-xs bg-background text-xs"
             />

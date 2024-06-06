@@ -19,8 +19,16 @@ import { buttonVariants } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 import { Badge } from "../ui/badge";
 import { differenceInHours, format, parseISO } from "date-fns";
+import { AccessibilityType } from "@prisma/client";
+import { UserProps } from "@/types/user";
 
-const RecentAnnouncement = () => {
+interface RecentAnnouncementProps {
+  currentUserData: UserProps;
+}
+
+const RecentAnnouncement: React.FC<RecentAnnouncementProps> = ({
+  currentUserData,
+}) => {
   const { data, isLoading, isError } = useQuery<PostProps[]>({
     queryFn: async () => {
       const response = await axios.get("/api/announcement/latest");
@@ -64,60 +72,66 @@ const RecentAnnouncement = () => {
     <>
       {data
         ? data.map((announcement, index) => (
-            <Card key={index}>
-              <CardHeader className="flex-row items-center justify-between">
-                <div className="flex space-x-3">
-                  <CardTitle>Latest Announcement</CardTitle>
-                  {shouldRenderBadge(announcement.createdAt) && (
-                    <Badge>New</Badge>
-                  )}
-                </div>
-                <Link
-                  href="/announcement"
-                  className={cn(
-                    buttonVariants({ variant: "link", size: "sm" }),
-                    "h-fit py-0",
-                  )}
-                >
-                  View all
-                </Link>
-              </CardHeader>
-              <Link href={`/f/${announcement.postId}`}>
-                <CardContent className="group m-2 mt-0 flex items-center space-x-2 rounded-xl bg-background p-2">
-                  <Image
-                    src={
-                      announcement.imageUrls.length > 0 &&
-                      announcement.imageUrls[0].url
-                        ? announcement.imageUrls[0].url
-                        : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/Group%2052%20(1).png"
-                    }
-                    width={120}
-                    height={120}
-                    alt="announcement-image"
-                    objectFit="contain"
-                    objectPosition="center"
-                    quality={100}
-                    placeholder={
-                      announcement.imageUrls.length > 0 &&
-                      announcement.imageUrls[0].blurDataUrl
-                        ? "blur"
-                        : undefined
-                    }
-                    blurDataURL={
-                      announcement.imageUrls.length > 0 &&
-                      announcement.imageUrls[0].blurDataUrl
-                        ? announcement.imageUrls[0].blurDataUrl
-                        : undefined
-                    }
-                    className="aspect-square h-[120px] rounded-lg border bg-stone-800 object-cover transition-transform duration-300 ease-in-out group-hover:scale-[1.01]"
-                  />
-                  <CardDescription className="whitespace-pre-wrap break-words text-xs">
-                    {announcement.content.slice(0, 320)}
-                    {announcement.content.length > 320 && "..."}
-                  </CardDescription>
-                </CardContent>
-              </Link>
-            </Card>
+            <>
+              {announcement.accessibility === AccessibilityType.EXCLUSIVE &&
+              announcement.author.studentData.department !==
+                currentUserData.studentData.department ? null : (
+                <Card key={index}>
+                  <CardHeader className="flex-row items-center justify-between">
+                    <div className="flex space-x-3">
+                      <CardTitle>Latest Announcement</CardTitle>
+                      {shouldRenderBadge(announcement.createdAt) && (
+                        <Badge>New</Badge>
+                      )}
+                    </div>
+                    <Link
+                      href="/announcement"
+                      className={cn(
+                        buttonVariants({ variant: "link", size: "sm" }),
+                        "h-fit py-0",
+                      )}
+                    >
+                      View all
+                    </Link>
+                  </CardHeader>
+                  <Link href={`/f/${announcement.postId}`}>
+                    <CardContent className="group m-2 mt-0 flex items-center space-x-2 rounded-xl bg-background p-2">
+                      <Image
+                        src={
+                          announcement.imageUrls.length > 0 &&
+                          announcement.imageUrls[0].url
+                            ? announcement.imageUrls[0].url
+                            : "https://jolfgowviyxdrvtelayh.supabase.co/storage/v1/object/public/static%20images/Group%2052%20(1).png"
+                        }
+                        width={120}
+                        height={120}
+                        alt="announcement-image"
+                        objectFit="contain"
+                        objectPosition="center"
+                        quality={100}
+                        placeholder={
+                          announcement.imageUrls.length > 0 &&
+                          announcement.imageUrls[0].blurDataUrl
+                            ? "blur"
+                            : undefined
+                        }
+                        blurDataURL={
+                          announcement.imageUrls.length > 0 &&
+                          announcement.imageUrls[0].blurDataUrl
+                            ? announcement.imageUrls[0].blurDataUrl
+                            : undefined
+                        }
+                        className="aspect-square h-[120px] rounded-lg border bg-stone-800 object-cover transition-transform duration-300 ease-in-out group-hover:scale-[1.01]"
+                      />
+                      <CardDescription className="whitespace-pre-wrap break-words text-xs">
+                        {announcement.content.slice(0, 320)}
+                        {announcement.content.length > 320 && "..."}
+                      </CardDescription>
+                    </CardContent>
+                  </Link>
+                </Card>
+              )}
+            </>
           ))
         : null}
     </>

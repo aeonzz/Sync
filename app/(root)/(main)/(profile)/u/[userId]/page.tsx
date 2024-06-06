@@ -35,13 +35,14 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
     redirect("/login");
   }
 
+  const currentUser = await getUserById(session.user.id);
   const userData = await getUserById(params.userId);
 
-  if (!userData.data || !paramsId) {
+  if (!userData.data || !currentUser.data || !paramsId) {
     return <NotFound className="w-full" />;
   }
 
-  if (userData.error) {
+  if (userData.error || currentUser.error) {
     return <FetchDataError />;
   }
 
@@ -72,7 +73,7 @@ const UserProfile: React.FC<UserProfileProps> = async ({ params }) => {
           {paramsId === session.user.id && (
             <CreatePost currentUser={userData.data} announcement={false} />
           )}
-          <UserFeed session={session} userId={userData.data.id} />
+          <UserFeed session={session} userId={userData.data.id} currentUserData={currentUser.data} />
         </div>
         <Card className="flex-1 h-fit">
           <CardHeader>

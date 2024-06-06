@@ -63,6 +63,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       });
     },
     onSuccess: () => {
+      setInput("");
       setIsLoading(false);
       setMessageId(null);
     },
@@ -73,7 +74,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   async function handleMessageSubmit() {
     if (input) {
-      setInput("");
       setIsLoading(true);
       if (isEditing && isEditingData) {
         if (input === isEditingData.text) {
@@ -88,6 +88,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           const response = await updateMessage(data);
 
           if (response.status === 200) {
+            setInput("");
             setIsLoading(false);
             setIsEditing?.(null);
             setMessageAction?.(false);
@@ -125,7 +126,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
     if (textareaRef.current) {
       textareaRef.current.focus();
     }
-  }, [messageId]);
+  }, [messageId, input]);
 
   return (
     <div className={cn(isEditing && "pb-2 pt-3", "space-y-2", className)}>
@@ -133,6 +134,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         <TextareaAutosize
           ref={textareaRef}
           value={input}
+          disabled={isLoading}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {

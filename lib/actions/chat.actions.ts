@@ -47,7 +47,6 @@ export async function createChannel({
       data: {
         userId: to,
         channelId: channel.id,
-        isConfirmed: true,
       },
     });
 
@@ -55,6 +54,7 @@ export async function createChannel({
       data: {
         userId: from,
         channelId: channel.id,
+        isConfirmed: true,
       },
     });
 

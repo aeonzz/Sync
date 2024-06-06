@@ -228,6 +228,12 @@ const StudentForm: React.FC<StudentFormProps> = ({ setOpen, formData }) => {
                   >
                     4th
                   </SelectItem>
+                  <SelectItem
+                    value={YearLevel.admin}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    Admin
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

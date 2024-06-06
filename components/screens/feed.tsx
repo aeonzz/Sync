@@ -12,8 +12,9 @@ import { useMutationSuccess } from "@/context/store";
 import { Session } from "next-auth";
 import PostSkeleton from "../loaders/post-skeleton";
 import NoPostMessage from "../ui/no-post-message";
+import { UserProps } from "@/types/user";
 
-const Feed = ({ session }: { session: Session }) => {
+const Feed = ({ session, currentUserData }: { session: Session; currentUserData: UserProps }) => {
   const { ref, inView } = useInView();
   const queryClient = useQueryClient();
   const { isMutate, setIsMutate } = useMutationSuccess();
@@ -46,7 +47,7 @@ const Feed = ({ session }: { session: Session }) => {
       ) : (
         <div>
           {group.data.map((post: PostProps) => (
-            <PostCard key={post.postId} post={post} session={session} />
+            <PostCard key={post.postId} post={post} session={session} currentUserData={currentUserData} />
           ))}
         </div>
       )}

@@ -60,7 +60,11 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
     return NextResponse.json({ data: users }, { status: 200 });
   } catch (error: any) {

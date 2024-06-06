@@ -16,9 +16,7 @@ export async function GET(req: Request, context: Context) {
       where: {
         members: {
           some: {
-            userId: {
-              not: userId,
-            },
+            userId,
             isConfirmed: false,
           },
         },

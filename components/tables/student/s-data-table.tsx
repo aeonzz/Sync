@@ -147,8 +147,8 @@ export function SDataTable<TData, TValue>({
       <Card className="bg-background p-5">
         <div className="mb-5 flex items-center justify-between space-x-2">
           <div>
-            <h3 className="text-md font-semibold tracking-tight">Stundents</h3>
-            <p className="text-xs text-muted-foreground">Studens lists</p>
+            <h3 className="text-md font-semibold tracking-tight">Students</h3>
+            <p className="text-xs text-muted-foreground">Students lists</p>
           </div>
           <div className="flex items-center space-x-2">
             {roleFilter === "" &&
@@ -204,6 +204,9 @@ export function SDataTable<TData, TValue>({
                   </DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value={YearLevel.fourth}>
                     4th year
+                  </DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value={YearLevel.admin}>
+                    Admin
                   </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>

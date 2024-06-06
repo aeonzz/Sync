@@ -46,7 +46,7 @@ import {
 } from "@/lib/actions/post.actions";
 import { toast } from "sonner";
 import { useMutationSuccess } from "@/context/store";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Tooltip,
   TooltipContent,
@@ -64,15 +64,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import ProfileHover from "../shared/profile-hover";
 import ImageView from "../ui/image-view";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { NotificationType, PostLike } from "@prisma/client";
+import {
+  AccessibilityType,
+  NotificationType,
+  PostLike,
+  PostType,
+} from "@prisma/client";
 import { createNotification } from "@/lib/actions/notification.actions";
 import axios from "axios";
 import FetchDataError from "../ui/fetch-data-error";
 import Error from "next/error";
+import { Input } from "../ui/input";
+import { UserProps } from "@/types/user";
 
 interface PostCardProps {
   post: PostProps;
   session: Session;
+  currentUserData: UserProps;
   detailsView?: boolean | undefined;
 }
 
@@ -86,7 +94,20 @@ const options = {
   className: "text-blue-500 hover:underline",
 };
 
-const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
+const PostCard: React.FC<PostCardProps> = ({
+  post,
+  session,
+  detailsView,
+  currentUserData,
+}) => {
+  if (
+    post.accessibility === AccessibilityType.EXCLUSIVE &&
+    post.author.studentData.department !==
+      currentUserData.studentData.department
+  ) {
+    return null;
+  }
+
   const [actionDropdown, setActionDropdown] = useState(false);
   const [openImageViewer, setOpenImageViewer] = useState(false);
   const [open, setOpen] = useState(false);
@@ -97,6 +118,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
   const { setIsMutate } = useMutationSuccess();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const pathname = usePathname();
 
   const ShortContentWithNoImage =
     post.content.length < 40 && post.imageUrls?.length === 0;
@@ -374,7 +396,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
           </div>
         </Link>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex-col">
         <div className="flex w-full items-center justify-between">
           <div className="-mr-5 flex items-center">
             {likeData.data?.newLikes.slice(0, 5).map((user, index) => (
@@ -535,6 +557,13 @@ const PostCard: React.FC<PostCardProps> = ({ post, session, detailsView }) => {
             </Link>
           </div>
         </div>
+        {pathname !== `/f/${post.postId}` && (
+          <div className="mt-1 w-full">
+            <Link href={`/f/${post.postId}`}>
+              <Input placeholder="Write a comment..." className="w-full" />
+            </Link>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );

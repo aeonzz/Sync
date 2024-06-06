@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import HomeTabs from "@/components/screens/home-tabs";
 import Announcements from "@/components/screens/announcement";
+import { UserRoleType } from "@prisma/client";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -29,11 +30,13 @@ export default async function Home() {
         <h3 className="flex-1 scroll-m-20 text-2xl font-semibold tracking-tight">
           Announcements
         </h3>
-        <div className="flex-1">
-          <CreatePost currentUser={currentUser.data} announcement />
-        </div>
+        {currentUser.data.role !== UserRoleType.USER && (
+          <div className="flex-1">
+            <CreatePost currentUser={currentUser.data} announcement />
+          </div>
+        )}
       </div>
-      <Announcements session={session} />
+      <Announcements session={session} currentUserData={currentUser.data} />
     </div>
   );
 }

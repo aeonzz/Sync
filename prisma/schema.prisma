@@ -119,19 +119,20 @@ model Reservation {
 }
 
 model Post {
-  postId     String     @id @default(uuid())
-  sequenceId Int        @default(autoincrement())
-  title      String?
-  content    String
-  createdAt  DateTime   @default(now()) @db.Timestamp(6)
-  updatedAt  DateTime   @updatedAt @db.Timestamp(6)
-  deleted    Boolean    @default(false)
-  author     User       @relation(fields: [authorId], references: [id])
-  authorId   String
-  type       PostType   @default(POST)
-  imageUrls  Image[]
-  comment    Comment[]
-  postLike   PostLike[]
+  postId        String            @id @default(uuid())
+  sequenceId    Int               @default(autoincrement())
+  title         String?
+  content       String
+  createdAt     DateTime          @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime          @updatedAt @db.Timestamp(6)
+  deleted       Boolean           @default(false)
+  author        User              @relation(fields: [authorId], references: [id])
+  authorId      String
+  accessibility AccessibilityType @default(PUBLIC)
+  type          PostType          @default(POST)
+  imageUrls     Image[]
+  comment       Comment[]
+  postLike      PostLike[]
 }
 
 model Comment {
@@ -320,4 +321,5 @@ enum YearLevel {
   second @map("2")
   third  @map("3")
   fourth @map("4")
+  admin  @map("admin")
 }

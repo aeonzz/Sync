@@ -23,7 +23,7 @@ const page = async () => {
   }
   return (
     <>
-      <FollowingTab session={session} />
+      <FollowingTab session={session} currentUserData={currentUser.data} />
     </>
   );
 };

@@ -28,7 +28,7 @@ export const OnboardingValidation = z.object({
     .string()
     .min(1, "Display name is required")
     .min(5, "Display name should be at least 5 characters")
-    .max(12, "Display name cannot exceed 12 characters"),
+    .max(50, "Display name cannot exceed 50 characters"),
   bio: z
     .string()
     .max(100, {

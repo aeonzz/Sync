@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { format } from "date-fns";
 import { StudentData } from "@prisma/client";
 import STableActions from "./s-table-actions";
+import { Badge } from "@/components/ui/badge";
 
 export const sColumns: ColumnDef<StudentData>[] = [
   {
@@ -76,9 +77,7 @@ export const sColumns: ColumnDef<StudentData>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="ml-4">{row.getValue("lastName")}</div>
-    ),
+    cell: ({ row }) => <div className="ml-4">{row.getValue("lastName")}</div>,
   },
   {
     accessorKey: "department",
@@ -96,18 +95,26 @@ export const sColumns: ColumnDef<StudentData>[] = [
     accessorKey: "createdAt",
     header: "Created",
     cell: ({ row }) => {
+      const newDate = new Date(row.original.createdAt);
+      const newUpdate = format(newDate, "PPpp");
 
-      const newDate = new Date(row.original.createdAt)
-      const newUpdate = format(newDate, 'PPpp')
-
+      return <div>{newUpdate}</div>;
+    },
+  },
+  {
+    accessorKey: "hasAccount",
+    header: "",
+    cell: ({ row }) => {
       return (
-        <div>{newUpdate}</div>
-      )
-    }
+        <Badge variant={row.original.hasAccount ? "outline" : "default"}>
+          {row.original.hasAccount ? "Registered" : "Available"}
+        </Badge>
+      );
+    },
   },
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => <STableActions row={row.original} />
+    cell: ({ row }) => <STableActions row={row.original} />,
   },
 ];

@@ -24,7 +24,7 @@ export default async function Home() {
 
   return (
     <>
-      <Feed session={session} />
+      <Feed session={session} currentUserData={currentUser.data} />
     </>
   );
 }

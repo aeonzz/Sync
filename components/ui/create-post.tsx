@@ -42,6 +42,7 @@ const CreatePost: React.FC<CreatePostProps> = ({
   announcement,
 }) => {
   const [checked, setChecked] = useState<boolean>(announcement);
+  const [accChecked, setAccChecked] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
@@ -170,18 +171,32 @@ const CreatePost: React.FC<CreatePostProps> = ({
                   </h4>
                 </div>
               </div>
-              {currentUser.role !== UserRoleType.USER && (
-                <div className="flex items-center space-x-2">
-                  <Label htmlFor="announcement" className="text-xs">
-                    Announcement
-                  </Label>
-                  <Switch
-                    id="announcement"
-                    checked={checked}
-                    onCheckedChange={setChecked}
-                  />
-                </div>
-              )}
+              <div className="space-y-1">
+                {currentUser.role !== UserRoleType.USER && (
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="announcement" className="text-xs">
+                      Announcement
+                    </Label>
+                    <Switch
+                      id="announcement"
+                      checked={checked}
+                      onCheckedChange={setChecked}
+                    />
+                  </div>
+                )}
+                {checked && (
+                  <div className="flex items-center justify-end space-x-2">
+                    <Label htmlFor="announcement" className="text-xs">
+                      {accChecked ? "Exclusive" : "Public"}
+                    </Label>
+                    <Switch
+                      id="accessibility"
+                      checked={accChecked}
+                      onCheckedChange={setAccChecked}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
             <PostForm
               onMutationSuccess={setOpen}
@@ -190,6 +205,7 @@ const CreatePost: React.FC<CreatePostProps> = ({
               onLoading={setIsLoading}
               currentUser={currentUser}
               checked={checked}
+              accChecked={accChecked}
             />
           </DialogContent>
         </Dialog>

@@ -1,3 +1,4 @@
+import { AccessibilityType, PostType, UserRoleType } from "@prisma/client";
 import { UserProps } from "./user";
 
 export type PostProps = {
@@ -5,6 +6,8 @@ export type PostProps = {
   postId: string;
   title: string | null;
   content: string;
+  accessibility: AccessibilityType;
+  type: PostType;
   createdAt: Date;
   imageUrls: {
     id: number;
@@ -18,6 +21,7 @@ export type PostProps = {
     avatarUrl: string | null;
     coverUrl: string;
     username: string | null;
+    role: UserRoleType;
     createdAt: Date;
     studentData: {
       firstName: string;
@@ -249,8 +253,7 @@ export type ReplyProps = {
   };
 };
 
-
 export type PostLikeProps = {
   id: string;
   user: UserProps;
-}
+};

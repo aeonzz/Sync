@@ -1,12 +1,13 @@
-import ExplorePage from "@/components/screens/explore-page";
-import ExploreSearch from "@/components/ui/explore-search";
+import ConfirmationsPage from "@/components/screens/confirmations-page";
 import FetchDataError from "@/components/ui/fetch-data-error";
 import { getUserById } from "@/lib/actions/user.actions";
 import { authOptions } from "@/lib/auth";
+import { UserRoleType } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import React from "react";
 
-export default async function Home() {
+const page = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -22,10 +23,16 @@ export default async function Home() {
     redirect("/onboarding");
   }
 
+  if (currentUser.data.role !== UserRoleType.SYSTEMADMIN) {
+    notFound();
+  }
+
   return (
-    <div className="w-[550px]">
-      <ExploreSearch />
-      <ExplorePage session={session} currentUserData={currentUser.data} />
-    </div>
+    <section className="h-full w-full bg-card p-6">
+      <h3 className="text-2xl font-semibold tracking-tight">Dashboard</h3>
+      <ConfirmationsPage currentUserId={session.user.id} />
+    </section>
   );
-}
+};
+
+export default page;

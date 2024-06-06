@@ -49,7 +49,7 @@ const UserNav: React.FC<UserNavProps> = ({ currentUserId }) => {
           size="lg"
           className={cn(
             chatRooms ? "w-fit" : "w-full",
-            "mb-3 flex h-[52px] justify-start border bg-card p-2 shadow-sm transition-all duration-300",
+            "mb-3 flex h-auto justify-start border bg-card p-2 shadow-sm transition-all duration-300",
           )}
         >
           <Avatar>
@@ -66,7 +66,7 @@ const UserNav: React.FC<UserNavProps> = ({ currentUserId }) => {
                 "ml-2 flex flex-col items-start space-y-1",
               )}
             >
-              <p className="text-sm font-medium leading-none">
+              <p className="whitespace-pre-wrap break-words text-sm font-medium leading-none text-start">
                 {data.username}
               </p>
               <p className="text-xs leading-none text-muted-foreground">

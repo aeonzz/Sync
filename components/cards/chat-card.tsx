@@ -17,7 +17,7 @@ interface ChatCardProps {
 const ChatCard: React.FC<ChatCardProps> = ({ channel, currentUserId }) => {
   const { isOnline } = useIsOnline();
   const pathname = usePathname();
-  const chatPartner = channel.members[0];
+  const chatPartner = channel.members.find(member => member.user.id !== currentUserId);
 
   return (
     <Link
@@ -31,16 +31,16 @@ const ChatCard: React.FC<ChatCardProps> = ({ channel, currentUserId }) => {
       <div className="relative">
         <Avatar className="h-8 w-8">
           <AvatarImage
-            src={chatPartner.user.avatarUrl ?? undefined}
+            src={chatPartner?.user.avatarUrl ?? undefined}
             className="object-cover"
-            alt={chatPartner.user.avatarUrl ?? undefined}
+            alt={chatPartner?.user.avatarUrl ?? undefined}
           />
           <AvatarFallback>
-            {chatPartner.user.username?.charAt(0).toUpperCase()}
+            {chatPartner?.user.username?.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
       </div>
-      <p className="text-sm">{chatPartner.user.username}</p>
+      <p className="text-sm">{chatPartner?.user.username}</p>
     </Link>
   );
 };
